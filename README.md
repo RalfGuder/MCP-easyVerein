@@ -2,6 +2,42 @@
 
 Ein lokaler MCP-Server (Model Context Protocol) zur Anbindung der [easyVerein API](https://easyverein.com/api/). Ermöglicht KI-Assistenten wie Claude den direkten Zugriff auf Vereinsdaten.
 
+## Systemvoraussetzungen
+
+Der MCP-Server kann auf zwei Wegen betrieben werden:
+
+### Option 1: Docker (empfohlen)
+
+| Komponente | Mindestversion |
+|-----------|---------------|
+| Docker | 20.10+ |
+
+```bash
+docker build -t mcp-easyverein .
+docker run --env EASYVEREIN_API_TOKEN=<token> mcp-easyverein
+```
+
+### Option 2: Nativ mit .NET 8 SDK
+
+| Komponente | Mindestversion |
+|-----------|---------------|
+| .NET 8 SDK | 8.0+ (LTS) |
+
+**Unterstützte Betriebssysteme:** Windows, Linux, macOS (x86_64 / ARM64)
+
+```bash
+dotnet build
+dotnet run
+```
+
+### Getestete Plattformen
+
+| Betriebssystem | Architektur | Status |
+|---------------|-------------|--------|
+| Ubuntu 24.04 LTS | x86_64 | Unterstützt |
+| Windows 10/11 | x86_64 | Unterstützt |
+| macOS 13+ | x86_64 / ARM64 | Unterstützt |
+
 ## Branch-Strategie
 
 Dieses Projekt verwendet **GitHub Flow** als Branch-Strategie.
