@@ -24,7 +24,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
         // Authentifizierung (FR-002)
         _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {config.ApiToken}");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {config.ApiKey}");
     }
 
     private string BuildUrl(string resource, string? apiVersionOverride = null)

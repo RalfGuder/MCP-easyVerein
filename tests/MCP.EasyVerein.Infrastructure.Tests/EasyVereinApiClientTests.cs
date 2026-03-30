@@ -16,8 +16,8 @@ public class EasyVereinApiClientTests
         };
         var config = new EasyVereinConfiguration
         {
-            ApiToken = "test-token",
-            BaseUrl = "https://easyverein.com/api",
+            ApiKey = "test-token",
+            ApiUrl = "https://easyverein.com/api",
             ApiVersion = "v1.7"
         };
         return new EasyVereinApiClient(httpClient, config);
@@ -124,7 +124,7 @@ public class EasyVereinApiClientTests
     {
         var handler = new FakeHttpHandler(HttpStatusCode.OK, "{}");
         var httpClient = new HttpClient(handler);
-        var config = new EasyVereinConfiguration { ApiToken = "my-secret-token" };
+        var config = new EasyVereinConfiguration { ApiKey = "my-secret-token" };
 
         _ = new EasyVereinApiClient(httpClient, config);
 
