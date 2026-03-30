@@ -1,37 +1,39 @@
 using MCP.EasyVerein.Domain.ValueObjects;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MCP.EasyVerein.Application.Configuration;
 
 /// <summary>
-/// Konfiguration für den easyVerein MCP-Server (FR-008, FR-013).
+/// Konfiguration für den easyVerein MCP-Server (FR-008, FR-013, FR-041–FR-044).
 /// </summary>
 public class EasyVereinConfiguration
 {
-    public const string EnvironmentVariableToken = "EASYVEREIN_API_TOKEN";
-    public const string EnvironmentVariableBaseUrl = "EASYVEREIN_BASE_URL";
+    public const string EnvironmentVariableApiKey     = "EASYVEREIN_API_KEY";
+    public const string EnvironmentVariableApiUrl     = "EASYVEREIN_API_URL";
     public const string EnvironmentVariableApiVersion = "EASYVEREIN_API_VERSION";
 
-    public const string DefaultBaseUrl = "https://easyverein.com/api";
+    public const string DefaultApiUrl = "https://easyverein.com/api";
 
-    public string ApiToken { get; set; } = string.Empty;
-    public string BaseUrl { get; set; } = DefaultBaseUrl;
+    public string ApiKey     { get; set; } = string.Empty;
+    public string ApiUrl     { get; set; } = DefaultApiUrl;
     public string ApiVersion { get; set; } = Domain.ValueObjects.ApiVersion.Default.Version;
 
     /// <summary>
-    /// Erstellt Konfiguration aus Umgebungsvariablen (FR-008).
+    /// Erstellt Konfiguration aus Umgebungsvariablen (FR-008). Legacy-Methode.
     /// </summary>
     public static EasyVereinConfiguration FromEnvironment()
     {
-        var token = Environment.GetEnvironmentVariable(EnvironmentVariableToken);
-        if (string.IsNullOrEmpty(token))
+        var apiKey = Environment.GetEnvironmentVariable(EnvironmentVariableApiKey);
+        if (string.IsNullOrEmpty(apiKey))
             throw new InvalidOperationException(
-                $"Umgebungsvariable '{EnvironmentVariableToken}' ist nicht gesetzt. " +
-                "Bitte setzen Sie Ihren easyVerein API-Token.");
+                $"Umgebungsvariable '{EnvironmentVariableApiKey}' ist nicht gesetzt. " +
+                "Bitte setzen Sie Ihren easyVerein API-Schlüssel.");
 
         var config = new EasyVereinConfiguration
         {
-            ApiToken = token,
-            BaseUrl = Environment.GetEnvironmentVariable(EnvironmentVariableBaseUrl) ?? DefaultBaseUrl,
+            ApiKey     = apiKey,
+            ApiUrl     = Environment.GetEnvironmentVariable(EnvironmentVariableApiUrl) ?? DefaultApiUrl,
             ApiVersion = Environment.GetEnvironmentVariable(EnvironmentVariableApiVersion)
                          ?? Domain.ValueObjects.ApiVersion.Default.Version
         };
@@ -43,6 +45,45 @@ public class EasyVereinConfiguration
     }
 
     /// <summary>
+    /// Erstellt Konfiguration aus IConfiguration (FR-041–FR-043).
+    /// CLI-Parameter überschreiben Env-Vars (Priorität via IConfiguration-Provider-Reihenfolge).
+    /// Fehlende Werte lösen eine Warnung aus; es wird der Standardwert verwendet.
+    /// </summary>
+    public static EasyVereinConfiguration FromConfiguration(IConfiguration configuration, ILogger logger)
+    {
+        var apiVersion = Resolve(
+            configuration, EnvironmentVariableApiVersion,
+            Domain.ValueObjects.ApiVersion.Default.Version,
+            "api-version", logger);
+
+        // Ungültige API-Version führt zu einer Exception (gewollt, FR-015)
+        Domain.ValueObjects.ApiVersion.Create(apiVersion);
+
+        return new EasyVereinConfiguration
+        {
+            ApiKey     = Resolve(configuration, EnvironmentVariableApiKey, string.Empty, "api-key", logger),
+            ApiUrl     = Resolve(configuration, EnvironmentVariableApiUrl, DefaultApiUrl, "api-url", logger),
+            ApiVersion = apiVersion
+        };
+    }
+
+    private static string Resolve(
+        IConfiguration configuration, string key, string defaultValue,
+        string paramName, ILogger logger)
+    {
+        var value = configuration[key];
+        if (string.IsNullOrEmpty(value))
+        {
+            logger.LogWarning(
+                "Konfigurationswert '{Key}' nicht gesetzt (weder --{Param} noch Umgebungsvariable). " +
+                "Standardwert wird verwendet: '{Default}'",
+                key, paramName, defaultValue);
+            return defaultValue;
+        }
+        return value;
+    }
+
+    /// <summary>
     /// Gibt die vollständige Basis-URL inkl. Version zurück.
     /// </summary>
     public string GetVersionedBaseUrl(string? versionOverride = null)
@@ -51,6 +92,6 @@ public class EasyVereinConfiguration
         if (versionOverride != null)
             Domain.ValueObjects.ApiVersion.Create(versionOverride);
 
-        return $"{BaseUrl.TrimEnd('/')}/{version}";
+        return $"{ApiUrl.TrimEnd('/')}/{version}";
     }
 }
