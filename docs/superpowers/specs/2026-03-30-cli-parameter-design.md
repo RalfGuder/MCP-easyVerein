@@ -72,15 +72,15 @@ var switchMappings = new Dictionary<string, string>
 };
 builder.Configuration.AddCommandLine(args, switchMappings);
 
-// 3. EasyVereinConfiguration via IOptions<T> binden (FR-041–FR-043)
-builder.Services.AddOptions<EasyVereinConfiguration>()
-    .Configure<IConfiguration, ILogger<EasyVereinConfiguration>>(
-        (cfg, config, logger) =>
-        {
-            cfg.ApiKey     = Resolve(config, "EASYVEREIN_API_KEY",     string.Empty,                        "api-key",     logger);
-            cfg.ApiUrl     = Resolve(config, "EASYVEREIN_API_URL",     EasyVereinConfiguration.DefaultApiUrl, "api-url",   logger);
-            cfg.ApiVersion = Resolve(config, "EASYVEREIN_API_VERSION", ApiVersion.Default.Version,           "api-version", logger);
-        });
+// 3. EasyVereinConfiguration via AddSingleton + FromConfiguration (FR-041–FR-043)
+// Abweichung vom ursprünglichen IOptions<T>-Ansatz: Factory-Methode direkt testbar,
+// kein IOptions<T>-Wrapper nötig für Consumer.
+builder.Services.AddSingleton(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var logger = sp.GetRequiredService<ILogger<EasyVereinConfiguration>>();
+    return EasyVereinConfiguration.FromConfiguration(configuration, logger);
+});
 
 static string Resolve(IConfiguration config, string key, string defaultValue,
                       string paramName, ILogger logger)
