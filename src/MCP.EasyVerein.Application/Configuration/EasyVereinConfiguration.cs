@@ -1,4 +1,4 @@
-using MCP.EasyVerein.Domain.ValueObjects;
+using ApiVersionVO = MCP.EasyVerein.Domain.ValueObjects.ApiVersion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -15,9 +15,9 @@ public class EasyVereinConfiguration
 
     public const string DefaultApiUrl = "https://easyverein.com/api";
 
-    public string ApiKey     { get; set; } = string.Empty;
-    public string ApiUrl     { get; set; } = DefaultApiUrl;
-    public string ApiVersion { get; set; } = Domain.ValueObjects.ApiVersion.Default.Version;
+    public string ApiKey     { get; init; } = string.Empty;
+    public string ApiUrl     { get; init; } = DefaultApiUrl;
+    public string ApiVersion { get; init; } = ApiVersionVO.Default.Version;
 
     /// <summary>
     /// Erstellt Konfiguration aus Umgebungsvariablen (FR-008). Legacy-Methode.
@@ -35,11 +35,11 @@ public class EasyVereinConfiguration
             ApiKey     = apiKey,
             ApiUrl     = Environment.GetEnvironmentVariable(EnvironmentVariableApiUrl) ?? DefaultApiUrl,
             ApiVersion = Environment.GetEnvironmentVariable(EnvironmentVariableApiVersion)
-                         ?? Domain.ValueObjects.ApiVersion.Default.Version
+                         ?? ApiVersionVO.Default.Version
         };
 
         // API-Version validieren (FR-015)
-        Domain.ValueObjects.ApiVersion.Create(config.ApiVersion);
+        ApiVersionVO.Create(config.ApiVersion);
 
         return config;
     }
@@ -53,11 +53,11 @@ public class EasyVereinConfiguration
     {
         var apiVersion = Resolve(
             configuration, EnvironmentVariableApiVersion,
-            Domain.ValueObjects.ApiVersion.Default.Version,
+            ApiVersionVO.Default.Version,
             "api-version", logger);
 
         // Ungültige API-Version führt zu einer Exception (gewollt, FR-015)
-        Domain.ValueObjects.ApiVersion.Create(apiVersion);
+        ApiVersionVO.Create(apiVersion);
 
         return new EasyVereinConfiguration
         {
@@ -90,7 +90,7 @@ public class EasyVereinConfiguration
     {
         var version = versionOverride ?? ApiVersion;
         if (versionOverride != null)
-            Domain.ValueObjects.ApiVersion.Create(versionOverride);
+            ApiVersionVO.Create(versionOverride);
 
         return $"{ApiUrl.TrimEnd('/')}/{version}";
     }

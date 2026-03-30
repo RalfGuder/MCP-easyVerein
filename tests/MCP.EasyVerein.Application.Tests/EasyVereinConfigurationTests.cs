@@ -1,4 +1,5 @@
 using MCP.EasyVerein.Application.Configuration;
+using ApiVersionVO = MCP.EasyVerein.Domain.ValueObjects.ApiVersion;
 
 namespace MCP.EasyVerein.Application.Tests;
 
@@ -12,7 +13,7 @@ public class EasyVereinConfigurationTests
         var config = new EasyVereinConfiguration();
 
         Assert.Equal("https://easyverein.com/api", config.ApiUrl);
-        Assert.Equal("v1.7", config.ApiVersion);
+        Assert.Equal(ApiVersionVO.Default.Version, config.ApiVersion);
         Assert.Equal(string.Empty, config.ApiKey);
     }
 
@@ -156,7 +157,7 @@ public class EasyVereinConfigurationTests
 
         var config = EasyVereinConfiguration.FromConfiguration(configuration, NullLogger.Instance);
 
-        Assert.Equal("v1.7", config.ApiVersion);
+        Assert.Equal(ApiVersionVO.Default.Version, config.ApiVersion);
     }
 
     [Fact]
