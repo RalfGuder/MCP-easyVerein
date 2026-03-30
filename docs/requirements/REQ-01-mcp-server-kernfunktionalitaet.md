@@ -1,8 +1,8 @@
 # REQ-01: MCP-Server Kernfunktionalität
 
 > **Thema:** MCP-Server und easyVerein API-Anbindung
-> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5)
-> **Stand:** 2026-03-29
+> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12)
+> **Stand:** 2026-03-30
 
 ## Übersicht
 
@@ -28,6 +28,10 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 | FR-014 | API-Version pro MCP-Tool-Aufruf als Parameter überschreibbar | Should | US-0005 |
 | FR-015 | Fehlermeldung mit Vorschlag der nächstmöglichen Version bei ungültiger API-Version | Should | US-0005 |
 | FR-016 | SSE als zusätzlicher Transportkanal | Could | US-0001 |
+| FR-041 | Konfiguration über Kommandozeilenparameter (`--api-url`, `--api-version`, `--api-key`) | Must | US-0007 |
+| FR-042 | CLI-Parameter überschreiben Umgebungsvariablen (Priorität: CLI > Env-Var > Default) | Must | US-0007 |
+| FR-043 | Warnung bei fehlendem Konfigurationswert, Fallback auf Standardwert | Must | US-0007 |
+| FR-044 | `--help`-Parameter dokumentiert alle verfügbaren Startparameter | Must | US-0007 |
 
 ### FR-001: MCP-Server lokal über stdio erreichbar
 
@@ -84,12 +88,13 @@ CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Re
 
 **Priorität:** Must | **Herkunft:** US-0001
 
-Der Server muss über Umgebungsvariablen konfigurierbar sein (mindestens API-Token und Basis-URL).
+Der Server muss über Umgebungsvariablen konfigurierbar sein (mindestens API-Token und Basis-URL). Umgebungsvariablen haben Vorrang vor Standardwerten, werden aber durch CLI-Parameter überschrieben (siehe FR-042).
 
 **Akzeptanzkriterien:**
-- [ ] `EASYVEREIN_API_TOKEN` wird als Umgebungsvariable unterstützt
-- [ ] `EASYVEREIN_BASE_URL` wird als Umgebungsvariable unterstützt
-- [ ] Fehlende Pflicht-Variablen führen zu aussagekräftiger Fehlermeldung beim Start
+- [ ] `EASYVEREIN_API_KEY` wird als Umgebungsvariable unterstützt
+- [ ] `EASYVEREIN_API_URL` wird als Umgebungsvariable unterstützt
+- [ ] `EASYVEREIN_API_VERSION` wird als Umgebungsvariable unterstützt
+- [ ] Fehlende Pflicht-Variablen führen zu Warnung und Nutzung des Standardwerts (siehe FR-043)
 
 ### FR-009: Konfiguration über Konfigurationsdatei
 
@@ -136,6 +141,53 @@ Bei einer nicht unterstützten API-Version wird eine hilfreiche Fehlermeldung mi
 - [ ] Fehlermeldung schlägt die nächstmögliche unterstützte Version vor
 - [ ] Liste aller unterstützten Versionen wird angezeigt
 
+### FR-041: Konfiguration über Kommandozeilenparameter
+
+**Priorität:** Must | **Herkunft:** US-0007
+
+Der Server akzeptiert beim Start die Parameter `--api-url`, `--api-version` und `--api-key`.
+
+**Akzeptanzkriterien:**
+- [ ] `--api-url` setzt die Basis-URL der easyVerein API
+- [ ] `--api-version` setzt die zu verwendende API-Version
+- [ ] `--api-key` setzt den API-Schlüssel für die Authentifizierung
+- [ ] Unbekannte Parameter führen zu einer Fehlermeldung mit Hinweis auf `--help`
+
+### FR-042: Prioritätsreihenfolge CLI > Env-Var > Default
+
+**Priorität:** Must | **Herkunft:** US-0007
+
+Konfigurationswerte werden in der Reihenfolge CLI-Parameter → Umgebungsvariablen → Standardwerte aufgelöst.
+
+**Akzeptanzkriterien:**
+- [ ] CLI-Parameter überschreiben gleichnamige Umgebungsvariablen
+- [ ] Umgebungsvariablen überschreiben Standardwerte
+- [ ] Prioritätsreihenfolge ist in `--help` und Dokumentation beschrieben
+
+### FR-043: Warnung bei fehlendem Konfigurationswert
+
+**Priorität:** Must | **Herkunft:** US-0007
+
+Fehlt ein Konfigurationswert auf allen Ebenen (CLI, Env-Var), wird eine Warnung ausgegeben und ein Standardwert verwendet.
+
+**Akzeptanzkriterien:**
+- [ ] Warnung enthält den Namen des fehlenden Parameters
+- [ ] Warnung nennt den verwendeten Standardwert
+- [ ] Server startet trotz Warnung weiter (kein Abbruch)
+- [ ] Standardwerte sind im Code dokumentiert
+
+### FR-044: `--help`-Parameter
+
+**Priorität:** Must | **Herkunft:** US-0007
+
+Der Server gibt bei `--help` eine strukturierte Übersicht aller unterstützten Startparameter aus.
+
+**Akzeptanzkriterien:**
+- [ ] Alle Parameter (`--api-url`, `--api-version`, `--api-key`) sind aufgeführt
+- [ ] Beschreibung, Typ und Standardwert je Parameter sind angegeben
+- [ ] Zugehörige Umgebungsvariable je Parameter ist angegeben
+- [ ] Prioritätsreihenfolge (CLI > Env-Var > Default) ist beschrieben
+
 ### FR-016: SSE als Transportkanal
 
 **Priorität:** Could | **Herkunft:** US-0001
@@ -158,6 +210,7 @@ SSE (Server-Sent Events) soll als zusätzlicher Transportkanal neben stdio unter
 | NFR-004 | Versionsabstraktion erweiterbar mit minimalem Aufwand | Should | US-0005 |
 | NFR-005 | Dokumentation: Installations-/Konfigurationsanleitung | Must | US-0001 |
 | NFR-006 | Dokumentation der Versionskonfiguration | Should | US-0005 |
+| NFR-023 | Dokumentation aller CLI-Parameter und Konfigurationsquellen im README | Must | US-0007 |
 
 ### NFR-001: Fehlerbehandlung bei ungültigen API-Tokens
 
@@ -224,6 +277,18 @@ Die Konfiguration der API-Versionierung muss dokumentiert sein.
 - [ ] Konfiguration über Umgebungsvariable ist beschrieben
 - [ ] Override-Mechanismus pro Aufruf ist dokumentiert
 
+### NFR-023: Dokumentation aller Konfigurationsquellen
+
+**Priorität:** Must | **Herkunft:** US-0007
+
+Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) und ihre Prioritätsreihenfolge sind im README dokumentiert.
+
+**Akzeptanzkriterien:**
+- [ ] CLI-Parameter (`--api-url`, `--api-version`, `--api-key`) sind im README beschrieben
+- [ ] Zugehörige Umgebungsvariablen je Parameter sind aufgeführt
+- [ ] Prioritätsreihenfolge CLI > Env-Var > Default ist erklärt
+- [ ] Mindestens ein Beispielaufruf mit CLI-Parametern ist enthalten
+
 ---
 
 ## Abhängigkeiten
@@ -233,6 +298,9 @@ Die Konfiguration der API-Versionierung muss dokumentiert sein.
 | FR-003 bis FR-007 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
 | FR-010 bis FR-015 | FR-001 | Versionierung setzt laufenden Server voraus |
 | FR-014 | FR-012, FR-013 | Override setzt Standard-Version voraus |
+| FR-042 | FR-008, FR-041 | Prioritätslogik setzt beide Konfigurationsquellen voraus |
+| FR-043 | FR-041, FR-042 | Fallback-Logik setzt Prioritätsauflösung voraus |
+| FR-044 | FR-041 | --help setzt definierte CLI-Parameter voraus |
 | Alle FR | REQ-02 (NFR-008) | Clean Architecture definiert die Projektstruktur |
 
 ## Offene Fragen
