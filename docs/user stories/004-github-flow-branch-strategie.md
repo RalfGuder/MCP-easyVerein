@@ -10,23 +10,25 @@
 
 ## Akzeptanzkriterien
 
-- [ ] `main` ist immer stabil und deploybar
-- [ ] Für jede User Story / jedes Issue wird ein eigener Feature-Branch erstellt
-- [ ] Branch-Namenskonvention ist definiert: `feature/US-XXXX-kurzbeschreibung` bzw. `fix/kurzbeschreibung`
-- [ ] Änderungen werden über Pull Requests in `main` integriert
-- [ ] CI/CD-Pipeline prüft Tests vor dem Merge (siehe US-0003)
-- [ ] Feature-Branches werden nach dem Merge gelöscht
-- [ ] Die Branch-Strategie ist im README dokumentiert
+- [x] `main` ist immer stabil und deploybar *(alle Merges über PRs, Tests grün)*
+- [x] Für jede User Story / jedes Issue wird ein eigener Feature-Branch erstellt *(z.B. `feature/US-0001-easyverein-mcp-server`)*
+- [x] Branch-Namenskonvention ist definiert: `feature/US-XXXX-kurzbeschreibung` bzw. `fix/kurzbeschreibung` *(angewandt und im README dokumentiert)*
+- [x] Änderungen werden über Pull Requests in `main` integriert *(PRs #7, #8, #9, #10)*
+- [x] CI/CD-Pipeline prüft Tests vor dem Merge *(`.github/workflows/build.yml` als PR-Check)*
+- [ ] Feature-Branches werden nach dem Merge gelöscht *(GitHub-Einstellung noch nicht konfiguriert)*
+- [x] Die Branch-Strategie ist im README dokumentiert *(README enthält Branch-Strategie-Abschnitt)*
 
 ## Aufgaben
 
-- **GitHub Flow als Standard definieren** und im Team kommunizieren
-- **Branch-Namenskonvention festlegen** und dokumentieren
-- **README erstellen/aktualisieren** mit Branch-Strategie-Abschnitt
-- **Branch-Schutzregeln** für `main` auf GitHub konfigurieren (optional)
+- [x] **GitHub Flow als Standard definieren** und dokumentieren
+- [x] **Branch-Namenskonvention festlegen** und dokumentieren
+- [x] **README erstellen/aktualisieren** mit Branch-Strategie-Abschnitt
+- [ ] **Branch-Schutzregeln** für `main` auf GitHub konfigurieren (optional)
+- [ ] **Auto-Delete** für Feature-Branches nach Merge aktivieren
 
 ## Technische Hinweise
 
-- GitHub Flow wurde gewählt, weil es für kleine Teams und einfache Release-Zyklen optimal ist
+- GitHub Flow gewählt wegen einfacher Release-Zyklen
+- CI/CD-Pipeline prüft auf Ubuntu, Windows und macOS
+- Bisherige PRs: #7 (US-006), #8 (Systemvoraussetzungen), #9 (MCP-Konfiguration), #10 (MCP-Server)
 - Git Flow (mit `develop`, `release`, `hotfix`) wäre Overhead ohne Mehrwert für dieses Projekt
-- Die Branch-Strategie ergänzt sich mit der TDD-Entscheidung aus US-0003 (CI/CD prüft Tests vor Merge)
