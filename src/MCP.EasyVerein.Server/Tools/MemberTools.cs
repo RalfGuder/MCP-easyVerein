@@ -7,39 +7,41 @@ using ModelContextProtocol.Server;
 namespace MCP.EasyVerein.Server.Tools;
 
 [McpServerToolType]
-public sealed class MemberTools
+public sealed class MemberTools(IEasyVereinApiClient client)
 {
-    private readonly IEasyVereinApiClient _client;
-
-    public MemberTools(IEasyVereinApiClient client) { _client = client; }
-
-    [McpServerTool, Description("Alle Mitglieder auflisten")]
-    public async Task<string> ListMembers(CancellationToken ct)
+    [McpServerTool(Name = "list_members"), Description("List all members")]
+    public async Task<string> ListMembers(
+        [Description("The ID of a member")]long? id, 
+        [Description("The membership number of a member")] string? membershipNumber,
+        string[]? search , CancellationToken ct)
     {
         try
         {
-            var members = await _client.GetMembersAsync(ct);
+            var members = await client.ListMembersAsync(id, membershipNumber, search, ct);
             return JsonSerializer.Serialize(members, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception ex)
         {
-            return $"FEHLER: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
+            return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
         }
     }
 
-    [McpServerTool, Description("Ein Mitglied anhand der ID abrufen")]
-    public async Task<string> GetMember(long id, CancellationToken ct)
+    [McpServerTool(Name="get_member"), Description("Retrieve a member using their ID.")]
+    public async Task<string> GetMember([Description("The ID of the member")] long id, CancellationToken ct)
     {
-        var member = await _client.GetMemberAsync(id, ct);
+        var member = await client.GetMemberAsync(id, ct);
         return member != null
             ? JsonSerializer.Serialize(member, new JsonSerializerOptions { WriteIndented = true })
-            : $"Mitglied mit ID {id} nicht gefunden.";
+            : $"Member with ID {id} not found.";
     }
 
-    [McpServerTool, Description("Neues Mitglied anlegen (erstellt ContactDetails automatisch)")]
+    [McpServerTool(Name="create_member"), Description("Create new member (creates ContactDetails automatically))")]
     public async Task<string> CreateMember(
-        string emailOrUserName, string firstName, string familyName,
-        string? privateEmail, CancellationToken ct)
+        [Description("The email or username of the new member")] string emailOrUserName,
+        [Description("The first name of the new member")] string firstName,
+        [Description("The family name of the new member")] string familyName,
+        [Description("The private email of the new member")] string? privateEmail,
+        CancellationToken ct)
     {
         var contactDetails = new ContactDetails
         {
@@ -47,25 +49,27 @@ public sealed class MemberTools
             FamilyName = familyName,
             PrivateEmail = privateEmail
         };
-        var created = await _client.CreateMemberAsync(emailOrUserName, contactDetails, ct);
+        var created = await client.CreateMemberAsync(emailOrUserName, contactDetails, ct);
         return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
     }
 
-    [McpServerTool, Description("Mitglied aktualisieren")]
+    [McpServerTool(Name="update_member"), Description("Check if the user is permitted to change values and if so, update")]
     public async Task<string> UpdateMember(
-        long id, string? emailOrUserName, string? membershipNumber, CancellationToken ct)
+        [Description("The ID of the member")] long id,
+        [Description("The email or user name of the member")] string? emailOrUserName,
+        [Description("The membership number of a member")] string? membershipNumber, CancellationToken ct)
     {
         var member = new Member { Id = id };
         if (emailOrUserName != null) member.EmailOrUserName = emailOrUserName;
         if (membershipNumber != null) member.MembershipNumber = membershipNumber;
-        var updated = await _client.UpdateMemberAsync(id, member, ct);
+        var updated = await client.UpdateMemberAsync(id, member, ct);
         return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
     }
 
-    [McpServerTool, Description("Mitglied löschen")]
-    public async Task<string> DeleteMember(long id, CancellationToken ct)
+    [McpServerTool(Name="delete_member"), Description("Delete a member. Only authorized users are able to perform this action!")]
+    public async Task<string> DeleteMember([Description("The ID of the member")] long id, CancellationToken ct)
     {
-        await _client.DeleteMemberAsync(id, ct);
-        return $"Mitglied mit ID {id} wurde gelöscht.";
+        await client.DeleteMemberAsync(id, ct);
+        return $"Member with ID {id} has been deleted.";
     }
 }

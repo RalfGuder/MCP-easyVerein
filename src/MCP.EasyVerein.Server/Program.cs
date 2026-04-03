@@ -59,6 +59,7 @@ builder.Services
 
 var app = builder.Build();
 await app.RunAsync();
+var xx = app.Services.GetService<MemberTools>();
 
 static void PrintHelp()
 {

@@ -16,8 +16,15 @@ public sealed class InvoiceTools
     [McpServerTool, Description("Alle Rechnungen auflisten")]
     public async Task<string> ListInvoices(CancellationToken ct)
     {
-        var invoices = await _client.GetInvoicesAsync(ct);
-        return JsonSerializer.Serialize(invoices, new JsonSerializerOptions { WriteIndented = true });
+        try
+        {
+            var invoices = await _client.GetInvoicesAsync(ct);
+            return JsonSerializer.Serialize(invoices, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch (Exception ex)
+        {
+            return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
+        }
     }
 
     [McpServerTool, Description("Eine Rechnung anhand der ID abrufen")]

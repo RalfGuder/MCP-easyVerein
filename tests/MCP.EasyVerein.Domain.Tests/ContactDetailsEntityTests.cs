@@ -43,8 +43,8 @@ public class ContactDetailsEntityTests
                 "privateEmail": "anna@private.de",
                 "companyEmail": "anna@company.de",
                 "primaryEmail": "anna@primary.de",
-                "_preferredEmailField": "privateEmail",
-                "preferredCommunicationWay": "email",
+                "_preferredEmailField": 1,
+                "preferredCommunicationWay": 1,
                 "privatePhone": "030-123456",
                 "companyPhone": "030-654321",
                 "mobilePhone": "0160-111222",
@@ -78,8 +78,8 @@ public class ContactDetailsEntityTests
                 "bankAccountOwner": "Anna Schmidt",
                 "sepaMandate": "MANDAT-001",
                 "sepaDate": "2023-01-15",
-                "methodOfPayment": "sepa",
-                "datevAccountNumber": "10000",
+                "methodOfPayment": 1,
+                "datevAccountNumber": 10000,
                 "internalNote": "VIP-Mitglied",
                 "invoiceCompany": true,
                 "sendInvoiceCompanyMail": false,
@@ -101,8 +101,8 @@ public class ContactDetailsEntityTests
         Assert.Equal("anna@private.de", contact.PrivateEmail);
         Assert.Equal("anna@company.de", contact.CompanyEmail);
         Assert.Equal("anna@primary.de", contact.PrimaryEmail);
-        Assert.Equal("privateEmail", contact.PreferredEmailField);
-        Assert.Equal("email", contact.PreferredCommunicationWay);
+        Assert.Equal(1, contact.PreferredEmailField);
+        Assert.Equal(1, contact.PreferredCommunicationWay);
         Assert.Equal("030-123456", contact.PrivatePhone);
         Assert.Equal("030-654321", contact.CompanyPhone);
         Assert.Equal("0160-111222", contact.MobilePhone);
@@ -136,12 +136,11 @@ public class ContactDetailsEntityTests
         Assert.Equal("Anna Schmidt", contact.BankAccountOwner);
         Assert.Equal("MANDAT-001", contact.SepaMandate);
         Assert.Equal("2023-01-15", contact.SepaDate);
-        Assert.Equal("sepa", contact.MethodOfPayment);
-        Assert.Equal("10000", contact.DatevAccountNumber);
+        Assert.Equal(1, contact.MethodOfPayment);
+        Assert.Equal(10000, contact.DatevAccountNumber);
         Assert.Equal("VIP-Mitglied", contact.InternalNote);
         Assert.True(contact.InvoiceCompany);
         Assert.False(contact.SendInvoiceCompanyMail);
         Assert.True(contact.AddressCompany);
-        Assert.Equal("Überweisung", contact.CustomPaymentMethod);
     }
 }

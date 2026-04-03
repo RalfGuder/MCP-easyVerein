@@ -58,7 +58,7 @@ public class EasyVereinApiClientTests
         var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
         var client = CreateClient(handler);
 
-        var result = await client.GetMembersAsync();
+        var result = await client.ListMembersAsync();
 
         Assert.Single(result);
         Assert.Equal("max@test.de", result[0].EmailOrUserName);
@@ -81,7 +81,7 @@ public class EasyVereinApiClientTests
             new[] { (HttpStatusCode.OK, page1), (HttpStatusCode.OK, page2) });
         var client = CreateClient(handler);
 
-        var result = await client.GetMembersAsync();
+        var result = await client.ListMembersAsync();
 
         Assert.Equal(2, result.Count);
         Assert.Equal("user1@test.de", result[0].EmailOrUserName);
@@ -99,7 +99,7 @@ public class EasyVereinApiClientTests
         var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
         var client = CreateClient(handler);
 
-        await client.GetMembersAsync();
+        await client.ListMembersAsync();
 
         Assert.NotNull(handler.LastRequestUri);
         Assert.Contains("query=", handler.LastRequestUri!.Query);
@@ -112,7 +112,7 @@ public class EasyVereinApiClientTests
         var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
         var client = CreateClient(handler);
 
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.GetMembersAsync());
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListMembersAsync());
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class EasyVereinApiClientTests
         var handler = new FakeHttpHandler(HttpStatusCode.BadRequest, errorBody);
         var client = CreateClient(handler);
 
-        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetMembersAsync());
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.ListMembersAsync());
 
         Assert.Contains("400", ex.Message);
         Assert.Contains("Invalid query field", ex.Message);
@@ -135,7 +135,7 @@ public class EasyVereinApiClientTests
         var handler = new FakeHttpHandler(HttpStatusCode.InternalServerError, errorBody);
         var client = CreateClient(handler);
 
-        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetMembersAsync());
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.ListMembersAsync());
 
         Assert.Contains("500", ex.Message);
         Assert.Contains("Internal server error", ex.Message);
@@ -254,7 +254,7 @@ public class EasyVereinApiClientTests
         var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
         var client = CreateClient(handler);
 
-        var result = await client.GetContactDetailsAsync();
+        var result = await client.ListContactDetailsAsync();
 
         Assert.Single(result);
         Assert.Equal("Anna", result[0].FirstName);
