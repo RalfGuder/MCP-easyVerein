@@ -1,7 +1,7 @@
 # REQ-01: MCP-Server Kernfunktionalität
 
 > **Thema:** MCP-Server und easyVerein API-Anbindung
-> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16)
+> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20)
 > **Stand:** 2026-04-03
 
 ## Übersicht
@@ -18,6 +18,10 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 | FR-004 | CRUD-Operationen für Mitglieder | Must | US-0001 |
 | FR-005 | CRUD-Operationen für Rechnungen | Must | US-0001 |
 | FR-045 | CRUD-Operationen für Buchungen | Must | US-0001, US-0009 |
+| FR-046 | CRUD-Operationen für Ankündigungen | Must | US-0010 |
+| FR-047 | CRUD-Operationen für Bankkonten | Must | US-0011 |
+| FR-048 | CRUD-Operationen für Abrechnungskonten | Must | US-0012 |
+| FR-049 | CRUD-Operationen für Buchungsprojekte | Must | US-0013 |
 | FR-006 | CRUD-Operationen für Veranstaltungen | Must | US-0001 |
 | FR-007 | CRUD-Operationen für Kontaktdaten | Must | US-0001 |
 | FR-008 | Konfiguration über Umgebungsvariablen (API-Token, Basis-URL) | Must | US-0001 |
@@ -80,6 +84,10 @@ CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Re
 | FR-006 | Veranstaltungen | `/event` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-007 | Kontaktdaten | `/contact-details` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-045 | Buchungen | `/booking` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-046 | Ankündigungen | `/announcement` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-047 | Bankkonten | `/bank-account` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-048 | Abrechnungskonten | `/billing-account` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-049 | Buchungsprojekte | `/booking-project` | Anlegen, Abfragen, Bearbeiten, Löschen |
 
 **Akzeptanzkriterien (je Ressource):**
 - [ ] Alle vier CRUD-Operationen als MCP-Tools verfügbar
@@ -100,6 +108,70 @@ CRUD-Operationen für Buchungen über den separaten easyVerein `/booking`-Endpoi
 - [ ] `UpdateBooking` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
 - [ ] `DeleteBooking` MCP-Tool zum Löschen von Buchungen
 - [ ] `Booking`-Entity mit `BookingFields`-Konstanten und `BookingQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-046: CRUD-Operationen für Ankündigungen
+
+**Priorität:** Must | **Herkunft:** US-0010
+
+CRUD-Operationen für Ankündigungen über den easyVerein `/announcement`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListAnnouncements` MCP-Tool mit Filterung nach ID, Datum, Mitglied
+- [ ] `GetAnnouncement` MCP-Tool zum Abrufen einzelner Ankündigungen
+- [ ] `CreateAnnouncement` MCP-Tool zum Anlegen neuer Ankündigungen
+- [ ] `UpdateAnnouncement` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteAnnouncement` MCP-Tool zum Löschen von Ankündigungen
+- [ ] `Announcement`-Entity mit `AnnouncementFields`-Konstanten und `AnnouncementQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-047: CRUD-Operationen für Bankkonten
+
+**Priorität:** Must | **Herkunft:** US-0011
+
+CRUD-Operationen für Bankkonten über den easyVerein `/bank-account`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListBankAccounts` MCP-Tool mit Filterung nach ID
+- [ ] `GetBankAccount` MCP-Tool zum Abrufen einzelner Bankkonten
+- [ ] `CreateBankAccount` MCP-Tool zum Anlegen neuer Bankkonten
+- [ ] `UpdateBankAccount` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteBankAccount` MCP-Tool zum Löschen von Bankkonten
+- [ ] `BankAccount`-Entity mit `BankAccountFields`-Konstanten und `BankAccountQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-048: CRUD-Operationen für Abrechnungskonten
+
+**Priorität:** Must | **Herkunft:** US-0012
+
+CRUD-Operationen für Abrechnungskonten über den easyVerein `/billing-account`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListBillingAccounts` MCP-Tool mit Filterung nach ID
+- [ ] `GetBillingAccount` MCP-Tool zum Abrufen einzelner Abrechnungskonten
+- [ ] `CreateBillingAccount` MCP-Tool zum Anlegen neuer Abrechnungskonten
+- [ ] `UpdateBillingAccount` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteBillingAccount` MCP-Tool zum Löschen von Abrechnungskonten
+- [ ] `BillingAccount`-Entity mit `BillingAccountFields`-Konstanten und `BillingAccountQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-049: CRUD-Operationen für Buchungsprojekte
+
+**Priorität:** Must | **Herkunft:** US-0013
+
+CRUD-Operationen für Buchungsprojekte über den easyVerein `/booking-project`-Endpoint. Buchungsprojekte dienen der thematischen Gruppierung von Buchungen.
+
+**Akzeptanzkriterien:**
+- [ ] `ListBookingProjects` MCP-Tool mit Filterung nach ID
+- [ ] `GetBookingProject` MCP-Tool zum Abrufen einzelner Buchungsprojekte
+- [ ] `CreateBookingProject` MCP-Tool zum Anlegen neuer Buchungsprojekte
+- [ ] `UpdateBookingProject` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteBookingProject` MCP-Tool zum Löschen von Buchungsprojekten
+- [ ] `BookingProject`-Entity mit `BookingProjectFields`-Konstanten und `BookingProjectQuery`-Klasse
 - [ ] Error-Handling in allen Tool-Methoden
 - [ ] Pagination für Listen-Endpunkt
 
@@ -314,7 +386,7 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 | Requirement | hängt ab von | Grund |
 |-------------|-------------|-------|
-| FR-003 bis FR-007, FR-045 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
+| FR-003 bis FR-007, FR-045 bis FR-049 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
 | FR-010 bis FR-015 | FR-001 | Versionierung setzt laufenden Server voraus |
 | FR-014 | FR-012, FR-013 | Override setzt Standard-Version voraus |
 | FR-042 | FR-008, FR-041 | Prioritätslogik setzt beide Konfigurationsquellen voraus |
