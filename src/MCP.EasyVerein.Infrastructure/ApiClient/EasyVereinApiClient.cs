@@ -32,6 +32,16 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return $"{_config.GetVersionedBaseUrl(apiVersionOverride)}/{resource}";
     }
 
+    private string BuildListUrl(string resource, string query)
+    {
+        return $"{BuildUrl(resource)}?query={query}&limit=100";
+    }
+
+    private string BuildGetUrl(string resource, string query)
+    {
+        return $"{BuildUrl(resource)}?query={query}";
+    }
+
     private async Task<T> HandleResponse<T>(HttpResponseMessage response, CancellationToken ct)
     {
         // NFR-001: Fehlerbehandlung bei ungültigen API-Tokens
@@ -44,41 +54,40 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<ApiListResponse<T>>(_jsonOptions, ct);
-        if (result?.Results != null && result.Results.Any())
-            return result.Results.First();
-
         var single = await response.Content.ReadFromJsonAsync<T>(_jsonOptions, ct);
         return single ?? throw new InvalidOperationException("Leere API-Antwort.");
     }
 
-    private async Task<IReadOnlyList<T>> HandleListResponse<T>(HttpResponseMessage response, CancellationToken ct)
+    private async Task<IReadOnlyList<T>> HandleListResponseWithPagination<T>(
+        string initialUrl, CancellationToken ct)
     {
-        if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
+        var allResults = new List<T>();
+        string? url = initialUrl;
+
+        while (url != null)
         {
-            throw new UnauthorizedAccessException(
-                $"Authentifizierung fehlgeschlagen (HTTP {(int)response.StatusCode}). " +
-                "Bitte prüfen Sie Ihren API-Token.");
+            var response = await SendWithErrorHandling(
+                () => _httpClient.GetAsync(url, ct), ct);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized
+                || response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                throw new UnauthorizedAccessException(
+                    $"Authentifizierung fehlgeschlagen (HTTP {(int)response.StatusCode}). " +
+                    "Bitte prüfen Sie Ihren API-Token.");
+            }
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync(ct);
+            var page = JsonSerializer.Deserialize<ApiListResponse<T>>(content, _jsonOptions);
+
+            if (page?.Results != null)
+                allResults.AddRange(page.Results);
+
+            url = page?.Next;
         }
 
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync(ct);
-
-        // easyVerein API gibt Listen als { "results": [...] } zurück
-        try
-        {
-            var listResponse = JsonSerializer.Deserialize<ApiListResponse<T>>(content, _jsonOptions);
-            if (listResponse?.Results != null)
-                return listResponse.Results.AsReadOnly();
-        }
-        catch (JsonException)
-        {
-            // Fallback: direktes Array
-        }
-
-        var items = JsonSerializer.Deserialize<List<T>>(content, _jsonOptions);
-        return items?.AsReadOnly() ?? (IReadOnlyList<T>)Array.Empty<T>();
+        return allResults.AsReadOnly();
     }
 
     private async Task<HttpResponseMessage> SendWithErrorHandling(
@@ -107,24 +116,26 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
     public async Task<IReadOnlyList<Member>> GetMembersAsync(CancellationToken ct = default)
     {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl("member"), ct), ct);
-        return await HandleListResponse<Member>(response, ct);
+        return await HandleListResponseWithPagination<Member>(
+            BuildListUrl("member", ApiQueries.Member), ct);
     }
 
     public async Task<Member?> GetMemberAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl($"member/{id}"), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"member/{id}", ApiQueries.Member), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         return await HandleResponse<Member>(response, ct);
     }
 
-    public async Task<Member> CreateMemberAsync(Member member, CancellationToken ct = default)
+    public async Task<Member> CreateMemberAsync(
+        string emailOrUserName, ContactDetails contactDetails, CancellationToken ct = default)
     {
+        var createdContact = await CreateContactDetailsAsync(contactDetails, ct);
+        var payload = new { emailOrUserName, contactDetails = createdContact.Id };
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("member"), member, ct), ct);
+            () => _httpClient.PostAsJsonAsync(BuildUrl("member"), payload, ct), ct);
         return await HandleResponse<Member>(response, ct);
     }
 
@@ -140,7 +151,49 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         var response = await SendWithErrorHandling(
             () => _httpClient.DeleteAsync(BuildUrl($"member/{id}"), ct), ct);
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
-            throw new UnauthorizedAccessException("Authentifizierung fehlgeschlagen.");
+            throw new UnauthorizedAccessException(
+                $"Authentifizierung fehlgeschlagen (HTTP {(int)response.StatusCode}). " +
+                "Bitte prüfen Sie Ihren API-Token.");
+        response.EnsureSuccessStatusCode();
+    }
+
+    // --- Kontaktdaten (FR-007) ---
+
+    public async Task<IReadOnlyList<ContactDetails>> GetContactDetailsAsync(CancellationToken ct = default)
+    {
+        return await HandleListResponseWithPagination<ContactDetails>(
+            BuildListUrl("contact-details", ApiQueries.ContactDetails), ct);
+    }
+
+    public async Task<ContactDetails?> GetContactDetailsAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"contact-details/{id}", ApiQueries.ContactDetails), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return null;
+        return await HandleResponse<ContactDetails>(response, ct);
+    }
+
+    public async Task<ContactDetails> CreateContactDetailsAsync(
+        ContactDetails contact, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("contact-details"), contact, ct), ct);
+        return await HandleResponse<ContactDetails>(response, ct);
+    }
+
+    public async Task<ContactDetails> UpdateContactDetailsAsync(
+        long id, ContactDetails contact, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsJsonAsync(BuildUrl($"contact-details/{id}"), contact, ct), ct);
+        return await HandleResponse<ContactDetails>(response, ct);
+    }
+
+    public async Task DeleteContactDetailsAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"contact-details/{id}"), ct), ct);
         response.EnsureSuccessStatusCode();
     }
 
@@ -148,15 +201,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
     public async Task<IReadOnlyList<Invoice>> GetInvoicesAsync(CancellationToken ct = default)
     {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl("invoice"), ct), ct);
-        return await HandleListResponse<Invoice>(response, ct);
+        return await HandleListResponseWithPagination<Invoice>(
+            BuildListUrl("invoice", ApiQueries.Invoice), ct);
     }
 
     public async Task<Invoice?> GetInvoiceAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl($"invoice/{id}"), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"invoice/{id}", ApiQueries.Invoice), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Invoice>(response, ct);
     }
@@ -186,15 +238,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
     public async Task<IReadOnlyList<Event>> GetEventsAsync(CancellationToken ct = default)
     {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl("event"), ct), ct);
-        return await HandleListResponse<Event>(response, ct);
+        return await HandleListResponseWithPagination<Event>(
+            BuildListUrl("event", ApiQueries.Event), ct);
     }
 
     public async Task<Event?> GetEventAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl($"event/{id}"), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"event/{id}", ApiQueries.Event), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Event>(response, ct);
     }
@@ -217,44 +268,6 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     {
         var response = await SendWithErrorHandling(
             () => _httpClient.DeleteAsync(BuildUrl($"event/{id}"), ct), ct);
-        response.EnsureSuccessStatusCode();
-    }
-
-    // --- Kontaktdaten (FR-007) ---
-
-    public async Task<IReadOnlyList<Contact>> GetContactsAsync(CancellationToken ct = default)
-    {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl("contact-details"), ct), ct);
-        return await HandleListResponse<Contact>(response, ct);
-    }
-
-    public async Task<Contact?> GetContactAsync(long id, CancellationToken ct = default)
-    {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildUrl($"contact-details/{id}"), ct), ct);
-        if (response.StatusCode == HttpStatusCode.NotFound) return null;
-        return await HandleResponse<Contact>(response, ct);
-    }
-
-    public async Task<Contact> CreateContactAsync(Contact contact, CancellationToken ct = default)
-    {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("contact-details"), contact, ct), ct);
-        return await HandleResponse<Contact>(response, ct);
-    }
-
-    public async Task<Contact> UpdateContactAsync(long id, Contact contact, CancellationToken ct = default)
-    {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.PatchAsJsonAsync(BuildUrl($"contact-details/{id}"), contact, ct), ct);
-        return await HandleResponse<Contact>(response, ct);
-    }
-
-    public async Task DeleteContactAsync(long id, CancellationToken ct = default)
-    {
-        var response = await SendWithErrorHandling(
-            () => _httpClient.DeleteAsync(BuildUrl($"contact-details/{id}"), ct), ct);
         response.EnsureSuccessStatusCode();
     }
 }
