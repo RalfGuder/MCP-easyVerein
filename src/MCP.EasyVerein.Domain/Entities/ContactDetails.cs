@@ -153,13 +153,13 @@ public class ContactDetails
 
     // Invoice and address preferences
     [JsonPropertyName("invoiceCompany")]
-    public bool? InvoiceCompany { get; init; }
+    public bool InvoiceCompany { get; init; }
 
     [JsonPropertyName("sendInvoiceCompanyMail")]
-    public bool? SendInvoiceCompanyMail { get; init; }
+    public bool SendInvoiceCompanyMail { get; init; }
 
     [JsonPropertyName("addressCompany")]
-    public bool? AddressCompany { get; init; }
+    public bool AddressCompany { get; init; }
 
     [JsonPropertyName("customPaymentMethod")]
     public string? CustomPaymentMethod { get; init; }
