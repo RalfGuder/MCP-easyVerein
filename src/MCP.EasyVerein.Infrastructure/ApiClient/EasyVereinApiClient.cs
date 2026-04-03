@@ -34,12 +34,12 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
     private string BuildListUrl(string resource, string query)
     {
-        return $"{BuildUrl(resource)}?query={Uri.EscapeDataString(query)}&limit=100";
+        return $"{BuildUrl(resource)}?query={query}&limit=100";
     }
 
     private string BuildGetUrl(string resource, string query)
     {
-        return $"{BuildUrl(resource)}?query={Uri.EscapeDataString(query)}";
+        return $"{BuildUrl(resource)}?query={query}";
     }
 
     private async Task<T> HandleResponse<T>(HttpResponseMessage response, CancellationToken ct)
