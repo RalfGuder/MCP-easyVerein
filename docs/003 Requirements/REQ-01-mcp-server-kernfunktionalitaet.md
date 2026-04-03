@@ -1,7 +1,7 @@
 # REQ-01: MCP-Server Kernfunktionalität
 
 > **Thema:** MCP-Server und easyVerein API-Anbindung
-> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20)
+> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20), [US-0014](https://github.com/RalfGuder/MCP-easyVerein/issues/21), [US-0015](https://github.com/RalfGuder/MCP-easyVerein/issues/22), [US-0016](https://github.com/RalfGuder/MCP-easyVerein/issues/23), [US-0017](https://github.com/RalfGuder/MCP-easyVerein/issues/24)
 > **Stand:** 2026-04-03
 
 ## Übersicht
@@ -22,6 +22,10 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 | FR-047 | CRUD-Operationen für Bankkonten | Must | US-0011 |
 | FR-048 | CRUD-Operationen für Abrechnungskonten | Must | US-0012 |
 | FR-049 | CRUD-Operationen für Buchungsprojekte | Must | US-0013 |
+| FR-050 | CRUD-Operationen für Kalender | Must | US-0014 |
+| FR-051 | CRUD-Operationen für Vorstandsebenen | Must | US-0015 |
+| FR-052 | CRUD-Operationen für Kontaktdaten-Gruppen | Must | US-0016 |
+| FR-053 | CRUD-Operationen für Kontaktdaten-Änderungsprotokolle | Must | US-0017 |
 | FR-006 | CRUD-Operationen für Veranstaltungen | Must | US-0001 |
 | FR-007 | CRUD-Operationen für Kontaktdaten | Must | US-0001 |
 | FR-008 | Konfiguration über Umgebungsvariablen (API-Token, Basis-URL) | Must | US-0001 |
@@ -88,6 +92,10 @@ CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Re
 | FR-047 | Bankkonten | `/bank-account` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-048 | Abrechnungskonten | `/billing-account` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-049 | Buchungsprojekte | `/booking-project` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-050 | Kalender | `/calendar` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-051 | Vorstandsebenen | `/chairman-level` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-052 | Kontaktdaten-Gruppen | `/contact-details-group` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-053 | Kontaktdaten-Änderungsprotokolle | `/contact-details-log` | Anlegen, Abfragen, Bearbeiten, Löschen |
 
 **Akzeptanzkriterien (je Ressource):**
 - [ ] Alle vier CRUD-Operationen als MCP-Tools verfügbar
@@ -108,6 +116,70 @@ CRUD-Operationen für Buchungen über den separaten easyVerein `/booking`-Endpoi
 - [ ] `UpdateBooking` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
 - [ ] `DeleteBooking` MCP-Tool zum Löschen von Buchungen
 - [ ] `Booking`-Entity mit `BookingFields`-Konstanten und `BookingQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-050: CRUD-Operationen für Kalender
+
+**Priorität:** Must | **Herkunft:** US-0014
+
+CRUD-Operationen für Kalendereinträge über den easyVerein `/calendar`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListCalendars` MCP-Tool mit Filterung nach ID und Datum
+- [ ] `GetCalendar` MCP-Tool zum Abrufen einzelner Kalendereinträge
+- [ ] `CreateCalendar` MCP-Tool zum Anlegen neuer Kalendereinträge
+- [ ] `UpdateCalendar` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteCalendar` MCP-Tool zum Löschen von Kalendereinträgen
+- [ ] `Calendar`-Entity mit `CalendarFields`-Konstanten und `CalendarQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-051: CRUD-Operationen für Vorstandsebenen
+
+**Priorität:** Must | **Herkunft:** US-0015
+
+CRUD-Operationen für Vorstandsebenen über den easyVerein `/chairman-level`-Endpoint. Vorstandsebenen definieren die Berechtigungsstruktur des Vereins.
+
+**Akzeptanzkriterien:**
+- [ ] `ListChairmanLevels` MCP-Tool mit Filterung nach ID
+- [ ] `GetChairmanLevel` MCP-Tool zum Abrufen einzelner Vorstandsebenen
+- [ ] `CreateChairmanLevel` MCP-Tool zum Anlegen neuer Vorstandsebenen
+- [ ] `UpdateChairmanLevel` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteChairmanLevel` MCP-Tool zum Löschen von Vorstandsebenen
+- [ ] `ChairmanLevel`-Entity mit `ChairmanLevelFields`-Konstanten und `ChairmanLevelQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-052: CRUD-Operationen für Kontaktdaten-Gruppen
+
+**Priorität:** Must | **Herkunft:** US-0016
+
+CRUD-Operationen für Kontaktdaten-Gruppen über den easyVerein `/contact-details-group`-Endpoint. Gruppen dienen der thematischen Gruppierung von Kontakten.
+
+**Akzeptanzkriterien:**
+- [ ] `ListContactDetailsGroups` MCP-Tool mit Filterung nach ID
+- [ ] `GetContactDetailsGroup` MCP-Tool zum Abrufen einzelner Gruppen
+- [ ] `CreateContactDetailsGroup` MCP-Tool zum Anlegen neuer Gruppen
+- [ ] `UpdateContactDetailsGroup` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteContactDetailsGroup` MCP-Tool zum Löschen von Gruppen
+- [ ] `ContactDetailsGroup`-Entity mit `ContactDetailsGroupFields`-Konstanten und `ContactDetailsGroupQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
+
+### FR-053: CRUD-Operationen für Kontaktdaten-Änderungsprotokolle
+
+**Priorität:** Must | **Herkunft:** US-0017
+
+CRUD-Operationen für Änderungsprotokolle von Kontaktdaten über den easyVerein `/contact-details-log`-Endpoint. Protokolle ermöglichen die Nachvollziehbarkeit von Datenänderungen.
+
+**Akzeptanzkriterien:**
+- [ ] `ListContactDetailsLogs` MCP-Tool mit Filterung nach ID, Datum und Kontakt-ID
+- [ ] `GetContactDetailsLog` MCP-Tool zum Abrufen einzelner Protokolleinträge
+- [ ] `CreateContactDetailsLog` MCP-Tool zum Anlegen neuer Protokolleinträge
+- [ ] `UpdateContactDetailsLog` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteContactDetailsLog` MCP-Tool zum Löschen von Protokolleinträgen
+- [ ] `ContactDetailsLog`-Entity mit `ContactDetailsLogFields`-Konstanten und `ContactDetailsLogQuery`-Klasse
 - [ ] Error-Handling in allen Tool-Methoden
 - [ ] Pagination für Listen-Endpunkt
 
@@ -386,7 +458,7 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 | Requirement | hängt ab von | Grund |
 |-------------|-------------|-------|
-| FR-003 bis FR-007, FR-045 bis FR-049 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
+| FR-003 bis FR-007, FR-045 bis FR-053 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
 | FR-010 bis FR-015 | FR-001 | Versionierung setzt laufenden Server voraus |
 | FR-014 | FR-012, FR-013 | Override setzt Standard-Version voraus |
 | FR-042 | FR-008, FR-041 | Prioritätslogik setzt beide Konfigurationsquellen voraus |
