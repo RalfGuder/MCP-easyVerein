@@ -11,10 +11,7 @@ public sealed class MemberTools
 {
     private readonly IEasyVereinApiClient _client;
 
-    public MemberTools(IEasyVereinApiClient client)
-    {
-        _client = client;
-    }
+    public MemberTools(IEasyVereinApiClient client) { _client = client; }
 
     [McpServerTool, Description("Alle Mitglieder auflisten")]
     public async Task<string> ListMembers(CancellationToken ct)
@@ -32,22 +29,28 @@ public sealed class MemberTools
             : $"Mitglied mit ID {id} nicht gefunden.";
     }
 
-    [McpServerTool, Description("Neues Mitglied anlegen")]
-    public async Task<string> CreateMember(string firstName, string lastName, string email, CancellationToken ct)
+    [McpServerTool, Description("Neues Mitglied anlegen (erstellt ContactDetails automatisch)")]
+    public async Task<string> CreateMember(
+        string emailOrUserName, string firstName, string familyName,
+        string? privateEmail, CancellationToken ct)
     {
-        var member = new Member { FirstName = firstName, LastName = lastName, Email = email };
-        var created = await _client.CreateMemberAsync(member, ct);
+        var contactDetails = new ContactDetails
+        {
+            FirstName = firstName,
+            FamilyName = familyName,
+            PrivateEmail = privateEmail
+        };
+        var created = await _client.CreateMemberAsync(emailOrUserName, contactDetails, ct);
         return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
     }
 
     [McpServerTool, Description("Mitglied aktualisieren")]
-    public async Task<string> UpdateMember(long id, string? firstName, string? lastName, string? email, CancellationToken ct)
+    public async Task<string> UpdateMember(
+        long id, string? emailOrUserName, string? membershipNumber, CancellationToken ct)
     {
         var member = new Member { Id = id };
-        if (firstName != null) member.FirstName = firstName;
-        if (lastName != null) member.LastName = lastName;
-        if (email != null) member.Email = email;
-
+        if (emailOrUserName != null) member.EmailOrUserName = emailOrUserName;
+        if (membershipNumber != null) member.MembershipNumber = membershipNumber;
         var updated = await _client.UpdateMemberAsync(id, member, ct);
         return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
     }

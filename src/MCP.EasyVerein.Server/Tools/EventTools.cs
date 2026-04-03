@@ -11,10 +11,7 @@ public sealed class EventTools
 {
     private readonly IEasyVereinApiClient _client;
 
-    public EventTools(IEasyVereinApiClient client)
-    {
-        _client = client;
-    }
+    public EventTools(IEasyVereinApiClient client) { _client = client; }
 
     [McpServerTool, Description("Alle Veranstaltungen auflisten")]
     public async Task<string> ListEvents(CancellationToken ct)
@@ -33,9 +30,10 @@ public sealed class EventTools
     }
 
     [McpServerTool, Description("Neue Veranstaltung anlegen")]
-    public async Task<string> CreateEvent(string name, string? description, string? location, CancellationToken ct)
+    public async Task<string> CreateEvent(
+        string name, string? description, string? locationName, CancellationToken ct)
     {
-        var ev = new Event { Name = name, Description = description, Location = location };
+        var ev = new Event { Name = name, Description = description, LocationName = locationName };
         var created = await _client.CreateEventAsync(ev, ct);
         return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
     }

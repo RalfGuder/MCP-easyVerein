@@ -11,10 +11,7 @@ public sealed class InvoiceTools
 {
     private readonly IEasyVereinApiClient _client;
 
-    public InvoiceTools(IEasyVereinApiClient client)
-    {
-        _client = client;
-    }
+    public InvoiceTools(IEasyVereinApiClient client) { _client = client; }
 
     [McpServerTool, Description("Alle Rechnungen auflisten")]
     public async Task<string> ListInvoices(CancellationToken ct)
@@ -33,9 +30,16 @@ public sealed class InvoiceTools
     }
 
     [McpServerTool, Description("Neue Rechnung anlegen")]
-    public async Task<string> CreateInvoice(string invoiceNumber, decimal amount, string? description, CancellationToken ct)
+    public async Task<string> CreateInvoice(
+        string? invoiceNumber, decimal totalPrice, string? description, string? kind, CancellationToken ct)
     {
-        var invoice = new Invoice { InvoiceNumber = invoiceNumber, Amount = amount, Description = description };
+        var invoice = new Invoice
+        {
+            InvoiceNumber = invoiceNumber,
+            TotalPrice = totalPrice,
+            Description = description,
+            Kind = kind
+        };
         var created = await _client.CreateInvoiceAsync(invoice, ct);
         return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
     }
