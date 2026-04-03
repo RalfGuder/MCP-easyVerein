@@ -1,8 +1,8 @@
 # REQ-01: MCP-Server Kernfunktionalität
 
 > **Thema:** MCP-Server und easyVerein API-Anbindung
-> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12)
-> **Stand:** 2026-03-30
+> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16)
+> **Stand:** 2026-04-03
 
 ## Übersicht
 
@@ -16,7 +16,8 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 | FR-002 | Authentifizierung mit easyVerein API-Token | Must | US-0001 |
 | FR-003 | Lese-Zugriff auf Mitgliederdaten als MCP-Tool | Must | US-0001 |
 | FR-004 | CRUD-Operationen für Mitglieder | Must | US-0001 |
-| FR-005 | CRUD-Operationen für Rechnungen/Buchungen | Must | US-0001 |
+| FR-005 | CRUD-Operationen für Rechnungen | Must | US-0001 |
+| FR-045 | CRUD-Operationen für Buchungen | Must | US-0001, US-0009 |
 | FR-006 | CRUD-Operationen für Veranstaltungen | Must | US-0001 |
 | FR-007 | CRUD-Operationen für Kontaktdaten | Must | US-0001 |
 | FR-008 | Konfiguration über Umgebungsvariablen (API-Token, Basis-URL) | Must | US-0001 |
@@ -66,23 +67,41 @@ Mindestens der Lese-Zugriff auf Mitgliederdaten muss als MCP-Tool bereitgestellt
 - [ ] MCP-Tool zum Abrufen einzelner Mitgliederdaten verfügbar
 - [ ] Ergebnisse werden strukturiert zurückgegeben
 
-### FR-004 bis FR-007: CRUD-Operationen
+### FR-004 bis FR-007, FR-045: CRUD-Operationen
 
-**Priorität:** Must | **Herkunft:** US-0001
+**Priorität:** Must | **Herkunft:** US-0001, US-0009
 
 CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Ressourcen:
 
-| ID | Ressource | Akzeptanzkriterien |
-|----|-----------|-------------------|
-| FR-004 | Mitglieder | Anlegen, Abfragen, Bearbeiten, Löschen |
-| FR-005 | Rechnungen/Buchungen | Anlegen, Abfragen, Bearbeiten, Löschen |
-| FR-006 | Veranstaltungen | Anlegen, Abfragen, Bearbeiten, Löschen |
-| FR-007 | Kontaktdaten | Anlegen, Abfragen, Bearbeiten, Löschen |
+| ID | Ressource | API-Endpoint | Akzeptanzkriterien |
+|----|-----------|-------------|-------------------|
+| FR-004 | Mitglieder | `/member` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-005 | Rechnungen | `/invoice` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-006 | Veranstaltungen | `/event` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-007 | Kontaktdaten | `/contact-details` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-045 | Buchungen | `/booking` | Anlegen, Abfragen, Bearbeiten, Löschen |
 
 **Akzeptanzkriterien (je Ressource):**
 - [ ] Alle vier CRUD-Operationen als MCP-Tools verfügbar
 - [ ] Eingabeparameter werden validiert
 - [ ] Fehler der easyVerein API werden sauber weitergeleitet
+- [ ] PATCH-Requests senden nur geänderte Felder (Dictionary-Ansatz)
+
+### FR-045: CRUD-Operationen für Buchungen
+
+**Priorität:** Must | **Herkunft:** US-0001, US-0009
+
+CRUD-Operationen für Buchungen über den separaten easyVerein `/booking`-Endpoint. Buchungen sind von Rechnungen (`/invoice`) getrennte Ressourcen in der API.
+
+**Akzeptanzkriterien:**
+- [ ] `ListBookings` MCP-Tool mit Filterung nach ID, Datum, Mitglied
+- [ ] `GetBooking` MCP-Tool zum Abrufen einzelner Buchungen
+- [ ] `CreateBooking` MCP-Tool zum Anlegen neuer Buchungen
+- [ ] `UpdateBooking` MCP-Tool – sendet nur geänderte Felder (PATCH-Dictionary)
+- [ ] `DeleteBooking` MCP-Tool zum Löschen von Buchungen
+- [ ] `Booking`-Entity mit `BookingFields`-Konstanten und `BookingQuery`-Klasse
+- [ ] Error-Handling in allen Tool-Methoden
+- [ ] Pagination für Listen-Endpunkt
 
 ### FR-008: Konfiguration über Umgebungsvariablen
 
@@ -295,7 +314,7 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 | Requirement | hängt ab von | Grund |
 |-------------|-------------|-------|
-| FR-003 bis FR-007 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
+| FR-003 bis FR-007, FR-045 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
 | FR-010 bis FR-015 | FR-001 | Versionierung setzt laufenden Server voraus |
 | FR-014 | FR-012, FR-013 | Override setzt Standard-Version voraus |
 | FR-042 | FR-008, FR-041 | Prioritätslogik setzt beide Konfigurationsquellen voraus |
@@ -307,4 +326,4 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 - [ ] Welche easyVerein API-Versionen sind aktuell verfügbar und müssen initial unterstützt werden?
 - [ ] Gibt es Rate-Limiting seitens der easyVerein API, das berücksichtigt werden muss?
-- [ ] Sollen Pagination-Mechanismen für Listenabfragen unterstützt werden?
+- [x] ~~Sollen Pagination-Mechanismen für Listenabfragen unterstützt werden?~~ Ja, implementiert: automatisches Abrufen aller Seiten über `next`-Link mit `?limit=100`
