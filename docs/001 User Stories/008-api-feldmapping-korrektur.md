@@ -14,14 +14,16 @@ Die easyVerein API trennt Daten in separate Ressourcen (`member`, `contact-detai
 
 ## Akzeptanzkriterien
 
-- [ ] **Domain-Model refactored:** `Member` und `ContactDetails` sind getrennte Domain-Entities (entsprechend der API-Struktur)
-- [ ] **JSON-Mapping korrekt:** Alle Entities verwenden `[JsonPropertyName]`-Attribute, die den tatsächlichen API-Feldnamen entsprechen (z.B. `familyName`, `membershipNumber`, `zip`, `emailOrUserName`)
-- [ ] **Query-Parameter:** Alle API-Aufrufe (GET) verwenden den `query`-Parameter zur Feldauswahl mit korrekter Syntax `{field1,field2,nested{subfield}}`
-- [ ] **Pagination vollständig:** Alle Listen-Endpunkte rufen automatisch alle Seiten ab (über `next`-Link), sodass immer alle Datensätze zurückgegeben werden
-- [ ] **CRUD vollständig:** Create, Read, Update und Delete für alle Endpunkte funktionieren korrekt mit der tatsächlichen API-Struktur (z.B. Member-Erstellung zweistufig: erst ContactDetails, dann Member)
-- [ ] **Alle Endpunkte korrigiert:** Member, Invoice, Event und Contact-Details sind an die korrekte API-Struktur angepasst
-- [ ] **Tests:** Mindestens 70% Code-Coverage, TDD-Ansatz (Red-Green-Refactor)
-- [ ] **MCP-Tools aktualisiert:** Die MCP-Server-Tools geben vollständige, korrekte Daten zurück
+- [x] **Domain-Model refactored:** `Member` und `ContactDetails` sind getrennte Domain-Entities (entsprechend der API-Struktur)
+- [x] **JSON-Mapping korrekt:** Alle Entities verwenden `[JsonPropertyName]`-Attribute, die den tatsächlichen API-Feldnamen entsprechen (z.B. `familyName`, `membershipNumber`, `zip`, `emailOrUserName`)
+- [x] **Query-Parameter:** Alle API-Aufrufe (GET) verwenden den `query`-Parameter zur Feldauswahl mit korrekter Syntax `{field1,field2,nested{subfield}}`
+- [x] **Pagination vollständig:** Alle Listen-Endpunkte rufen automatisch alle Seiten ab (über `next`-Link), sodass immer alle Datensätze zurückgegeben werden
+- [x] **CRUD vollständig:** Create, Read, Update und Delete für alle Endpunkte funktionieren korrekt mit der tatsächlichen API-Struktur (z.B. Member-Erstellung zweistufig: erst ContactDetails, dann Member)
+- [x] **Alle Endpunkte korrigiert:** Member, Invoice, Event und Contact-Details sind an die korrekte API-Struktur angepasst
+- [x] **Tests:** 42 Tests bestanden (19 Domain + 10 Infrastructure + 13 Application), TDD-Ansatz
+- [x] **MCP-Tools aktualisiert:** Die MCP-Server-Tools geben vollständige, korrekte Daten zurück
+
+> **Abgeschlossen:** 2026-04-03 via PR [#15](https://github.com/RalfGuder/MCP-easyVerein/pull/15)
 
 ## Aufgaben
 
