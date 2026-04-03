@@ -1,7 +1,7 @@
 # REQ-01: MCP-Server Kernfunktionalität
 
 > **Thema:** MCP-Server und easyVerein API-Anbindung
-> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20), [US-0014](https://github.com/RalfGuder/MCP-easyVerein/issues/21), [US-0015](https://github.com/RalfGuder/MCP-easyVerein/issues/22), [US-0016](https://github.com/RalfGuder/MCP-easyVerein/issues/23), [US-0017](https://github.com/RalfGuder/MCP-easyVerein/issues/24)
+> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20), [US-0014](https://github.com/RalfGuder/MCP-easyVerein/issues/21), [US-0015](https://github.com/RalfGuder/MCP-easyVerein/issues/22), [US-0016](https://github.com/RalfGuder/MCP-easyVerein/issues/23), [US-0017](https://github.com/RalfGuder/MCP-easyVerein/issues/24), [US-0018](https://github.com/RalfGuder/MCP-easyVerein/issues/25), [US-0019](https://github.com/RalfGuder/MCP-easyVerein/issues/26), [US-0020](https://github.com/RalfGuder/MCP-easyVerein/issues/27), [US-0021](https://github.com/RalfGuder/MCP-easyVerein/issues/28), [US-0022](https://github.com/RalfGuder/MCP-easyVerein/issues/29)
 > **Stand:** 2026-04-03
 
 ## Übersicht
@@ -26,6 +26,11 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 | FR-051 | CRUD-Operationen für Vorstandsebenen | Must | US-0015 |
 | FR-052 | CRUD-Operationen für Kontaktdaten-Gruppen | Must | US-0016 |
 | FR-053 | CRUD-Operationen für Kontaktdaten-Änderungsprotokolle | Must | US-0017 |
+| FR-054 | CRUD-Operationen für benutzerdefinierte Felder | Must | US-0018 |
+| FR-055 | CRUD-Operationen für benutzerdefinierte Feldsammlungen | Must | US-0019 |
+| FR-056 | CRUD-Operationen für benutzerdefinierte Filter | Must | US-0020 |
+| FR-057 | CRUD-Operationen für benutzerdefinierte Steuersätze | Must | US-0021 |
+| FR-058 | CRUD-Operationen für DOSB-Sportarten | Must | US-0022 |
 | FR-006 | CRUD-Operationen für Veranstaltungen | Must | US-0001 |
 | FR-007 | CRUD-Operationen für Kontaktdaten | Must | US-0001 |
 | FR-008 | Konfiguration über Umgebungsvariablen (API-Token, Basis-URL) | Must | US-0001 |
@@ -96,6 +101,11 @@ CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Re
 | FR-051 | Vorstandsebenen | `/chairman-level` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-052 | Kontaktdaten-Gruppen | `/contact-details-group` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-053 | Kontaktdaten-Änderungsprotokolle | `/contact-details-log` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-054 | Benutzerdefinierte Felder | `/custom-field` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-055 | Benutzerdefinierte Feldsammlungen | `/custom-field-collection` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-056 | Benutzerdefinierte Filter | `/custom-filter` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-057 | Benutzerdefinierte Steuersätze | `/custom-tax-rate` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-058 | DOSB-Sportarten | `/dosb-sport` | Anlegen, Abfragen, Bearbeiten, Löschen |
 
 **Akzeptanzkriterien (je Ressource):**
 - [ ] Alle vier CRUD-Operationen als MCP-Tools verfügbar
@@ -182,6 +192,66 @@ CRUD-Operationen für Änderungsprotokolle von Kontaktdaten über den easyVerein
 - [ ] `ContactDetailsLog`-Entity mit `ContactDetailsLogFields`-Konstanten und `ContactDetailsLogQuery`-Klasse
 - [ ] Error-Handling in allen Tool-Methoden
 - [ ] Pagination für Listen-Endpunkt
+
+### FR-054: CRUD-Operationen für benutzerdefinierte Felder
+
+**Priorität:** Must | **Herkunft:** US-0018
+
+CRUD-Operationen für benutzerdefinierte Felder über den easyVerein `/custom-field`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListCustomFields` MCP-Tool mit Filterung nach ID
+- [ ] `GetCustomField`, `CreateCustomField`, `UpdateCustomField`, `DeleteCustomField` MCP-Tools
+- [ ] `CustomField`-Entity mit `CustomFieldFields`-Konstanten und `CustomFieldQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-055: CRUD-Operationen für benutzerdefinierte Feldsammlungen
+
+**Priorität:** Must | **Herkunft:** US-0019
+
+CRUD-Operationen für benutzerdefinierte Feldsammlungen über den easyVerein `/custom-field-collection`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListCustomFieldCollections` MCP-Tool mit Filterung nach ID
+- [ ] `GetCustomFieldCollection`, `CreateCustomFieldCollection`, `UpdateCustomFieldCollection`, `DeleteCustomFieldCollection` MCP-Tools
+- [ ] `CustomFieldCollection`-Entity mit `CustomFieldCollectionFields`-Konstanten und `CustomFieldCollectionQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-056: CRUD-Operationen für benutzerdefinierte Filter
+
+**Priorität:** Must | **Herkunft:** US-0020
+
+CRUD-Operationen für benutzerdefinierte Filter über den easyVerein `/custom-filter`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListCustomFilters` MCP-Tool mit Filterung nach ID
+- [ ] `GetCustomFilter`, `CreateCustomFilter`, `UpdateCustomFilter`, `DeleteCustomFilter` MCP-Tools
+- [ ] `CustomFilter`-Entity mit `CustomFilterFields`-Konstanten und `CustomFilterQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-057: CRUD-Operationen für benutzerdefinierte Steuersätze
+
+**Priorität:** Must | **Herkunft:** US-0021
+
+CRUD-Operationen für benutzerdefinierte Steuersätze über den easyVerein `/custom-tax-rate`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListCustomTaxRates` MCP-Tool mit Filterung nach ID
+- [ ] `GetCustomTaxRate`, `CreateCustomTaxRate`, `UpdateCustomTaxRate`, `DeleteCustomTaxRate` MCP-Tools
+- [ ] `CustomTaxRate`-Entity mit `CustomTaxRateFields`-Konstanten und `CustomTaxRateQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-058: CRUD-Operationen für DOSB-Sportarten
+
+**Priorität:** Must | **Herkunft:** US-0022
+
+CRUD-Operationen für DOSB-Sportarten über den easyVerein `/dosb-sport`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListDosbSports` MCP-Tool mit Filterung nach ID
+- [ ] `GetDosbSport`, `CreateDosbSport`, `UpdateDosbSport`, `DeleteDosbSport` MCP-Tools
+- [ ] `DosbSport`-Entity mit `DosbSportFields`-Konstanten und `DosbSportQuery`-Klasse
+- [ ] Error-Handling und Pagination
 
 ### FR-046: CRUD-Operationen für Ankündigungen
 
@@ -458,7 +528,7 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 | Requirement | hängt ab von | Grund |
 |-------------|-------------|-------|
-| FR-003 bis FR-007, FR-045 bis FR-053 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
+| FR-003 bis FR-007, FR-045 bis FR-058 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
 | FR-010 bis FR-015 | FR-001 | Versionierung setzt laufenden Server voraus |
 | FR-014 | FR-012, FR-013 | Override setzt Standard-Version voraus |
 | FR-042 | FR-008, FR-041 | Prioritätslogik setzt beide Konfigurationsquellen voraus |
