@@ -17,6 +17,9 @@ if (args.Contains("--help") || args.Contains("-h"))
 
 var builder = Host.CreateApplicationBuilder(args);
 
+// Console-Logging entfernen – stdout ist exklusiv für MCP-JSON-RPC reserviert
+builder.Logging.ClearProviders();
+
 // Switch-Mappings: CLI-Parameter → IConfiguration-Keys (FR-041, FR-042)
 // Priorität: CLI (zuletzt registriert) > Env-Var (von CreateApplicationBuilder) > Defaults
 var switchMappings = new Dictionary<string, string>

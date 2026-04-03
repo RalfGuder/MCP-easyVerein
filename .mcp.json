@@ -2,11 +2,11 @@
   "mcpServers": {
     "easyverein": {
       "command": "dotnet",
-      "args": ["run", "--project", "./src/MCP-easyVerein"],
+      "args": ["run", "--project", "src/MCP.EasyVerein.Server"],
       "env": {
-        "EASYVEREIN_API_TOKEN": "${EASYVEREIN_API_TOKEN}",
-        "EASYVEREIN_API_VERSION": "v2"
+        "EASYVEREIN_API_VERSION": "v1.7"
       }
     }
   }
 }
+
