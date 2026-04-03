@@ -16,8 +16,15 @@ public sealed class MemberTools
     [McpServerTool, Description("Alle Mitglieder auflisten")]
     public async Task<string> ListMembers(CancellationToken ct)
     {
-        var members = await _client.GetMembersAsync(ct);
-        return JsonSerializer.Serialize(members, new JsonSerializerOptions { WriteIndented = true });
+        try
+        {
+            var members = await _client.GetMembersAsync(ct);
+            return JsonSerializer.Serialize(members, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch (Exception ex)
+        {
+            return $"FEHLER: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
+        }
     }
 
     [McpServerTool, Description("Ein Mitglied anhand der ID abrufen")]

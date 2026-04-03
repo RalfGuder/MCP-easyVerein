@@ -42,7 +42,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return $"{BuildUrl(resource)}?query={Uri.EscapeDataString(query)}";
     }
 
-    private async Task<T> HandleResponse<T>(HttpResponseMessage response, CancellationToken ct)
+    private async Task EnsureSuccessOrThrowAsync(HttpResponseMessage response, CancellationToken ct)
     {
         // NFR-001: Fehlerbehandlung bei ungültigen API-Tokens
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
@@ -52,7 +52,17 @@ public class EasyVereinApiClient : IEasyVereinApiClient
                 "Bitte prüfen Sie Ihren API-Token.");
         }
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(ct);
+            throw new HttpRequestException(
+                $"HTTP {(int)response.StatusCode} ({response.ReasonPhrase}): {body}");
+        }
+    }
+
+    private async Task<T> HandleResponse<T>(HttpResponseMessage response, CancellationToken ct)
+    {
+        await EnsureSuccessOrThrowAsync(response, ct);
 
         var single = await response.Content.ReadFromJsonAsync<T>(_jsonOptions, ct);
         return single ?? throw new InvalidOperationException("Leere API-Antwort.");
@@ -69,15 +79,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             var response = await SendWithErrorHandling(
                 () => _httpClient.GetAsync(url, ct), ct);
 
-            if (response.StatusCode == HttpStatusCode.Unauthorized
-                || response.StatusCode == HttpStatusCode.Forbidden)
-            {
-                throw new UnauthorizedAccessException(
-                    $"Authentifizierung fehlgeschlagen (HTTP {(int)response.StatusCode}). " +
-                    "Bitte prüfen Sie Ihren API-Token.");
-            }
-
-            response.EnsureSuccessStatusCode();
+            await EnsureSuccessOrThrowAsync(response, ct);
             var content = await response.Content.ReadAsStringAsync(ct);
             var page = JsonSerializer.Deserialize<ApiListResponse<T>>(content, _jsonOptions);
 
@@ -150,11 +152,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     {
         var response = await SendWithErrorHandling(
             () => _httpClient.DeleteAsync(BuildUrl($"member/{id}"), ct), ct);
-        if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
-            throw new UnauthorizedAccessException(
-                $"Authentifizierung fehlgeschlagen (HTTP {(int)response.StatusCode}). " +
-                "Bitte prüfen Sie Ihren API-Token.");
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessOrThrowAsync(response, ct);
     }
 
     // --- Kontaktdaten (FR-007) ---
@@ -194,7 +192,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     {
         var response = await SendWithErrorHandling(
             () => _httpClient.DeleteAsync(BuildUrl($"contact-details/{id}"), ct), ct);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessOrThrowAsync(response, ct);
     }
 
     // --- Rechnungen (FR-005) ---
@@ -231,7 +229,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     {
         var response = await SendWithErrorHandling(
             () => _httpClient.DeleteAsync(BuildUrl($"invoice/{id}"), ct), ct);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessOrThrowAsync(response, ct);
     }
 
     // --- Veranstaltungen (FR-006) ---
@@ -268,7 +266,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     {
         var response = await SendWithErrorHandling(
             () => _httpClient.DeleteAsync(BuildUrl($"event/{id}"), ct), ct);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessOrThrowAsync(response, ct);
     }
 }
 

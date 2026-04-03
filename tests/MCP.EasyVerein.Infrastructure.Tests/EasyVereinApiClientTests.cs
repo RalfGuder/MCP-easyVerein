@@ -116,6 +116,58 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task GetMembers_WithBadRequest_ThrowsWithResponseBody()
+    {
+        var errorBody = "{\"detail\":\"Invalid query field: _invalidField\"}";
+        var handler = new FakeHttpHandler(HttpStatusCode.BadRequest, errorBody);
+        var client = CreateClient(handler);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetMembersAsync());
+
+        Assert.Contains("400", ex.Message);
+        Assert.Contains("Invalid query field", ex.Message);
+    }
+
+    [Fact]
+    public async Task GetMembers_WithInternalServerError_ThrowsWithResponseBody()
+    {
+        var errorBody = "{\"detail\":\"Internal server error occurred\"}";
+        var handler = new FakeHttpHandler(HttpStatusCode.InternalServerError, errorBody);
+        var client = CreateClient(handler);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetMembersAsync());
+
+        Assert.Contains("500", ex.Message);
+        Assert.Contains("Internal server error", ex.Message);
+    }
+
+    [Fact]
+    public async Task GetMember_WithBadRequest_ThrowsWithResponseBody()
+    {
+        var errorBody = "{\"detail\":\"Bad request for member\"}";
+        var handler = new FakeHttpHandler(HttpStatusCode.BadRequest, errorBody);
+        var client = CreateClient(handler);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetMemberAsync(1));
+
+        Assert.Contains("400", ex.Message);
+        Assert.Contains("Bad request for member", ex.Message);
+    }
+
+    [Fact]
+    public async Task DeleteMember_WithBadRequest_ThrowsWithResponseBody()
+    {
+        var errorBody = "{\"detail\":\"Cannot delete member\"}";
+        var handler = new FakeHttpHandler(HttpStatusCode.BadRequest, errorBody);
+        var client = CreateClient(handler);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteMemberAsync(1));
+
+        Assert.Contains("400", ex.Message);
+        Assert.Contains("Cannot delete member", ex.Message);
+    }
+
+    [Fact]
     public async Task GetMember_WithNotFound_ReturnsNull()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
