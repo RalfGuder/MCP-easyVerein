@@ -5,23 +5,49 @@ using Microsoft.Extensions.Logging;
 namespace MCP.EasyVerein.Application.Configuration;
 
 /// <summary>
-/// Konfiguration für den easyVerein MCP-Server (FR-008, FR-013, FR-041–FR-044).
+/// Configuration for the easyVerein MCP server (FR-008, FR-013, FR-041 to FR-044).
 /// </summary>
 public class EasyVereinConfiguration
 {
+    /// <summary>
+    /// Environment variable name for the easyVerein API key.
+    /// </summary>
     public const string EnvironmentVariableApiKey     = "EASYVEREIN_API_KEY";
+
+    /// <summary>
+    /// Environment variable name for the easyVerein API base URL.
+    /// </summary>
     public const string EnvironmentVariableApiUrl     = "EASYVEREIN_API_URL";
+
+    /// <summary>
+    /// Environment variable name for the easyVerein API version.
+    /// </summary>
     public const string EnvironmentVariableApiVersion = "EASYVEREIN_API_VERSION";
 
+    /// <summary>
+    /// Default base URL for the easyVerein API.
+    /// </summary>
     public const string DefaultApiUrl = "https://easyverein.com/api";
 
+    /// <summary>
+    /// Gets the API key used for authentication with the easyVerein API.
+    /// </summary>
     public string ApiKey     { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Gets the base URL of the easyVerein API.
+    /// </summary>
     public string ApiUrl     { get; init; } = DefaultApiUrl;
+
+    /// <summary>
+    /// Gets the API version string used for endpoint routing.
+    /// </summary>
     public string ApiVersion { get; init; } = ApiVersionVO.Default.Version;
 
     /// <summary>
-    /// Erstellt Konfiguration aus Umgebungsvariablen (FR-008). Legacy-Methode.
+    /// Creates a configuration from environment variables (FR-008). Legacy method.
     /// </summary>
+    /// <returns>A new <see cref="EasyVereinConfiguration"/> populated from environment variables.</returns>
     public static EasyVereinConfiguration FromEnvironment()
     {
         var apiKey = Environment.GetEnvironmentVariable(EnvironmentVariableApiKey);
@@ -45,10 +71,13 @@ public class EasyVereinConfiguration
     }
 
     /// <summary>
-    /// Erstellt Konfiguration aus IConfiguration (FR-041–FR-043).
-    /// CLI-Parameter überschreiben Env-Vars (Priorität via IConfiguration-Provider-Reihenfolge).
-    /// Fehlende Werte lösen eine Warnung aus; es wird der Standardwert verwendet.
+    /// Creates a configuration from an <see cref="IConfiguration"/> instance (FR-041 to FR-043).
+    /// CLI parameters override environment variables via the IConfiguration provider order.
+    /// Missing values trigger a warning and fall back to defaults.
     /// </summary>
+    /// <param name="configuration">The configuration source containing API settings.</param>
+    /// <param name="logger">Logger used to report missing configuration values.</param>
+    /// <returns>A new <see cref="EasyVereinConfiguration"/> populated from the configuration source.</returns>
     public static EasyVereinConfiguration FromConfiguration(IConfiguration configuration, ILogger logger)
     {
         var apiVersion = Resolve(
@@ -67,6 +96,15 @@ public class EasyVereinConfiguration
         };
     }
 
+    /// <summary>
+    /// Resolves a configuration value by key, logging a warning and returning the default if not found.
+    /// </summary>
+    /// <param name="configuration">The configuration source to read from.</param>
+    /// <param name="key">The configuration key to look up.</param>
+    /// <param name="defaultValue">The default value to use when the key is not set.</param>
+    /// <param name="paramName">The CLI parameter name shown in the warning message.</param>
+    /// <param name="logger">Logger for reporting missing values.</param>
+    /// <returns>The resolved configuration value or the default.</returns>
     private static string Resolve(
         IConfiguration configuration, string key, string defaultValue,
         string paramName, ILogger logger)
@@ -84,8 +122,10 @@ public class EasyVereinConfiguration
     }
 
     /// <summary>
-    /// Gibt die vollständige Basis-URL inkl. Version zurück.
+    /// Returns the fully qualified base URL including the API version segment.
     /// </summary>
+    /// <param name="versionOverride">Optional version string to use instead of the configured version.</param>
+    /// <returns>The versioned base URL (e.g. "https://easyverein.com/api/v1.7").</returns>
     public string GetVersionedBaseUrl(string? versionOverride = null)
     {
         var version = versionOverride ?? ApiVersion;

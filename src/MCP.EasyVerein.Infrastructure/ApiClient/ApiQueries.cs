@@ -1,14 +1,33 @@
 namespace MCP.EasyVerein.Infrastructure.ApiClient;
 
+/// <summary>
+/// Provides pre-built query strings for each easyVerein API resource endpoint.
+/// </summary>
 internal static class ApiQueries
 {
+    /// <summary>
+    /// Shared <see cref="MemberQuery"/> instance used to build member query strings with optional filters.
+    /// </summary>
     internal static readonly MemberQuery MemberQuery = new();
+
+    /// <summary>
+    /// Shared <see cref="ContactDetailsQuery"/> instance used to build contact details query strings with optional filters.
+    /// </summary>
     internal static readonly ContactDetailsQuery ContactDetailsQuery = new();
 
+    /// <summary>
+    /// Gets the current member query string including field selection and any active filters.
+    /// </summary>
     internal static string Member => MemberQuery.ToString();
 
+    /// <summary>
+    /// Gets the current contact details query string including field selection and any active filters.
+    /// </summary>
     internal static string ContactDetails => ContactDetailsQuery.ToString();
 
+    /// <summary>
+    /// Query string for invoice endpoints specifying all requested fields.
+    /// </summary>
     public const string Invoice =
         "query={id," + "invNumber,totalPrice,date,dateItHappend,dateSent,kind," +
         "description,receiver,relatedAddress," +
@@ -22,6 +41,9 @@ internal static class ApiQueries
         "offerValidUntil,offerNumber,relatedOffer," +
         "closingDescription,useAddressBalance}";
 
+    /// <summary>
+    /// Query string for event endpoints specifying all requested fields.
+    /// </summary>
     public const string Event =
         "query={id,name,description,prologue,note,start,end,allDay," +
         "locationName,locationObject,parent," +

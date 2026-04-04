@@ -6,12 +6,23 @@ using ModelContextProtocol.Server;
 
 namespace MCP.EasyVerein.Server.Tools;
 
+/// <summary>
+/// MCP tools for managing members via the easyVerein API.
+/// </summary>
 [McpServerToolType]
 public sealed class MemberTools(IEasyVereinApiClient client)
 {
+    /// <summary>
+    /// Lists members with optional filters for ID, membership number, and search terms.
+    /// </summary>
+    /// <param name="id">Optional member ID filter.</param>
+    /// <param name="membershipNumber">Optional membership number filter.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A JSON string containing matching members, or an error message.</returns>
     [McpServerTool(Name = "list_members"), Description("List all members")]
     public async Task<string> ListMembers(
-        [Description("The ID of a member")]long? id, 
+        [Description("The ID of a member")]long? id,
         [Description("The membership number of a member")] string? membershipNumber,
         string[]? search , CancellationToken ct)
     {
@@ -26,6 +37,12 @@ public sealed class MemberTools(IEasyVereinApiClient client)
         }
     }
 
+    /// <summary>
+    /// Retrieves a single member by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the member.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A JSON string of the member, or a not-found message.</returns>
     [McpServerTool(Name="get_member"), Description("Retrieve a member using their ID.")]
     public async Task<string> GetMember([Description("The ID of the member")] long id, CancellationToken ct)
     {
@@ -35,6 +52,15 @@ public sealed class MemberTools(IEasyVereinApiClient client)
             : $"Member with ID {id} not found.";
     }
 
+    /// <summary>
+    /// Creates a new member with associated contact details.
+    /// </summary>
+    /// <param name="emailOrUserName">The email address or username for the new member.</param>
+    /// <param name="firstName">The first name of the new member.</param>
+    /// <param name="familyName">The family name of the new member.</param>
+    /// <param name="privateEmail">An optional private email address.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A JSON string of the created member.</returns>
     [McpServerTool(Name="create_member"), Description("Create new member (creates ContactDetails automatically))")]
     public async Task<string> CreateMember(
         [Description("The email or username of the new member")] string emailOrUserName,
@@ -53,6 +79,14 @@ public sealed class MemberTools(IEasyVereinApiClient client)
         return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
     }
 
+    /// <summary>
+    /// Updates an existing member's data. Only the provided fields are modified (PATCH semantics).
+    /// </summary>
+    /// <param name="id">The unique identifier of the member to update.</param>
+    /// <param name="emailOrUserName">An optional new email or username.</param>
+    /// <param name="membershipNumber">An optional new membership number.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A JSON string of the updated member.</returns>
     [McpServerTool(Name="update_member"), Description("Check if the user is permitted to change values and if so, update")]
     public async Task<string> UpdateMember(
         [Description("The ID of the member")] long id,
@@ -66,6 +100,12 @@ public sealed class MemberTools(IEasyVereinApiClient client)
         return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
     }
 
+    /// <summary>
+    /// Deletes a member by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the member to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A confirmation message.</returns>
     [McpServerTool(Name="delete_member"), Description("Delete a member. Only authorized users are able to perform this action!")]
     public async Task<string> DeleteMember([Description("The ID of the member")] long id, CancellationToken ct)
     {

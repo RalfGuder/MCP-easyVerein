@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 
-// --help vor Host-Start abfangen (FR-044)
+// Intercept --help before host startup (FR-044)
 if (args.Contains("--help") || args.Contains("-h"))
 {
     PrintHelp();
@@ -17,11 +17,11 @@ if (args.Contains("--help") || args.Contains("-h"))
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// Console-Logging entfernen – stdout ist exklusiv für MCP-JSON-RPC reserviert
+// Remove console logging – stdout is reserved exclusively for MCP JSON-RPC
 builder.Logging.ClearProviders();
 
-// Switch-Mappings: CLI-Parameter → IConfiguration-Keys (FR-041, FR-042)
-// Priorität: CLI (zuletzt registriert) > Env-Var (von CreateApplicationBuilder) > Defaults
+// Switch mappings: CLI parameters → IConfiguration keys (FR-041, FR-042)
+// Priority: CLI (registered last) > Env vars (from CreateApplicationBuilder) > Defaults
 var switchMappings = new Dictionary<string, string>
 {
     ["--api-key"]     = EasyVereinConfiguration.EnvironmentVariableApiKey,
@@ -30,7 +30,7 @@ var switchMappings = new Dictionary<string, string>
 };
 builder.Configuration.AddCommandLine(args, switchMappings);
 
-// EasyVereinConfiguration via DI auflösen (FR-041–FR-043)
+// Resolve EasyVereinConfiguration via DI (FR-041–FR-043)
 builder.Services.AddSingleton(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
@@ -38,10 +38,10 @@ builder.Services.AddSingleton(sp =>
     return EasyVereinConfiguration.FromConfiguration(configuration, logger);
 });
 
-// HttpClient + API-Client (FR-002)
+// HttpClient + API client (FR-002)
 builder.Services.AddHttpClient<IEasyVereinApiClient, EasyVereinApiClient>();
 
-// MCP-Server (FR-001, NFR-003)
+// MCP server setup (FR-001, NFR-003)
 builder.Services
     .AddMcpServer(options =>
     {
@@ -61,6 +61,9 @@ var app = builder.Build();
 await app.RunAsync();
 var xx = app.Services.GetService<MemberTools>();
 
+/// <summary>
+/// Prints the CLI usage help text with all available parameters, environment variables, and defaults.
+/// </summary>
 static void PrintHelp()
 {
     Console.WriteLine("""

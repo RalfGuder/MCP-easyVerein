@@ -1,22 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MCP.EasyVerein.Domain.ValueObjects;
 
 namespace MCP.EasyVerein.Infrastructure.ApiClient
 {
+    /// <summary>
+    /// Builds the query string for the contact details API endpoint, including field selection and optional filters.
+    /// </summary>
     internal class ContactDetailsQuery
     {
+        /// <summary>
+        /// Gets or sets an optional contact details identifier filter.
+        /// </summary>
         public long? Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets an optional first name filter.
+        /// </summary>
         public string? FirstName { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets an optional family name filter.
+        /// </summary>
         public string? FamilyName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets an optional name filter.
+        /// </summary>
         public string? Name { get; set; }
 
+        /// <summary>
+        /// The base field selection query requesting all contact details fields.
+        /// </summary>
         private const string FieldQuery =
-            "query=" + 
+            "query=" +
             "{" +
                 ContactDetailsFields.Id + "," +
                 ContactDetailsFields.FirstName + "," +
@@ -67,6 +82,10 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
                 ContactDetailsFields.AddressCompany +
             "}";
 
+        /// <summary>
+        /// Returns the complete query string with field selection and any active filters.
+        /// </summary>
+        /// <returns>A URL query string for the contact details endpoint.</returns>
         public override string ToString()
         {
             var parts = new List<string> { FieldQuery };
@@ -79,7 +98,7 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
 
             if (!string.IsNullOrEmpty(FamilyName))
                 parts.Add($"familyName={Uri.EscapeDataString(FamilyName)}");
-            
+
             if (!string.IsNullOrEmpty(Name))
                 parts.Add($"familyName={Uri.EscapeDataString(Name)}");
 
