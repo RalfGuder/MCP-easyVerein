@@ -55,7 +55,8 @@ builder.Services
     .WithTools<MemberTools>()
     .WithTools<InvoiceTools>()
     .WithTools<EventTools>()
-    .WithTools<ContactDetailsTools>();
+    .WithTools<ContactDetailsTools>()
+    .WithTools<BookingTools>();
 
 var app = builder.Build();
 await app.RunAsync();
