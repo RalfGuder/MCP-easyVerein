@@ -10,24 +10,25 @@
 
 ## Akzeptanzkriterien
 
-- [ ] Der Server akzeptiert die Parameter `--api-url`, `--api-version` und `--api-key` beim Start
-- [ ] Übergebene Kommandozeilenparameter überschreiben gleichnamige Umgebungsvariablen
-- [ ] Fehlt ein Parameter, wird der Wert aus der entsprechenden Umgebungsvariable (`EASYVEREIN_API_URL`, `EASYVEREIN_API_VERSION`, `EASYVEREIN_API_KEY`) verwendet
-- [ ] Fehlt der Parameter und die Umgebungsvariable, wird eine Warnung ausgegeben und ein Standardwert genutzt
-- [ ] Die Parameter sind in der Hilfemeldung (`--help`) dokumentiert
+- [x] Der Server akzeptiert die Parameter `--api-url`, `--api-version` und `--api-key` beim Start *(umgesetzt in `Program.cs` via `AddCommandLine` mit Switch-Mappings)*
+- [x] Übergebene Kommandozeilenparameter überschreiben gleichnamige Umgebungsvariablen *(IConfiguration-Provider-Reihenfolge: CLI zuletzt registriert → höchste Priorität)*
+- [x] Fehlt ein Parameter, wird der Wert aus der entsprechenden Umgebungsvariable (`EASYVEREIN_API_URL`, `EASYVEREIN_API_VERSION`, `EASYVEREIN_API_KEY`) verwendet *(umgesetzt in `EasyVereinConfiguration.FromConfiguration()` via `Resolve()`)*
+- [x] Fehlt der Parameter und die Umgebungsvariable, wird eine Warnung ausgegeben und ein Standardwert genutzt *(umgesetzt: `logger.LogWarning` in `Resolve()`)*
+- [x] Die Parameter sind in der Hilfemeldung (`--help`) dokumentiert *(umgesetzt: `PrintHelp()` in `Program.cs`)*
 
 ## Aufgaben
 
-- Kommandozeilenparser integrieren (z.B. `System.CommandLine`)
-- Parameter `--api-url`, `--api-version`, `--api-key` implementieren
-- Priorisierungslogik CLI > Env-Var > Default implementieren
-- Warnung bei fehlenden Pflichtangaben implementieren
-- Tests nach TDD-Prinzip (zuerst Tests, dann Implementierung) schreiben
-- Hilfemeldung (`--help`) ergänzen
+- [x] Kommandozeilenparser integrieren *(verwendet `Microsoft.Extensions.Configuration.CommandLine` statt `System.CommandLine`)*
+- [x] Parameter `--api-url`, `--api-version`, `--api-key` implementieren *(Switch-Mappings in `Program.cs`)*
+- [x] Priorisierungslogik CLI > Env-Var > Default implementieren *(IConfiguration-Provider-Reihenfolge)*
+- [x] Warnung bei fehlenden Pflichtangaben implementieren *(LogWarning in `EasyVereinConfiguration.Resolve()`)*
+- [x] Tests nach TDD-Prinzip schreiben *(6 Tests in `EasyVereinConfigurationTests`: FromConfiguration_*)*
+- [x] Hilfemeldung (`--help`) ergänzen *(PrintHelp() in `Program.cs`)*
 
 ## Technische Hinweise
 
 - Prioritätsreihenfolge: CLI-Parameter → Umgebungsvariablen → Standardwerte
 - Umgebungsvariablennamen: `EASYVEREIN_API_URL`, `EASYVEREIN_API_VERSION`, `EASYVEREIN_API_KEY`
-- Empfohlenes NuGet-Paket: `System.CommandLine`
-- TDD: Tests vor der Implementierung schreiben (Red-Green-Refactor)
+- Verwendet `Microsoft.Extensions.Configuration.CommandLine` (statt `System.CommandLine`) – nahtlose Integration mit `IConfiguration`
+- TDD: 6 Tests für `FromConfiguration` in `EasyVereinConfigurationTests`
+- Abgeschlossen via Feature-Branch und PR (nach US-008)

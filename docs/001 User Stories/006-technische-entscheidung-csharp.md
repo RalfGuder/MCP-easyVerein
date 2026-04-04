@@ -25,7 +25,7 @@
 - [x] **Dockerfile erstellen** für Container-Bereitstellung
 - [x] **CI/CD-Pipeline** mit Multi-Plattform-Builds (Windows, Linux, macOS)
 - [ ] **Dokumentation** erstellen: Projektstruktur, Architekturentscheidung
-- [x] **Beispiel-Test** mit xUnit erstellt *(25 Tests in 3 Testprojekten)*
+- [x] **Beispiel-Test** mit xUnit erstellt *(46 Tests in 4 Testprojekten: Domain: 19, Application: 13, Infrastructure: 14, Server: 0)*
 
 ## Technische Hinweise
 

@@ -25,7 +25,7 @@
 - [ ] **CI/CD-Pipeline** Coverage-Prüfung (≥ 70%) erzwingen
 - [ ] **Pre-Commit Hooks einrichten**, die Tests vor jedem Commit ausführen
 - [ ] **TDD-Workflow im README dokumentieren** (Red-Green-Refactor-Zyklus, Konventionen)
-- [x] **Beispieltest erstellen** als Vorlage *(25 Tests in 3 Testprojekten)*
+- [x] **Beispieltest erstellen** als Vorlage *(46 Tests in 4 Testprojekten: Domain: 19, Application: 13, Infrastructure: 14, Server: 0)*
 
 ## Technische Hinweise
 

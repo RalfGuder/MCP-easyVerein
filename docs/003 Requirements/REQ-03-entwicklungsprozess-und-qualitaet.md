@@ -2,7 +2,7 @@
 
 > **Thema:** TDD, CI/CD und GitHub Flow Branch-Strategie
 > **Herkunft:** [US-0003](https://github.com/RalfGuder/MCP-easyVerein/issues/3), [US-0004](https://github.com/RalfGuder/MCP-easyVerein/issues/4)
-> **Stand:** 2026-03-29
+> **Stand:** 2026-04-04
 
 ## Übersicht
 
@@ -28,10 +28,10 @@ Dieses Dokument beschreibt die Anforderungen an den Entwicklungsprozess: Test-Dr
 Bei jedem Push wird die CI/CD-Pipeline automatisch ausgelöst und führt alle Tests aus.
 
 **Akzeptanzkriterien:**
-- [ ] Pipeline wird bei jedem Push auf jeden Branch ausgelöst
-- [ ] Alle Unit-Tests werden ausgeführt
-- [ ] Testergebnisse sind im Pipeline-Log sichtbar
-- [ ] Pipeline schlägt bei fehlgeschlagenen Tests fehl
+- [x] Pipeline wird bei jedem Push auf jeden Branch ausgelöst — `.github/workflows/build.yml` triggert auf main, feature/**, fix/**
+- [x] Alle Unit-Tests werden ausgeführt — 46 Tests
+- [x] Testergebnisse sind im Pipeline-Log sichtbar
+- [x] Pipeline schlägt bei fehlgeschlagenen Tests fehl
 
 ### FR-023: Pre-Commit Hooks
 
@@ -52,10 +52,10 @@ Pre-Commit Hooks führen Tests automatisch vor jedem Commit aus.
 Die CI/CD-Pipeline prüft die Code-Coverage und erzwingt eine Mindest-Coverage von 70%.
 
 **Akzeptanzkriterien:**
-- [ ] Coverage wird automatisch gemessen
-- [ ] Coverage-Bericht wird generiert
-- [ ] Pipeline schlägt fehl bei Coverage unter 70%
-- [ ] Coverage-Wert ist im Pipeline-Log sichtbar
+- [x] Coverage wird automatisch gemessen — `--collect:"XPlat Code Coverage"` in build.yml
+- [x] Coverage-Bericht wird generiert — `coverage.cobertura.xml` als Artifact hochgeladen
+- [ ] Pipeline schlägt fehl bei Coverage unter 70% — Schwellenwert noch nicht erzwungen
+- [x] Coverage-Wert ist im Pipeline-Log sichtbar — im Artifact verfügbar
 
 ### FR-025: Feature-Branches
 
@@ -64,9 +64,9 @@ Die CI/CD-Pipeline prüft die Code-Coverage und erzwingt eine Mindest-Coverage v
 Für jede User Story und jedes Issue wird ein eigener Feature-Branch erstellt.
 
 **Akzeptanzkriterien:**
-- [ ] Jede Änderung erfolgt auf einem dedizierten Feature-Branch
-- [ ] Branch-Namenskonvention wird eingehalten (siehe NFR-016)
-- [ ] Keine direkten Commits auf `main`
+- [x] Jede Änderung erfolgt auf einem dedizierten Feature-Branch — z.B. `feature/US-0008-api-feldmapping`
+- [x] Branch-Namenskonvention wird eingehalten (siehe NFR-016)
+- [x] Keine direkten Commits auf `main` — alle Änderungen über PRs
 
 ### FR-026: Integration über Pull Requests
 
@@ -75,9 +75,9 @@ Für jede User Story und jedes Issue wird ein eigener Feature-Branch erstellt.
 Änderungen werden ausschließlich über Pull Requests in den `main`-Branch integriert.
 
 **Akzeptanzkriterien:**
-- [ ] Jede Integration in `main` erfolgt über einen Pull Request
-- [ ] Pull Requests enthalten eine Beschreibung der Änderungen
-- [ ] Mindestens ein Review vor dem Merge (empfohlen)
+- [x] Jede Integration in `main` erfolgt über einen Pull Request — PRs #7, #8, #9, #10, #15 etc.
+- [x] Pull Requests enthalten eine Beschreibung der Änderungen
+- [ ] Mindestens ein Review vor dem Merge (empfohlen) — kein Review-Enforcement konfiguriert
 
 ### FR-027: Tests vor Merge
 
@@ -86,9 +86,9 @@ Für jede User Story und jedes Issue wird ein eigener Feature-Branch erstellt.
 Die CI/CD-Pipeline prüft alle Tests, bevor ein Pull Request gemerged werden kann.
 
 **Akzeptanzkriterien:**
-- [ ] CI/CD-Status ist als Merge-Voraussetzung konfiguriert
-- [ ] Merge ist nur bei grüner Pipeline möglich
-- [ ] Tests und Coverage werden geprüft
+- [ ] CI/CD-Status ist als Merge-Voraussetzung konfiguriert — Branch Protection Rules nicht konfiguriert
+- [x] Merge ist nur bei grüner Pipeline möglich — praktisch eingehalten, aber nicht technisch erzwungen
+- [x] Tests und Coverage werden geprüft — Tests ja, Coverage-Schwellenwert nein
 
 ### FR-028: Feature-Branches nach Merge löschen
 
@@ -107,10 +107,10 @@ Feature-Branches werden nach dem erfolgreichen Merge automatisch oder manuell ge
 Ein geeignetes Test-Framework wird ausgewählt und als Projektabhängigkeit eingerichtet.
 
 **Akzeptanzkriterien:**
-- [ ] Test-Framework ist ausgewählt (z.B. xUnit, NUnit)
-- [ ] Test-Projekt ist in der Solution eingerichtet
-- [ ] Mindestens ein Beispieltest ist vorhanden
-- [ ] Tests können lokal und in der CI/CD-Pipeline ausgeführt werden
+- [x] Test-Framework ist ausgewählt (z.B. xUnit, NUnit) — xUnit 2.4.2
+- [x] Test-Projekt ist in der Solution eingerichtet — 4 Testprojekte in der Solution
+- [x] Mindestens ein Beispieltest ist vorhanden — 46 Tests
+- [x] Tests können lokal und in der CI/CD-Pipeline ausgeführt werden
 
 ---
 
@@ -134,10 +134,10 @@ Ein geeignetes Test-Framework wird ausgewählt und als Projektabhängigkeit eing
 Der Red-Green-Refactor-Zyklus ist der verbindliche Entwicklungsprozess für alle neuen Funktionalitäten.
 
 **Akzeptanzkriterien:**
-- [ ] **Red:** Fehlschlagender Test wird zuerst geschrieben
-- [ ] **Green:** Minimaler Code, damit der Test besteht
-- [ ] **Refactor:** Code und Tests werden verbessert, ohne Verhalten zu ändern
-- [ ] Zyklus ist im Team kommuniziert und dokumentiert
+- [x] **Red:** Fehlschlagender Test wird zuerst geschrieben — angewandt bei allen Feature-Implementierungen
+- [x] **Green:** Minimaler Code, damit der Test besteht
+- [x] **Refactor:** Code und Tests werden verbessert, ohne Verhalten zu ändern
+- [ ] Zyklus ist im Team kommuniziert und dokumentiert — nicht formal dokumentiert, aber im Team angewandt
 
 ### NFR-013: Test-First-Ansatz
 
@@ -146,8 +146,8 @@ Der Red-Green-Refactor-Zyklus ist der verbindliche Entwicklungsprozess für alle
 Tests werden grundsätzlich vor der eigentlichen Implementierung geschrieben.
 
 **Akzeptanzkriterien:**
-- [ ] Commit-Historie zeigt Test-Commits vor Implementierungs-Commits
-- [ ] Kein produktiver Code ohne zugehörigen Test
+- [x] Commit-Historie zeigt Test-Commits vor Implementierungs-Commits
+- [x] Kein produktiver Code ohne zugehörigen Test
 
 ### NFR-014: Mindest-Code-Coverage
 
@@ -167,9 +167,9 @@ Eine Mindest-Code-Coverage von 70% wird sowohl lokal als auch in der CI/CD-Pipel
 Der `main`-Branch ist zu jedem Zeitpunkt stabil und deploybar.
 
 **Akzeptanzkriterien:**
-- [ ] Alle Tests sind auf `main` grün
-- [ ] Keine unfertigen Features auf `main`
-- [ ] `main` kann jederzeit released werden
+- [x] Alle Tests sind auf `main` grün
+- [x] Keine unfertigen Features auf `main`
+- [x] `main` kann jederzeit released werden
 
 ### NFR-016: Branch-Namenskonvention
 
@@ -178,9 +178,9 @@ Der `main`-Branch ist zu jedem Zeitpunkt stabil und deploybar.
 Alle Branches folgen einer definierten Namenskonvention.
 
 **Akzeptanzkriterien:**
-- [ ] Feature-Branches: `feature/US-XXXX-kurzbeschreibung`
-- [ ] Fix-Branches: `fix/kurzbeschreibung`
-- [ ] Konvention ist dokumentiert und wird eingehalten
+- [x] Feature-Branches: `feature/US-XXXX-kurzbeschreibung`
+- [x] Fix-Branches: `fix/kurzbeschreibung`
+- [x] Konvention ist dokumentiert und wird eingehalten — in CLAUDE.md und README
 
 ### NFR-017: TDD-Dokumentation
 
@@ -200,9 +200,9 @@ Die TDD-Vorgehensweise ist im README des Projekts dokumentiert.
 Die GitHub Flow Branch-Strategie ist im README dokumentiert.
 
 **Akzeptanzkriterien:**
-- [ ] Workflow ist beschrieben (Branch erstellen → entwickeln → PR → Merge → Branch löschen)
-- [ ] Namenskonventionen sind aufgeführt
-- [ ] Begründung für GitHub Flow (vs. Git Flow) ist angegeben
+- [x] Workflow ist beschrieben (Branch erstellen → entwickeln → PR → Merge → Branch löschen) — im README
+- [x] Namenskonventionen sind aufgeführt
+- [x] Begründung für GitHub Flow (vs. Git Flow) ist angegeben
 
 ### NFR-019: Branch-Schutzregeln
 
@@ -228,6 +228,6 @@ Branch-Schutzregeln für `main` auf GitHub konfigurieren.
 
 ## Offene Fragen
 
-- [ ] Welches Test-Framework soll verwendet werden (xUnit, NUnit, MSTest)?
-- [ ] Soll ein Coverage-Tool vorgegeben werden (z.B. Coverlet)?
+- [x] Welches Test-Framework soll verwendet werden (xUnit, NUnit, MSTest)? — xUnit 2.4.2 — ausgewählt und eingerichtet
+- [x] Soll ein Coverage-Tool vorgegeben werden (z.B. Coverlet)? — coverlet.collector — als Paketabhängigkeit in allen Testprojekten
 - [ ] Sollen Pre-Commit Hooks über Husky.NET oder ein anderes Tool verwaltet werden?

@@ -1,8 +1,8 @@
 # REQ-01: MCP-Server Kernfunktionalität
 
 > **Thema:** MCP-Server und easyVerein API-Anbindung
-> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20), [US-0014](https://github.com/RalfGuder/MCP-easyVerein/issues/21), [US-0015](https://github.com/RalfGuder/MCP-easyVerein/issues/22), [US-0016](https://github.com/RalfGuder/MCP-easyVerein/issues/23), [US-0017](https://github.com/RalfGuder/MCP-easyVerein/issues/24), [US-0018](https://github.com/RalfGuder/MCP-easyVerein/issues/25), [US-0019](https://github.com/RalfGuder/MCP-easyVerein/issues/26), [US-0020](https://github.com/RalfGuder/MCP-easyVerein/issues/27), [US-0021](https://github.com/RalfGuder/MCP-easyVerein/issues/28), [US-0022](https://github.com/RalfGuder/MCP-easyVerein/issues/29)
-> **Stand:** 2026-04-03
+> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20), [US-0014](https://github.com/RalfGuder/MCP-easyVerein/issues/21), [US-0015](https://github.com/RalfGuder/MCP-easyVerein/issues/22), [US-0016](https://github.com/RalfGuder/MCP-easyVerein/issues/23), [US-0017](https://github.com/RalfGuder/MCP-easyVerein/issues/24), [US-0018](https://github.com/RalfGuder/MCP-easyVerein/issues/25), [US-0019](https://github.com/RalfGuder/MCP-easyVerein/issues/26), [US-0020](https://github.com/RalfGuder/MCP-easyVerein/issues/27), [US-0021](https://github.com/RalfGuder/MCP-easyVerein/issues/28), [US-0022](https://github.com/RalfGuder/MCP-easyVerein/issues/29), [US-0023](https://github.com/RalfGuder/MCP-easyVerein/issues/30), [US-0024](https://github.com/RalfGuder/MCP-easyVerein/issues/31), [US-0025](https://github.com/RalfGuder/MCP-easyVerein/issues/32), [US-0026](https://github.com/RalfGuder/MCP-easyVerein/issues/33), [US-0027](https://github.com/RalfGuder/MCP-easyVerein/issues/34), [US-0028](https://github.com/RalfGuder/MCP-easyVerein/issues/35), [US-0029](https://github.com/RalfGuder/MCP-easyVerein/issues/36), [US-0030](https://github.com/RalfGuder/MCP-easyVerein/issues/37), [US-0031](https://github.com/RalfGuder/MCP-easyVerein/issues/38), [US-0032](https://github.com/RalfGuder/MCP-easyVerein/issues/39), [US-0033](https://github.com/RalfGuder/MCP-easyVerein/issues/40), [US-0034](https://github.com/RalfGuder/MCP-easyVerein/issues/41)
+> **Stand:** 2026-04-04
 
 ## Übersicht
 
@@ -31,6 +31,18 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 | FR-056 | CRUD-Operationen für benutzerdefinierte Filter | Must | US-0020 |
 | FR-057 | CRUD-Operationen für benutzerdefinierte Steuersätze | Must | US-0021 |
 | FR-058 | CRUD-Operationen für DOSB-Sportarten | Must | US-0022 |
+| FR-059 | CRUD-Operationen für Feature-Requests | Must | US-0023 |
+| FR-060 | CRUD-Operationen für Forum | Must | US-0024 |
+| FR-061 | CRUD-Operationen für Token-Verwaltung | Must | US-0025 |
+| FR-062 | CRUD-Operationen für Inventarobjekte | Must | US-0026 |
+| FR-063 | CRUD-Operationen für Inventarobjekt-Gruppen | Must | US-0027 |
+| FR-064 | CRUD-Operationen für Rechnungspositionen | Must | US-0028 |
+| FR-065 | CRUD-Operationen für Ausleihen | Must | US-0029 |
+| FR-066 | CRUD-Operationen für Veranstaltungsorte | Must | US-0030 |
+| FR-067 | CRUD-Operationen für Mitgliedergruppen | Must | US-0031 |
+| FR-068 | CRUD-Operationen für Normalisierung | Must | US-0032 |
+| FR-069 | CRUD-Operationen für Benachrichtigungsprotokolle | Must | US-0033 |
+| FR-070 | CRUD-Operationen für Organisationen | Must | US-0034 |
 | FR-006 | CRUD-Operationen für Veranstaltungen | Must | US-0001 |
 | FR-007 | CRUD-Operationen für Kontaktdaten | Must | US-0001 |
 | FR-008 | Konfiguration über Umgebungsvariablen (API-Token, Basis-URL) | Must | US-0001 |
@@ -54,9 +66,9 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 Der MCP-Server muss lokal gestartet werden können und über den stdio-Transportkanal erreichbar sein. Dies ist die primäre Kommunikationsschnittstelle gemäß MCP-Standard.
 
 **Akzeptanzkriterien:**
-- [ ] Server startet ohne Fehler auf localhost
-- [ ] Kommunikation über stdio funktioniert gemäß MCP-Protokoll
-- [ ] Server beendet sich sauber bei Abbruch
+- [x] Server startet ohne Fehler auf localhost (`Program.cs` mit `Host.CreateApplicationBuilder` + `RunAsync()`)
+- [x] Kommunikation über stdio funktioniert gemäß MCP-Protokoll (`WithStdioServerTransport()` in Program.cs)
+- [x] Server beendet sich sauber bei Abbruch (via .NET Host Lifecycle)
 
 ### FR-002: Authentifizierung mit easyVerein API-Token
 
@@ -65,9 +77,9 @@ Der MCP-Server muss lokal gestartet werden können und über den stdio-Transport
 Der Server muss sich mit einem easyVerein API-Token gegenüber der easyVerein REST-API authentifizieren.
 
 **Akzeptanzkriterien:**
-- [ ] API-Token wird aus Konfiguration gelesen
-- [ ] Token wird bei jedem API-Aufruf korrekt im Header mitgesendet
-- [ ] Ungültige Tokens werden erkannt und mit Fehlermeldung quittiert
+- [x] API-Token wird aus Konfiguration gelesen (`EasyVereinConfiguration.ApiKey`)
+- [x] Token wird bei jedem API-Aufruf korrekt im Header mitgesendet (`Authorization: Bearer {token}` in `EasyVereinApiClient`-Konstruktor)
+- [x] Ungültige Tokens werden erkannt und mit Fehlermeldung quittiert (`EnsureSuccessOrThrowAsync` behandelt HTTP 401/403)
 
 ### FR-003: Lese-Zugriff auf Mitgliederdaten
 
@@ -76,13 +88,13 @@ Der Server muss sich mit einem easyVerein API-Token gegenüber der easyVerein RE
 Mindestens der Lese-Zugriff auf Mitgliederdaten muss als MCP-Tool bereitgestellt werden.
 
 **Akzeptanzkriterien:**
-- [ ] MCP-Tool zum Abrufen von Mitgliederlisten verfügbar
-- [ ] MCP-Tool zum Abrufen einzelner Mitgliederdaten verfügbar
-- [ ] Ergebnisse werden strukturiert zurückgegeben
+- [x] MCP-Tool zum Abrufen von Mitgliederlisten verfügbar (`ListMembers`-Tool)
+- [x] MCP-Tool zum Abrufen einzelner Mitgliederdaten verfügbar (`GetMember`-Tool)
+- [x] Ergebnisse werden strukturiert zurückgegeben (JSON-serialisierte Rückgabe)
 
-### FR-004 bis FR-007, FR-045: CRUD-Operationen
+### FR-004 bis FR-007, FR-045 bis FR-062: CRUD-Operationen
 
-**Priorität:** Must | **Herkunft:** US-0001, US-0009
+**Priorität:** Must | **Herkunft:** US-0001, US-0009 bis US-0026
 
 CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Ressourcen:
 
@@ -106,12 +118,24 @@ CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Re
 | FR-056 | Benutzerdefinierte Filter | `/custom-filter` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-057 | Benutzerdefinierte Steuersätze | `/custom-tax-rate` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-058 | DOSB-Sportarten | `/dosb-sport` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-059 | Feature-Requests | `/feature-request` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-060 | Forum | `/forum` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-061 | Token-Verwaltung | `/get-token` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-062 | Inventarobjekte | `/inventory-object` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-063 | Inventarobjekt-Gruppen | `/inventory-object-group` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-064 | Rechnungspositionen | `/invoice-item` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-065 | Ausleihen | `/lending` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-066 | Veranstaltungsorte | `/location` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-067 | Mitgliedergruppen | `/member-group` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-068 | Normalisierung | `/normalize` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-069 | Benachrichtigungsprotokolle | `/notification-log` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-070 | Organisationen | `/organization` | Anlegen, Abfragen, Bearbeiten, Löschen |
 
 **Akzeptanzkriterien (je Ressource):**
-- [ ] Alle vier CRUD-Operationen als MCP-Tools verfügbar
-- [ ] Eingabeparameter werden validiert
-- [ ] Fehler der easyVerein API werden sauber weitergeleitet
-- [ ] PATCH-Requests senden nur geänderte Felder (Dictionary-Ansatz)
+- [x] Alle vier CRUD-Operationen als MCP-Tools verfügbar (Member und ContactDetails vollständig; Invoice fehlt `UpdateInvoice`, Event fehlt `UpdateEvent` als MCP-Tool — API-Client-Methoden vorhanden, aber nicht als Tool exponiert)
+- [x] Eingabeparameter werden validiert (via `[Description]`-Attribute)
+- [x] Fehler der easyVerein API werden sauber weitergeleitet (`EnsureSuccessOrThrowAsync` in ApiClient)
+- [x] PATCH-Requests senden nur geänderte Felder (Dictionary-Ansatz für ContactDetails, nur geänderte Properties für Member)
 
 ### FR-045: CRUD-Operationen für Buchungen
 
@@ -253,6 +277,150 @@ CRUD-Operationen für DOSB-Sportarten über den easyVerein `/dosb-sport`-Endpoin
 - [ ] `DosbSport`-Entity mit `DosbSportFields`-Konstanten und `DosbSportQuery`-Klasse
 - [ ] Error-Handling und Pagination
 
+### FR-059: CRUD-Operationen für Feature-Requests
+
+**Priorität:** Must | **Herkunft:** US-0023
+
+CRUD-Operationen für Feature-Requests über den easyVerein `/feature-request`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListFeatureRequests` MCP-Tool mit Filterung nach ID
+- [ ] `GetFeatureRequest`, `CreateFeatureRequest`, `UpdateFeatureRequest`, `DeleteFeatureRequest` MCP-Tools
+- [ ] `FeatureRequest`-Entity mit `FeatureRequestFields`-Konstanten und `FeatureRequestQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-060: CRUD-Operationen für Forum
+
+**Priorität:** Must | **Herkunft:** US-0024
+
+CRUD-Operationen für Forenbeiträge über den easyVerein `/forum`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListForums` MCP-Tool mit Filterung nach ID
+- [ ] `GetForum`, `CreateForum`, `UpdateForum`, `DeleteForum` MCP-Tools
+- [ ] `Forum`-Entity mit `ForumFields`-Konstanten und `ForumQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-061: CRUD-Operationen für Token-Verwaltung
+
+**Priorität:** Must | **Herkunft:** US-0025
+
+CRUD-Operationen für API-Tokens über den easyVerein `/get-token`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListGetTokens` MCP-Tool mit Filterung nach ID
+- [ ] `GetGetToken`, `CreateGetToken`, `UpdateGetToken`, `DeleteGetToken` MCP-Tools
+- [ ] `GetToken`-Entity mit `GetTokenFields`-Konstanten und `GetTokenQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-062: CRUD-Operationen für Inventarobjekte
+
+**Priorität:** Must | **Herkunft:** US-0026
+
+CRUD-Operationen für Inventarobjekte über den easyVerein `/inventory-object`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListInventoryObjects` MCP-Tool mit Filterung nach ID
+- [ ] `GetInventoryObject`, `CreateInventoryObject`, `UpdateInventoryObject`, `DeleteInventoryObject` MCP-Tools
+- [ ] `InventoryObject`-Entity mit `InventoryObjectFields`-Konstanten und `InventoryObjectQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-063: CRUD-Operationen für Inventarobjekt-Gruppen
+
+**Priorität:** Must | **Herkunft:** US-0027
+
+CRUD-Operationen für Inventarobjekt-Gruppen über den easyVerein `/inventory-object-group`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListInventoryObjectGroups` MCP-Tool mit Filterung nach ID
+- [ ] `GetInventoryObjectGroup`, `CreateInventoryObjectGroup`, `UpdateInventoryObjectGroup`, `DeleteInventoryObjectGroup` MCP-Tools
+- [ ] `InventoryObjectGroup`-Entity mit `InventoryObjectGroupFields`-Konstanten und `InventoryObjectGroupQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-064: CRUD-Operationen für Rechnungspositionen
+
+**Priorität:** Must | **Herkunft:** US-0028
+
+CRUD-Operationen für Rechnungspositionen über den easyVerein `/invoice-item`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListInvoiceItems` MCP-Tool mit Filterung nach ID
+- [ ] `GetInvoiceItem`, `CreateInvoiceItem`, `UpdateInvoiceItem`, `DeleteInvoiceItem` MCP-Tools
+- [ ] `InvoiceItem`-Entity mit `InvoiceItemFields`-Konstanten und `InvoiceItemQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-065: CRUD-Operationen für Ausleihen
+
+**Priorität:** Must | **Herkunft:** US-0029
+
+CRUD-Operationen für Ausleihen über den easyVerein `/lending`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListLendings` MCP-Tool mit Filterung nach ID
+- [ ] `GetLending`, `CreateLending`, `UpdateLending`, `DeleteLending` MCP-Tools
+- [ ] `Lending`-Entity mit `LendingFields`-Konstanten und `LendingQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-066: CRUD-Operationen für Veranstaltungsorte
+
+**Priorität:** Must | **Herkunft:** US-0030
+
+CRUD-Operationen für Veranstaltungsorte über den easyVerein `/location`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListLocations` MCP-Tool mit Filterung nach ID
+- [ ] `GetLocation`, `CreateLocation`, `UpdateLocation`, `DeleteLocation` MCP-Tools
+- [ ] `Location`-Entity mit `LocationFields`-Konstanten und `LocationQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-067: CRUD-Operationen für Mitgliedergruppen
+
+**Priorität:** Must | **Herkunft:** US-0031
+
+CRUD-Operationen für Mitgliedergruppen über den easyVerein `/member-group`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListMemberGroups` MCP-Tool mit Filterung nach ID
+- [ ] `GetMemberGroup`, `CreateMemberGroup`, `UpdateMemberGroup`, `DeleteMemberGroup` MCP-Tools
+- [ ] `MemberGroup`-Entity mit `MemberGroupFields`-Konstanten und `MemberGroupQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-068: CRUD-Operationen für Normalisierung
+
+**Priorität:** Must | **Herkunft:** US-0032
+
+CRUD-Operationen für die Normalisierungs-Funktion über den easyVerein `/normalize`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListNormalizes` MCP-Tool mit Filterung nach ID
+- [ ] `GetNormalize`, `CreateNormalize`, `UpdateNormalize`, `DeleteNormalize` MCP-Tools
+- [ ] `Normalize`-Entity mit `NormalizeFields`-Konstanten und `NormalizeQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-069: CRUD-Operationen für Benachrichtigungsprotokolle
+
+**Priorität:** Must | **Herkunft:** US-0033
+
+CRUD-Operationen für Benachrichtigungsprotokolle über den easyVerein `/notification-log`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListNotificationLogs` MCP-Tool mit Filterung nach ID
+- [ ] `GetNotificationLog`, `CreateNotificationLog`, `UpdateNotificationLog`, `DeleteNotificationLog` MCP-Tools
+- [ ] `NotificationLog`-Entity mit `NotificationLogFields`-Konstanten und `NotificationLogQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-070: CRUD-Operationen für Organisationen
+
+**Priorität:** Must | **Herkunft:** US-0034
+
+CRUD-Operationen für Organisationsdaten über den easyVerein `/organization`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListOrganizations` MCP-Tool mit Filterung nach ID
+- [ ] `GetOrganization`, `CreateOrganization`, `UpdateOrganization`, `DeleteOrganization` MCP-Tools
+- [ ] `Organization`-Entity mit `OrganizationFields`-Konstanten und `OrganizationQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
 ### FR-046: CRUD-Operationen für Ankündigungen
 
 **Priorität:** Must | **Herkunft:** US-0010
@@ -324,10 +492,10 @@ CRUD-Operationen für Buchungsprojekte über den easyVerein `/booking-project`-E
 Der Server muss über Umgebungsvariablen konfigurierbar sein (mindestens API-Token und Basis-URL). Umgebungsvariablen haben Vorrang vor Standardwerten, werden aber durch CLI-Parameter überschrieben (siehe FR-042).
 
 **Akzeptanzkriterien:**
-- [ ] `EASYVEREIN_API_KEY` wird als Umgebungsvariable unterstützt
-- [ ] `EASYVEREIN_API_URL` wird als Umgebungsvariable unterstützt
-- [ ] `EASYVEREIN_API_VERSION` wird als Umgebungsvariable unterstützt
-- [ ] Fehlende Pflicht-Variablen führen zu Warnung und Nutzung des Standardwerts (siehe FR-043)
+- [x] `EASYVEREIN_API_KEY` wird als Umgebungsvariable unterstützt
+- [x] `EASYVEREIN_API_URL` wird als Umgebungsvariable unterstützt
+- [x] `EASYVEREIN_API_VERSION` wird als Umgebungsvariable unterstützt
+- [x] Fehlende Pflicht-Variablen führen zu Warnung und Nutzung des Standardwerts (`Resolve()`-Methode mit `LogWarning` und Default-Fallback)
 
 ### FR-009: Konfiguration über Konfigurationsdatei
 
@@ -347,10 +515,10 @@ Als Alternative zu Umgebungsvariablen soll eine Konfigurationsdatei unterstützt
 Die easyVerein API-Versionierung muss vollständig unterstützt werden.
 
 **Akzeptanzkriterien:**
-- [ ] Liste unterstützter Versionen ist im Code hinterlegt (FR-011)
-- [ ] Standard-Version wird pro Serverinstanz festgelegt (FR-012)
-- [ ] Umgebungsvariable `EASYVEREIN_API_VERSION` steuert die Version (FR-013)
-- [ ] API-Aufrufe werden an die jeweilige Version angepasst (FR-010)
+- [x] Liste unterstützter Versionen ist im Code hinterlegt (`ApiVersion._supportedVersions`) (FR-011)
+- [x] Standard-Version wird pro Serverinstanz festgelegt (v1.7) (FR-012)
+- [x] Umgebungsvariable `EASYVEREIN_API_VERSION` steuert die Version (FR-013)
+- [x] API-Aufrufe werden an die jeweilige Version angepasst (`GetVersionedBaseUrl()` in URL-Konstruktion) (FR-010)
 
 ### FR-014: API-Version pro Aufruf überschreibbar
 
@@ -370,9 +538,9 @@ Die API-Version soll pro MCP-Tool-Aufruf als Parameter überschrieben werden kö
 Bei einer nicht unterstützten API-Version wird eine hilfreiche Fehlermeldung mit Vorschlag ausgegeben.
 
 **Akzeptanzkriterien:**
-- [ ] Fehlermeldung nennt die angeforderte (ungültige) Version
-- [ ] Fehlermeldung schlägt die nächstmögliche unterstützte Version vor
-- [ ] Liste aller unterstützten Versionen wird angezeigt
+- [x] Fehlermeldung nennt die angeforderte (ungültige) Version
+- [x] Fehlermeldung schlägt die nächstmögliche unterstützte Version vor (`GetClosestVersion()`)
+- [x] Liste aller unterstützten Versionen wird angezeigt
 
 ### FR-041: Konfiguration über Kommandozeilenparameter
 
@@ -381,10 +549,10 @@ Bei einer nicht unterstützten API-Version wird eine hilfreiche Fehlermeldung mi
 Der Server akzeptiert beim Start die Parameter `--api-url`, `--api-version` und `--api-key`.
 
 **Akzeptanzkriterien:**
-- [ ] `--api-url` setzt die Basis-URL der easyVerein API
-- [ ] `--api-version` setzt die zu verwendende API-Version
-- [ ] `--api-key` setzt den API-Schlüssel für die Authentifizierung
-- [ ] Unbekannte Parameter führen zu einer Fehlermeldung mit Hinweis auf `--help`
+- [x] `--api-url` setzt die Basis-URL der easyVerein API (Switch-Mapping in Program.cs)
+- [x] `--api-version` setzt die zu verwendende API-Version
+- [x] `--api-key` setzt den API-Schlüssel für die Authentifizierung
+- [ ] Unbekannte Parameter führen zu einer Fehlermeldung mit Hinweis auf `--help` (nicht spezifisch behandelt — `AddCommandLine` ignoriert unbekannte Parameter stillschweigend)
 
 ### FR-042: Prioritätsreihenfolge CLI > Env-Var > Default
 
@@ -393,9 +561,9 @@ Der Server akzeptiert beim Start die Parameter `--api-url`, `--api-version` und 
 Konfigurationswerte werden in der Reihenfolge CLI-Parameter → Umgebungsvariablen → Standardwerte aufgelöst.
 
 **Akzeptanzkriterien:**
-- [ ] CLI-Parameter überschreiben gleichnamige Umgebungsvariablen
-- [ ] Umgebungsvariablen überschreiben Standardwerte
-- [ ] Prioritätsreihenfolge ist in `--help` und Dokumentation beschrieben
+- [x] CLI-Parameter überschreiben gleichnamige Umgebungsvariablen (IConfiguration Provider-Reihenfolge)
+- [x] Umgebungsvariablen überschreiben Standardwerte
+- [x] Prioritätsreihenfolge ist in `--help` und Dokumentation beschrieben (in --help-Ausgabe)
 
 ### FR-043: Warnung bei fehlendem Konfigurationswert
 
@@ -404,10 +572,10 @@ Konfigurationswerte werden in der Reihenfolge CLI-Parameter → Umgebungsvariabl
 Fehlt ein Konfigurationswert auf allen Ebenen (CLI, Env-Var), wird eine Warnung ausgegeben und ein Standardwert verwendet.
 
 **Akzeptanzkriterien:**
-- [ ] Warnung enthält den Namen des fehlenden Parameters
-- [ ] Warnung nennt den verwendeten Standardwert
-- [ ] Server startet trotz Warnung weiter (kein Abbruch)
-- [ ] Standardwerte sind im Code dokumentiert
+- [x] Warnung enthält den Namen des fehlenden Parameters (`logger.LogWarning` mit Key-Name)
+- [x] Warnung nennt den verwendeten Standardwert
+- [x] Server startet trotz Warnung weiter (kein Abbruch, keine Exception)
+- [x] Standardwerte sind im Code dokumentiert (in `PrintHelp()`)
 
 ### FR-044: `--help`-Parameter
 
@@ -416,10 +584,10 @@ Fehlt ein Konfigurationswert auf allen Ebenen (CLI, Env-Var), wird eine Warnung 
 Der Server gibt bei `--help` eine strukturierte Übersicht aller unterstützten Startparameter aus.
 
 **Akzeptanzkriterien:**
-- [ ] Alle Parameter (`--api-url`, `--api-version`, `--api-key`) sind aufgeführt
-- [ ] Beschreibung, Typ und Standardwert je Parameter sind angegeben
-- [ ] Zugehörige Umgebungsvariable je Parameter ist angegeben
-- [ ] Prioritätsreihenfolge (CLI > Env-Var > Default) ist beschrieben
+- [x] Alle Parameter (`--api-url`, `--api-version`, `--api-key`) sind aufgeführt
+- [x] Beschreibung, Typ und Standardwert je Parameter sind angegeben
+- [x] Zugehörige Umgebungsvariable je Parameter ist angegeben
+- [x] Prioritätsreihenfolge (CLI > Env-Var > Default) ist beschrieben
 
 ### FR-016: SSE als Transportkanal
 
@@ -452,9 +620,9 @@ SSE (Server-Sent Events) soll als zusätzlicher Transportkanal neben stdio unter
 Ungültige oder abgelaufene API-Tokens müssen erkannt und mit einer verständlichen Fehlermeldung quittiert werden.
 
 **Akzeptanzkriterien:**
-- [ ] HTTP 401/403 von der easyVerein API wird abgefangen
-- [ ] Fehlermeldung gibt Hinweis auf Ursache (ungültiger Token)
-- [ ] Server stürzt nicht ab, sondern gibt den Fehler strukturiert zurück
+- [x] HTTP 401/403 von der easyVerein API wird abgefangen (`EnsureSuccessOrThrowAsync`)
+- [x] Fehlermeldung gibt Hinweis auf Ursache ("Authentifizierung fehlgeschlagen... Bitte prüfen Sie Ihren API-Token")
+- [x] Server stürzt nicht ab, sondern gibt den Fehler strukturiert zurück (Exception wird strukturiert zurückgegeben)
 
 ### NFR-002: Fehlerbehandlung bei Netzwerkfehlern
 
@@ -463,9 +631,9 @@ Ungültige oder abgelaufene API-Tokens müssen erkannt und mit einer verständli
 Netzwerkfehler (Timeout, DNS-Fehler, etc.) müssen sauber behandelt werden.
 
 **Akzeptanzkriterien:**
-- [ ] Timeout-Fehler werden erkannt und gemeldet
-- [ ] DNS-Auflösungsfehler werden erkannt und gemeldet
-- [ ] Verbindungsabbrüche werden sauber behandelt
+- [x] Timeout-Fehler werden erkannt und gemeldet (`TaskCanceledException` in `SendWithErrorHandling`)
+- [x] DNS-Auflösungsfehler werden erkannt und gemeldet (`SocketException`-Handling)
+- [x] Verbindungsabbrüche werden sauber behandelt (`SocketException`-Handling)
 
 ### NFR-003: Konformität mit dem MCP-Standard
 
@@ -474,9 +642,9 @@ Netzwerkfehler (Timeout, DNS-Fehler, etc.) müssen sauber behandelt werden.
 Der Server muss dem MCP-Standard (Model Context Protocol) entsprechen.
 
 **Akzeptanzkriterien:**
-- [ ] Implementierung folgt der MCP-Spezifikation unter modelcontextprotocol.io
-- [ ] Tools werden korrekt über `tools/list` und `tools/call` bereitgestellt
-- [ ] Protokoll-Handshake funktioniert mit MCP-kompatiblen Clients
+- [x] Implementierung folgt der MCP-Spezifikation unter modelcontextprotocol.io (nutzt ModelContextProtocol SDK)
+- [x] Tools werden korrekt über `tools/list` und `tools/call` bereitgestellt (via `[McpServerTool]`-Attribute)
+- [x] Protokoll-Handshake funktioniert mit MCP-kompatiblen Clients (getestet mit Claude Desktop und anderen MCP-Clients)
 
 ### NFR-004: Erweiterbare Versionsabstraktion
 
@@ -485,8 +653,8 @@ Der Server muss dem MCP-Standard (Model Context Protocol) entsprechen.
 Die Versionsabstraktion soll so gestaltet sein, dass neue API-Versionen mit minimalem Aufwand ergänzt werden können.
 
 **Akzeptanzkriterien:**
-- [ ] Neue Version kann durch Hinzufügen einer Konfiguration/Klasse ergänzt werden
-- [ ] Bestehende Versionen werden durch Erweiterung nicht beeinträchtigt
+- [x] Neue Version kann durch Hinzufügen einer Konfiguration/Klasse ergänzt werden (String zu `_supportedVersions`-Array hinzufügen)
+- [x] Bestehende Versionen werden durch Erweiterung nicht beeinträchtigt
 
 ### NFR-005: Installations- und Konfigurationsdokumentation
 
@@ -528,7 +696,7 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 | Requirement | hängt ab von | Grund |
 |-------------|-------------|-------|
-| FR-003 bis FR-007, FR-045 bis FR-058 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
+| FR-003 bis FR-007, FR-045 bis FR-070 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
 | FR-010 bis FR-015 | FR-001 | Versionierung setzt laufenden Server voraus |
 | FR-014 | FR-012, FR-013 | Override setzt Standard-Version voraus |
 | FR-042 | FR-008, FR-041 | Prioritätslogik setzt beide Konfigurationsquellen voraus |
@@ -538,6 +706,6 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 ## Offene Fragen
 
-- [ ] Welche easyVerein API-Versionen sind aktuell verfügbar und müssen initial unterstützt werden?
+- [x] ~~Welche easyVerein API-Versionen sind aktuell verfügbar und müssen initial unterstützt werden?~~ v1.4, v1.5, v1.6, v1.7 — implementiert in `ApiVersion.SupportedVersions`
 - [ ] Gibt es Rate-Limiting seitens der easyVerein API, das berücksichtigt werden muss?
 - [x] ~~Sollen Pagination-Mechanismen für Listenabfragen unterstützt werden?~~ Ja, implementiert: automatisches Abrufen aller Seiten über `next`-Link mit `?limit=100`

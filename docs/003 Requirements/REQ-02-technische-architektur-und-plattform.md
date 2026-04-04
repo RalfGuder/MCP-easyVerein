@@ -2,7 +2,7 @@
 
 > **Thema:** C# / .NET 8, Clean Architecture und Deployment
 > **Herkunft:** [US-0006](https://github.com/RalfGuder/MCP-easyVerein/issues/6)
-> **Stand:** 2026-03-29
+> **Stand:** 2026-04-04
 
 ## Übersicht
 
@@ -25,9 +25,9 @@ Dieses Dokument beschreibt die Anforderungen an die technische Plattform und Arc
 Das Projekt wird als .NET 8 Long-Term-Support C#-Lösung erstellt.
 
 **Akzeptanzkriterien:**
-- [ ] Solution-Datei (.sln) mit .NET 8 Target Framework
-- [ ] C# als Programmiersprache
-- [ ] .NET 8 SDK ist als Voraussetzung dokumentiert
+- [x] Solution-Datei (.sln) mit .NET 8 Target Framework — `MCP.EasyVerein.sln` mit 4 src + 4 test Projekten
+- [x] C# als Programmiersprache
+- [x] .NET 8 SDK ist als Voraussetzung dokumentiert — im README
 
 ### FR-018: Dockerfile für Container-Bereitstellung
 
@@ -36,10 +36,10 @@ Das Projekt wird als .NET 8 Long-Term-Support C#-Lösung erstellt.
 Ein Dockerfile ermöglicht die Bereitstellung als Docker-Container.
 
 **Akzeptanzkriterien:**
-- [ ] Multi-Stage Dockerfile vorhanden (Build + Runtime)
-- [ ] Container startet den MCP-Server korrekt
-- [ ] Container-Image ist möglichst schlank (z.B. Alpine-basiert)
-- [ ] Umgebungsvariablen werden im Container unterstützt
+- [x] Multi-Stage Dockerfile vorhanden (Build + Runtime) — Alpine-basiert
+- [x] Container startet den MCP-Server korrekt
+- [x] Container-Image ist möglichst schlank (z.B. Alpine-basiert)
+- [x] Umgebungsvariablen werden im Container unterstützt
 
 ### FR-019: CI/CD-Pipeline mit Multi-Plattform-Builds
 
@@ -48,10 +48,10 @@ Ein Dockerfile ermöglicht die Bereitstellung als Docker-Container.
 Die CI/CD-Pipeline muss Builds auf allen drei Zielplattformen ausführen.
 
 **Akzeptanzkriterien:**
-- [ ] Build-Job für Windows
-- [ ] Build-Job für Linux
-- [ ] Build-Job für macOS
-- [ ] Alle drei Builds sind erfolgreich
+- [x] Build-Job für Windows — `.github/workflows/build.yml` matrix
+- [x] Build-Job für Linux
+- [x] Build-Job für macOS
+- [x] Alle drei Builds sind erfolgreich
 
 ### FR-020: Clean Architecture-Projekt-Scaffolding
 
@@ -60,9 +60,9 @@ Die CI/CD-Pipeline muss Builds auf allen drei Zielplattformen ausführen.
 Die Projektstruktur folgt den Prinzipien der Clean Architecture.
 
 **Akzeptanzkriterien:**
-- [ ] Klare Trennung der Verantwortlichkeiten in Schichten
-- [ ] Abhängigkeiten zeigen nach innen (Dependency Rule)
-- [ ] Jede Schicht ist als eigenes Projekt in der Solution
+- [x] Klare Trennung der Verantwortlichkeiten in Schichten — 4 Schichten als separate Projekte
+- [x] Abhängigkeiten zeigen nach innen (Dependency Rule) — Domain hat keine externen Abhängigkeiten
+- [x] Jede Schicht ist als eigenes Projekt in der Solution — Domain, Application, Infrastructure, Server
 
 ### FR-021: Schichtendefinition
 
@@ -71,10 +71,10 @@ Die Projektstruktur folgt den Prinzipien der Clean Architecture.
 Die Architektur umfasst vier klar definierte Schichten.
 
 **Akzeptanzkriterien:**
-- [ ] **Domain:** Geschäftslogik und Entitäten, keine externen Abhängigkeiten
-- [ ] **Application:** Anwendungsfälle und Interfaces
-- [ ] **Infrastructure:** Implementierung externer Dienste (easyVerein API, Persistenz)
-- [ ] **Presentation/API:** MCP-Server-Endpunkte und Transportschicht
+- [x] **Domain:** Geschäftslogik und Entitäten, keine externen Abhängigkeiten — Entities (Member, ContactDetails, Event, Invoice), ValueObjects (ApiVersion, *Fields), Interfaces
+- [x] **Application:** Anwendungsfälle und Interfaces — Configuration (EasyVereinConfiguration)
+- [x] **Infrastructure:** Implementierung externer Dienste (easyVerein API, Persistenz) — ApiClient (EasyVereinApiClient, Queries)
+- [x] **Presentation/API:** MCP-Server-Endpunkte und Transportschicht — Server mit MCP-Tools (MemberTools, InvoiceTools, EventTools, ContactDetailsTools)
 
 ---
 
@@ -95,10 +95,10 @@ Die Architektur umfasst vier klar definierte Schichten.
 Die Anwendung muss auf Windows, Linux und macOS lauffähig sein.
 
 **Akzeptanzkriterien:**
-- [ ] Anwendung startet und funktioniert auf Windows
-- [ ] Anwendung startet und funktioniert auf Linux
-- [ ] Anwendung startet und funktioniert auf macOS
-- [ ] Keine plattformspezifischen Abhängigkeiten im Code
+- [x] Anwendung startet und funktioniert auf Windows
+- [x] Anwendung startet und funktioniert auf Linux
+- [x] Anwendung startet und funktioniert auf macOS
+- [x] Keine plattformspezifischen Abhängigkeiten im Code
 
 ### NFR-008: Strikte Schichtentrennung
 
@@ -107,10 +107,10 @@ Die Anwendung muss auf Windows, Linux und macOS lauffähig sein.
 Die Clean Architecture-Schichten müssen strikt eingehalten werden.
 
 **Akzeptanzkriterien:**
-- [ ] Domain-Schicht hat keine Abhängigkeiten zu äußeren Schichten
-- [ ] Application-Schicht kennt nur Domain
-- [ ] Infrastructure implementiert Interfaces aus Application
-- [ ] Dependency Injection wird für die Kopplung verwendet
+- [x] Domain-Schicht hat keine Abhängigkeiten zu äußeren Schichten — nur .NET BCL
+- [x] Application-Schicht kennt nur Domain
+- [x] Infrastructure implementiert Interfaces aus Application — `IEasyVereinApiClient`
+- [x] Dependency Injection wird für die Kopplung verwendet — `Microsoft.Extensions.DependencyInjection` in Program.cs
 
 ### NFR-009: Projektstruktur-Dokumentation
 
@@ -141,9 +141,9 @@ Die Entscheidung für C# / .NET 8 und Clean Architecture ist als ADR oder im REA
 Build und Tests müssen auf allen drei Zielplattformen erfolgreich durchlaufen.
 
 **Akzeptanzkriterien:**
-- [ ] CI/CD zeigt grüne Builds für Windows, Linux und macOS
-- [ ] Alle Tests bestehen auf allen drei Plattformen
-- [ ] Keine plattformspezifischen Testfehler
+- [x] CI/CD zeigt grüne Builds für Windows, Linux und macOS — CI/CD matrix zeigt grün
+- [x] Alle Tests bestehen auf allen drei Plattformen — 46 Tests alle grün
+- [x] Keine plattformspezifischen Testfehler
 
 ---
 
@@ -159,5 +159,5 @@ Build und Tests müssen auf allen drei Zielplattformen erfolgreich durchlaufen.
 
 ## Offene Fragen
 
-- [ ] Soll ein konkretes DI-Framework vorgegeben werden (z.B. Microsoft.Extensions.DependencyInjection)?
+- [x] Soll ein konkretes DI-Framework vorgegeben werden (z.B. Microsoft.Extensions.DependencyInjection)? — Ja, `Microsoft.Extensions.DependencyInjection` — bereits umgesetzt
 - [ ] Sollen Self-Contained Deployments oder Framework-Dependent Deployments bevorzugt werden?

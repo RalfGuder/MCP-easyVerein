@@ -36,6 +36,6 @@
 
 - Implementiert mit ModelContextProtocol SDK 1.2.0 für .NET
 - Clean Architecture: Domain → Application → Infrastructure → Server
-- 25 xUnit-Tests, alle grün
+- 46 xUnit-Tests, alle grün (Domain: 19, Application: 13, Infrastructure: 14)
 - Dockerfile vorhanden (Multi-Stage, Alpine-basiert)
 - Die easyVerein API-Dokumentation ist unter https://easyverein.com/api/ verfügbar
