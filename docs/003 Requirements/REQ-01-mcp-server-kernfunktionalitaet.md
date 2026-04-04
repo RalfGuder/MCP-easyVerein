@@ -1,7 +1,7 @@
 # REQ-01: MCP-Server Kernfunktionalität
 
 > **Thema:** MCP-Server und easyVerein API-Anbindung
-> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20), [US-0014](https://github.com/RalfGuder/MCP-easyVerein/issues/21), [US-0015](https://github.com/RalfGuder/MCP-easyVerein/issues/22), [US-0016](https://github.com/RalfGuder/MCP-easyVerein/issues/23), [US-0017](https://github.com/RalfGuder/MCP-easyVerein/issues/24), [US-0018](https://github.com/RalfGuder/MCP-easyVerein/issues/25), [US-0019](https://github.com/RalfGuder/MCP-easyVerein/issues/26), [US-0020](https://github.com/RalfGuder/MCP-easyVerein/issues/27), [US-0021](https://github.com/RalfGuder/MCP-easyVerein/issues/28), [US-0022](https://github.com/RalfGuder/MCP-easyVerein/issues/29), [US-0023](https://github.com/RalfGuder/MCP-easyVerein/issues/30), [US-0024](https://github.com/RalfGuder/MCP-easyVerein/issues/31), [US-0025](https://github.com/RalfGuder/MCP-easyVerein/issues/32), [US-0026](https://github.com/RalfGuder/MCP-easyVerein/issues/33), [US-0027](https://github.com/RalfGuder/MCP-easyVerein/issues/34), [US-0028](https://github.com/RalfGuder/MCP-easyVerein/issues/35), [US-0029](https://github.com/RalfGuder/MCP-easyVerein/issues/36), [US-0030](https://github.com/RalfGuder/MCP-easyVerein/issues/37), [US-0031](https://github.com/RalfGuder/MCP-easyVerein/issues/38), [US-0032](https://github.com/RalfGuder/MCP-easyVerein/issues/39), [US-0033](https://github.com/RalfGuder/MCP-easyVerein/issues/40), [US-0034](https://github.com/RalfGuder/MCP-easyVerein/issues/41)
+> **Herkunft:** [US-0001](https://github.com/RalfGuder/MCP-easyVerein/issues/1), [US-0005](https://github.com/RalfGuder/MCP-easyVerein/issues/5), [US-0007](https://github.com/RalfGuder/MCP-easyVerein/issues/12), [US-0009](https://github.com/RalfGuder/MCP-easyVerein/issues/16), [US-0010](https://github.com/RalfGuder/MCP-easyVerein/issues/17), [US-0011](https://github.com/RalfGuder/MCP-easyVerein/issues/18), [US-0012](https://github.com/RalfGuder/MCP-easyVerein/issues/19), [US-0013](https://github.com/RalfGuder/MCP-easyVerein/issues/20), [US-0014](https://github.com/RalfGuder/MCP-easyVerein/issues/21), [US-0015](https://github.com/RalfGuder/MCP-easyVerein/issues/22), [US-0016](https://github.com/RalfGuder/MCP-easyVerein/issues/23), [US-0017](https://github.com/RalfGuder/MCP-easyVerein/issues/24), [US-0018](https://github.com/RalfGuder/MCP-easyVerein/issues/25), [US-0019](https://github.com/RalfGuder/MCP-easyVerein/issues/26), [US-0020](https://github.com/RalfGuder/MCP-easyVerein/issues/27), [US-0021](https://github.com/RalfGuder/MCP-easyVerein/issues/28), [US-0022](https://github.com/RalfGuder/MCP-easyVerein/issues/29), [US-0023](https://github.com/RalfGuder/MCP-easyVerein/issues/30), [US-0024](https://github.com/RalfGuder/MCP-easyVerein/issues/31), [US-0025](https://github.com/RalfGuder/MCP-easyVerein/issues/32), [US-0026](https://github.com/RalfGuder/MCP-easyVerein/issues/33), [US-0027](https://github.com/RalfGuder/MCP-easyVerein/issues/34), [US-0028](https://github.com/RalfGuder/MCP-easyVerein/issues/35), [US-0029](https://github.com/RalfGuder/MCP-easyVerein/issues/36), [US-0030](https://github.com/RalfGuder/MCP-easyVerein/issues/37), [US-0031](https://github.com/RalfGuder/MCP-easyVerein/issues/38), [US-0032](https://github.com/RalfGuder/MCP-easyVerein/issues/39), [US-0033](https://github.com/RalfGuder/MCP-easyVerein/issues/40), [US-0034](https://github.com/RalfGuder/MCP-easyVerein/issues/41), [US-0035](https://github.com/RalfGuder/MCP-easyVerein/issues/44), [US-0036](https://github.com/RalfGuder/MCP-easyVerein/issues/47), [US-0037](https://github.com/RalfGuder/MCP-easyVerein/issues/49), [US-0038](https://github.com/RalfGuder/MCP-easyVerein/issues/52), [US-0039](https://github.com/RalfGuder/MCP-easyVerein/issues/54), [US-0040](https://github.com/RalfGuder/MCP-easyVerein/issues/56), [US-0041](https://github.com/RalfGuder/MCP-easyVerein/issues/59), [US-0042](https://github.com/RalfGuder/MCP-easyVerein/issues/42), [US-0043](https://github.com/RalfGuder/MCP-easyVerein/issues/43), [US-0044](https://github.com/RalfGuder/MCP-easyVerein/issues/46), [US-0045](https://github.com/RalfGuder/MCP-easyVerein/issues/51), [US-0046](https://github.com/RalfGuder/MCP-easyVerein/issues/57), [US-0047](https://github.com/RalfGuder/MCP-easyVerein/issues/61), [US-0048](https://github.com/RalfGuder/MCP-easyVerein/issues/62), [US-0049](https://github.com/RalfGuder/MCP-easyVerein/issues/45), [US-0050](https://github.com/RalfGuder/MCP-easyVerein/issues/48), [US-0051](https://github.com/RalfGuder/MCP-easyVerein/issues/50), [US-0052](https://github.com/RalfGuder/MCP-easyVerein/issues/53), [US-0053](https://github.com/RalfGuder/MCP-easyVerein/issues/55), [US-0054](https://github.com/RalfGuder/MCP-easyVerein/issues/58), [US-0055](https://github.com/RalfGuder/MCP-easyVerein/issues/60)
 > **Stand:** 2026-04-04
 
 ## Übersicht
@@ -43,6 +43,27 @@ Dieses Dokument beschreibt die Kernanforderungen an den easyVerein MCP-Server: d
 | FR-068 | CRUD-Operationen für Normalisierung | Must | US-0032 |
 | FR-069 | CRUD-Operationen für Benachrichtigungsprotokolle | Must | US-0033 |
 | FR-070 | CRUD-Operationen für Organisationen | Must | US-0034 |
+| FR-071 | CRUD-Operationen für Kontenpläne | Must | US-0035 |
+| FR-072 | CRUD-Operationen für Benachrichtigungs-Tokens | Must | US-0036 |
+| FR-073 | CRUD-Operationen für Organisationseinstellungen | Must | US-0037 |
+| FR-074 | CRUD-Operationen für Organisations-Tokens | Must | US-0038 |
+| FR-075 | CRUD-Operationen für Pässe | Must | US-0039 |
+| FR-076 | CRUD-Operationen für Pass-Felder | Must | US-0040 |
+| FR-077 | CRUD-Operationen für Pass-Vorlagen | Must | US-0041 |
+| FR-078 | CRUD-Operationen für Passcreator-Integrationen | Must | US-0042 |
+| FR-079 | CRUD-Operationen für Forenbeiträge | Must | US-0043 |
+| FR-080 | CRUD-Operationen für Preisgruppen | Must | US-0044 |
+| FR-081 | CRUD-Operationen für Sitzungsprotokolle | Must | US-0045 |
+| FR-082 | CRUD-Operationen für Protokollelemente | Must | US-0046 |
+| FR-083 | CRUD-Operationen für Protokollelement-Kommentare | Must | US-0047 |
+| FR-084 | CRUD-Operationen für Protokoll-Uploads | Must | US-0048 |
+| FR-085 | CRUD-Operationen für Aufgaben | Must | US-0049 |
+| FR-086 | CRUD-Operationen für Aufgaben-Kommentare | Must | US-0050 |
+| FR-087 | CRUD-Operationen für Aufgabengruppen | Must | US-0051 |
+| FR-088 | CRUD-Operationen für Forenthemen | Must | US-0052 |
+| FR-089 | CRUD-Operationen für Abstimmungen | Must | US-0053 |
+| FR-090 | CRUD-Operationen für Abstimmungsfragen | Must | US-0054 |
+| FR-091 | CRUD-Operationen für Webseiten | Must | US-0055 |
 | FR-006 | CRUD-Operationen für Veranstaltungen | Must | US-0001 |
 | FR-007 | CRUD-Operationen für Kontaktdaten | Must | US-0001 |
 | FR-008 | Konfiguration über Umgebungsvariablen (API-Token, Basis-URL) | Must | US-0001 |
@@ -130,6 +151,27 @@ CRUD-Operationen (Create, Read, Update, Delete) für die zentralen easyVerein-Re
 | FR-068 | Normalisierung | `/normalize` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-069 | Benachrichtigungsprotokolle | `/notification-log` | Anlegen, Abfragen, Bearbeiten, Löschen |
 | FR-070 | Organisationen | `/organization` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-071 | Kontenpläne | `/accounting-plan` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-072 | Benachrichtigungs-Tokens | `/notification-token` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-073 | Organisationseinstellungen | `/organization-settings` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-074 | Organisations-Tokens | `/organization-token` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-075 | Pässe | `/pass` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-076 | Pass-Felder | `/pass-field` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-077 | Pass-Vorlagen | `/pass-template` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-078 | Passcreator-Integrationen | `/passcreator-integration` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-079 | Forenbeiträge | `/post` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-080 | Preisgruppen | `/price-group` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-081 | Sitzungsprotokolle | `/protocol` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-082 | Protokollelemente | `/protocol-element` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-083 | Protokollelement-Kommentare | `/protocol-element-comment` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-084 | Protokoll-Uploads | `/protocol-upload` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-085 | Aufgaben | `/task` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-086 | Aufgaben-Kommentare | `/task-comment` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-087 | Aufgabengruppen | `/task-group` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-088 | Forenthemen | `/topic` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-089 | Abstimmungen | `/voting` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-090 | Abstimmungsfragen | `/voting-question` | Anlegen, Abfragen, Bearbeiten, Löschen |
+| FR-091 | Webseiten | `/website` | Anlegen, Abfragen, Bearbeiten, Löschen |
 
 **Akzeptanzkriterien (je Ressource):**
 - [x] Alle vier CRUD-Operationen als MCP-Tools verfügbar (Member und ContactDetails vollständig; Invoice fehlt `UpdateInvoice`, Event fehlt `UpdateEvent` als MCP-Tool — API-Client-Methoden vorhanden, aber nicht als Tool exponiert)
@@ -421,6 +463,258 @@ CRUD-Operationen für Organisationsdaten über den easyVerein `/organization`-En
 - [ ] `Organization`-Entity mit `OrganizationFields`-Konstanten und `OrganizationQuery`-Klasse
 - [ ] Error-Handling und Pagination
 
+### FR-071: CRUD-Operationen für Kontenpläne
+
+**Priorität:** Must | **Herkunft:** US-0035
+
+CRUD-Operationen für Kontenpläne über den easyVerein `/accounting-plan`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListAccountingPlans` MCP-Tool mit Filterung nach ID
+- [ ] `GetAccountingPlan`, `CreateAccountingPlan`, `UpdateAccountingPlan`, `DeleteAccountingPlan` MCP-Tools
+- [ ] `AccountingPlan`-Entity mit `AccountingPlanFields`-Konstanten und `AccountingPlanQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-072: CRUD-Operationen für Benachrichtigungs-Tokens
+
+**Priorität:** Must | **Herkunft:** US-0036
+
+CRUD-Operationen für Benachrichtigungs-Tokens über den easyVerein `/notification-token`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListNotificationTokens` MCP-Tool mit Filterung nach ID
+- [ ] `GetNotificationToken`, `CreateNotificationToken`, `UpdateNotificationToken`, `DeleteNotificationToken` MCP-Tools
+- [ ] `NotificationToken`-Entity mit `NotificationTokenFields`-Konstanten und `NotificationTokenQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-073: CRUD-Operationen für Organisationseinstellungen
+
+**Priorität:** Must | **Herkunft:** US-0037
+
+CRUD-Operationen für Organisationseinstellungen über den easyVerein `/organization-settings`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListOrganizationSettings` MCP-Tool mit Filterung nach ID
+- [ ] `GetOrganizationSettings`, `CreateOrganizationSettings`, `UpdateOrganizationSettings`, `DeleteOrganizationSettings` MCP-Tools
+- [ ] `OrganizationSettings`-Entity mit `OrganizationSettingsFields`-Konstanten und `OrganizationSettingsQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-074: CRUD-Operationen für Organisations-Tokens
+
+**Priorität:** Must | **Herkunft:** US-0038
+
+CRUD-Operationen für Organisations-Tokens über den easyVerein `/organization-token`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListOrganizationTokens` MCP-Tool mit Filterung nach ID
+- [ ] `GetOrganizationToken`, `CreateOrganizationToken`, `UpdateOrganizationToken`, `DeleteOrganizationToken` MCP-Tools
+- [ ] `OrganizationToken`-Entity mit `OrganizationTokenFields`-Konstanten und `OrganizationTokenQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-075: CRUD-Operationen für Pässe
+
+**Priorität:** Must | **Herkunft:** US-0039
+
+CRUD-Operationen für digitale Pässe und Ausweise über den easyVerein `/pass`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListPasses` MCP-Tool mit Filterung nach ID
+- [ ] `GetPass`, `CreatePass`, `UpdatePass`, `DeletePass` MCP-Tools
+- [ ] `Pass`-Entity mit `PassFields`-Konstanten und `PassQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-076: CRUD-Operationen für Pass-Felder
+
+**Priorität:** Must | **Herkunft:** US-0040
+
+CRUD-Operationen für Pass-Felder über den easyVerein `/pass-field`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListPassFields` MCP-Tool mit Filterung nach ID
+- [ ] `GetPassField`, `CreatePassField`, `UpdatePassField`, `DeletePassField` MCP-Tools
+- [ ] `PassField`-Entity mit `PassFieldFields`-Konstanten und `PassFieldQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-077: CRUD-Operationen für Pass-Vorlagen
+
+**Priorität:** Must | **Herkunft:** US-0041
+
+CRUD-Operationen für Pass-Vorlagen über den easyVerein `/pass-template`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListPassTemplates` MCP-Tool mit Filterung nach ID
+- [ ] `GetPassTemplate`, `CreatePassTemplate`, `UpdatePassTemplate`, `DeletePassTemplate` MCP-Tools
+- [ ] `PassTemplate`-Entity mit `PassTemplateFields`-Konstanten und `PassTemplateQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-078: CRUD-Operationen für Passcreator-Integrationen
+
+**Priorität:** Must | **Herkunft:** US-0042
+
+CRUD-Operationen für Passcreator-Integrationen über den easyVerein `/passcreator-integration`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListPasscreatorIntegrations` MCP-Tool mit Filterung nach ID
+- [ ] `GetPasscreatorIntegration`, `CreatePasscreatorIntegration`, `UpdatePasscreatorIntegration`, `DeletePasscreatorIntegration` MCP-Tools
+- [ ] `PasscreatorIntegration`-Entity mit `PasscreatorIntegrationFields`-Konstanten und `PasscreatorIntegrationQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-079: CRUD-Operationen für Forenbeiträge
+
+**Priorität:** Must | **Herkunft:** US-0043
+
+CRUD-Operationen für Forenbeiträge über den easyVerein `/post`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListPosts` MCP-Tool mit Filterung nach ID
+- [ ] `GetPost`, `CreatePost`, `UpdatePost`, `DeletePost` MCP-Tools
+- [ ] `Post`-Entity mit `PostFields`-Konstanten und `PostQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-080: CRUD-Operationen für Preisgruppen
+
+**Priorität:** Must | **Herkunft:** US-0044
+
+CRUD-Operationen für Preisgruppen über den easyVerein `/price-group`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListPriceGroups` MCP-Tool mit Filterung nach ID
+- [ ] `GetPriceGroup`, `CreatePriceGroup`, `UpdatePriceGroup`, `DeletePriceGroup` MCP-Tools
+- [ ] `PriceGroup`-Entity mit `PriceGroupFields`-Konstanten und `PriceGroupQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-081: CRUD-Operationen für Sitzungsprotokolle
+
+**Priorität:** Must | **Herkunft:** US-0045
+
+CRUD-Operationen für Sitzungsprotokolle über den easyVerein `/protocol`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListProtocols` MCP-Tool mit Filterung nach ID
+- [ ] `GetProtocol`, `CreateProtocol`, `UpdateProtocol`, `DeleteProtocol` MCP-Tools
+- [ ] `Protocol`-Entity mit `ProtocolFields`-Konstanten und `ProtocolQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-082: CRUD-Operationen für Protokollelemente
+
+**Priorität:** Must | **Herkunft:** US-0046
+
+CRUD-Operationen für Protokollelemente über den easyVerein `/protocol-element`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListProtocolElements` MCP-Tool mit Filterung nach ID
+- [ ] `GetProtocolElement`, `CreateProtocolElement`, `UpdateProtocolElement`, `DeleteProtocolElement` MCP-Tools
+- [ ] `ProtocolElement`-Entity mit `ProtocolElementFields`-Konstanten und `ProtocolElementQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-083: CRUD-Operationen für Protokollelement-Kommentare
+
+**Priorität:** Must | **Herkunft:** US-0047
+
+CRUD-Operationen für Kommentare zu Protokollelementen über den easyVerein `/protocol-element-comment`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListProtocolElementComments` MCP-Tool mit Filterung nach ID
+- [ ] `GetProtocolElementComment`, `CreateProtocolElementComment`, `UpdateProtocolElementComment`, `DeleteProtocolElementComment` MCP-Tools
+- [ ] `ProtocolElementComment`-Entity mit `ProtocolElementCommentFields`-Konstanten und `ProtocolElementCommentQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-084: CRUD-Operationen für Protokoll-Uploads
+
+**Priorität:** Must | **Herkunft:** US-0048
+
+CRUD-Operationen für Dateianhänge zu Protokollen über den easyVerein `/protocol-upload`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListProtocolUploads` MCP-Tool mit Filterung nach ID
+- [ ] `GetProtocolUpload`, `CreateProtocolUpload`, `UpdateProtocolUpload`, `DeleteProtocolUpload` MCP-Tools
+- [ ] `ProtocolUpload`-Entity mit `ProtocolUploadFields`-Konstanten und `ProtocolUploadQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-085: CRUD-Operationen für Aufgaben
+
+**Priorität:** Must | **Herkunft:** US-0049
+
+CRUD-Operationen für Aufgaben über den easyVerein `/task`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListTasks` MCP-Tool mit Filterung nach ID
+- [ ] `GetTask`, `CreateTask`, `UpdateTask`, `DeleteTask` MCP-Tools
+- [ ] `EasyVereinTask`-Entity mit `TaskFields`-Konstanten und `TaskQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-086: CRUD-Operationen für Aufgaben-Kommentare
+
+**Priorität:** Must | **Herkunft:** US-0050
+
+CRUD-Operationen für Aufgaben-Kommentare über den easyVerein `/task-comment`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListTaskComments` MCP-Tool mit Filterung nach ID
+- [ ] `GetTaskComment`, `CreateTaskComment`, `UpdateTaskComment`, `DeleteTaskComment` MCP-Tools
+- [ ] `TaskComment`-Entity mit `TaskCommentFields`-Konstanten und `TaskCommentQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-087: CRUD-Operationen für Aufgabengruppen
+
+**Priorität:** Must | **Herkunft:** US-0051
+
+CRUD-Operationen für Aufgabengruppen über den easyVerein `/task-group`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListTaskGroups` MCP-Tool mit Filterung nach ID
+- [ ] `GetTaskGroup`, `CreateTaskGroup`, `UpdateTaskGroup`, `DeleteTaskGroup` MCP-Tools
+- [ ] `TaskGroup`-Entity mit `TaskGroupFields`-Konstanten und `TaskGroupQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-088: CRUD-Operationen für Forenthemen
+
+**Priorität:** Must | **Herkunft:** US-0052
+
+CRUD-Operationen für Forenthemen über den easyVerein `/topic`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListTopics` MCP-Tool mit Filterung nach ID
+- [ ] `GetTopic`, `CreateTopic`, `UpdateTopic`, `DeleteTopic` MCP-Tools
+- [ ] `Topic`-Entity mit `TopicFields`-Konstanten und `TopicQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-089: CRUD-Operationen für Abstimmungen
+
+**Priorität:** Must | **Herkunft:** US-0053
+
+CRUD-Operationen für Abstimmungen über den easyVerein `/voting`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListVotings` MCP-Tool mit Filterung nach ID
+- [ ] `GetVoting`, `CreateVoting`, `UpdateVoting`, `DeleteVoting` MCP-Tools
+- [ ] `Voting`-Entity mit `VotingFields`-Konstanten und `VotingQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-090: CRUD-Operationen für Abstimmungsfragen
+
+**Priorität:** Must | **Herkunft:** US-0054
+
+CRUD-Operationen für Abstimmungsfragen über den easyVerein `/voting-question`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListVotingQuestions` MCP-Tool mit Filterung nach ID
+- [ ] `GetVotingQuestion`, `CreateVotingQuestion`, `UpdateVotingQuestion`, `DeleteVotingQuestion` MCP-Tools
+- [ ] `VotingQuestion`-Entity mit `VotingQuestionFields`-Konstanten und `VotingQuestionQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
+### FR-091: CRUD-Operationen für Webseiten
+
+**Priorität:** Must | **Herkunft:** US-0055
+
+CRUD-Operationen für Vereins-Webseiten über den easyVerein `/website`-Endpoint.
+
+**Akzeptanzkriterien:**
+- [ ] `ListWebsites` MCP-Tool mit Filterung nach ID
+- [ ] `GetWebsite`, `CreateWebsite`, `UpdateWebsite`, `DeleteWebsite` MCP-Tools
+- [ ] `Website`-Entity mit `WebsiteFields`-Konstanten und `WebsiteQuery`-Klasse
+- [ ] Error-Handling und Pagination
+
 ### FR-046: CRUD-Operationen für Ankündigungen
 
 **Priorität:** Must | **Herkunft:** US-0010
@@ -696,7 +990,7 @@ Alle Konfigurationsquellen (CLI-Parameter, Umgebungsvariablen, Standardwerte) un
 
 | Requirement | hängt ab von | Grund |
 |-------------|-------------|-------|
-| FR-003 bis FR-007, FR-045 bis FR-070 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
+| FR-003 bis FR-007, FR-045 bis FR-091 | FR-002 | CRUD-Operationen benötigen Authentifizierung |
 | FR-010 bis FR-015 | FR-001 | Versionierung setzt laufenden Server voraus |
 | FR-014 | FR-012, FR-013 | Override setzt Standard-Version voraus |
 | FR-042 | FR-008, FR-041 | Prioritätslogik setzt beide Konfigurationsquellen voraus |
