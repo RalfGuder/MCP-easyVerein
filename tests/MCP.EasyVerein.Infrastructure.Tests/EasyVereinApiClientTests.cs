@@ -260,6 +260,51 @@ public class EasyVereinApiClientTests
         Assert.Equal("Anna", result[0].FirstName);
         Assert.Equal("Schmidt", result[0].FamilyName);
     }
+
+    // ------------------------------------------------------------------ //
+    // Bookings
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task GetBookings_ReturnsBookings()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new { id = 1, amount = 150.50, receiver = "Max Mustermann" }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListBookingsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Max Mustermann", result[0].Receiver);
+        Assert.Equal(150.50m, result[0].Amount);
+    }
+
+    [Fact]
+    public async Task GetBooking_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetBookingAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetBookings_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBookingsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //

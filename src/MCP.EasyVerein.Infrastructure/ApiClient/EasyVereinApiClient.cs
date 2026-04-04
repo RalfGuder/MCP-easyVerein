@@ -319,6 +319,66 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<Member>(response, ct);
     }
 
+    // --- Bookings (FR-045) ---
+
+    /// <summary>Lists bookings with optional ID filter and automatic pagination.</summary>
+    /// <param name="id">Optional filter by booking identifier.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching <see cref="Booking"/> records.</returns>
+    public async Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, CancellationToken ct = default)
+    {
+        ApiQueries.BookingQuery.Id = id;
+        return await HandleListResponseWithPagination<Booking>(
+            BuildListUrl("booking", ApiQueries.Booking), ct);
+    }
+
+    /// <summary>Retrieves a single booking by its identifier.</summary>
+    /// <param name="id">The unique identifier of the booking.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The <see cref="Booking"/> if found; otherwise <c>null</c>.</returns>
+    public async Task<Booking?> GetBookingAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"booking/{id}", ApiQueries.Booking), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<Booking>(response, ct);
+    }
+
+    /// <summary>Creates a new booking via the API.</summary>
+    /// <param name="booking">The booking to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="Booking"/> as returned by the API.</returns>
+    public async Task<Booking> CreateBookingAsync(Booking booking, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("booking"), booking, ct), ct);
+        return await HandleResponse<Booking>(response, ct);
+    }
+
+    /// <summary>Partially updates a booking with a patch dictionary.</summary>
+    /// <param name="id">The unique identifier of the booking to update.</param>
+    /// <param name="patchData">An object containing only the fields to update.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="Booking"/> as returned by the API.</returns>
+    public async Task<Booking> UpdateBookingAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"booking/{id}"), content, ct), ct);
+        return await HandleResponse<Booking>(response, ct);
+    }
+
+    /// <summary>Deletes a booking by its identifier.</summary>
+    /// <param name="id">The unique identifier of the booking to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteBookingAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"booking/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
     /// <summary>
     /// Builds a URL for a single-resource GET request by appending the query string.
     /// </summary>
@@ -390,7 +450,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string initialUrl, CancellationToken ct)
     {
         var allResults = new List<T>();
-        string? url = initialUrl;
+        var url = initialUrl;
 
         while (url != null)
         {

@@ -130,4 +130,35 @@ public interface IEasyVereinApiClient
     /// <param name="id">The event ID to delete.</param>
     /// <param name="ct">Cancellation token.</param>
     Task DeleteEventAsync(long id, CancellationToken ct = default);
+
+    // Bookings
+    /// <summary>Lists bookings, optionally filtered by ID.</summary>
+    /// <param name="id">Optional booking ID to filter by.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching bookings.</returns>
+    Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, CancellationToken ct = default);
+
+    /// <summary>Gets a single booking by ID.</summary>
+    /// <param name="id">The booking ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The booking, or <c>null</c> if not found.</returns>
+    Task<Booking?> GetBookingAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new booking.</summary>
+    /// <param name="booking">The booking to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created booking.</returns>
+    Task<Booking> CreateBookingAsync(Booking booking, CancellationToken ct = default);
+
+    /// <summary>Partially updates a booking.</summary>
+    /// <param name="id">The booking ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated booking.</returns>
+    Task<Booking> UpdateBookingAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a booking by ID.</summary>
+    /// <param name="id">The booking ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteBookingAsync(long id, CancellationToken ct = default);
 }

@@ -26,6 +26,16 @@ internal static class ApiQueries
     internal static string ContactDetails => ContactDetailsQuery.ToString();
 
     /// <summary>
+    /// Shared <see cref="BookingQuery"/> instance used to build booking query strings with optional filters.
+    /// </summary>
+    internal static readonly BookingQuery BookingQuery = new();
+
+    /// <summary>
+    /// Gets the current booking query string including field selection and any active filters.
+    /// </summary>
+    internal static string Booking => BookingQuery.ToString();
+
+    /// <summary>
     /// Query string for invoice endpoints specifying all requested fields.
     /// </summary>
     public const string Invoice =
