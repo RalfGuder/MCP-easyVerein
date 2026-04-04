@@ -36,7 +36,26 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
                 MemberFields.PaymentStartDate + "," +
                 MemberFields.PaymentAmount + "," +
                 MemberFields.PaymentIntervalMonths + "," +
-                MemberFields.RelatedMember + "," +
+                MemberFields.RelatedMember +
+                "{" +
+                    MemberFields.Id  + "," +
+                    MemberFields.ContactDetails +
+                    "{" +
+                        ContactDetailsFields.Id  + "," +
+                        ContactDetailsFields.FirstName + "," +
+                        ContactDetailsFields.FamilyName +
+                    "}" +
+                "}," +
+                MemberFields.RelatedMembers +
+                "{" +
+                    MemberFields.Id + "," +
+                    MemberFields.ContactDetails +
+                    "{" +
+                        ContactDetailsFields.Id + "," +
+                        ContactDetailsFields.FirstName + "," +
+                        ContactDetailsFields.FamilyName +
+                    "}" +
+                "}," +
                 MemberFields.UseBalanceForMembershipFee + "," +
                 MemberFields.BulletinBoardNewPostNotification + "," +
                 MemberFields.MembershipNumber + "," +

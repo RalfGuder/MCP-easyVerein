@@ -49,8 +49,14 @@ public class Booking
     /// </summary>
     [JsonPropertyName(BookingFields.Date)] public DateTime? Date { get; set; }
 
+    /// <summary>
+    /// Gets or sets the date after which the booking is deleted. Maps to API field '<c>_deleteAfterDate</c>'.
+    /// </summary>
     [JsonPropertyName(BookingFields.DeleteAfterDate)] public DateTime? DeleteAfterDate { get; set; }
 
+    /// <summary>
+    /// Gets or sets the user who deleted the booking. Maps to API field '<c>_deletedBy</c>'.
+    /// </summary>
     [JsonPropertyName(BookingFields.DeletedBy)] public string? DeletedBy { get; set; }
 
     /// <summary>
@@ -63,6 +69,9 @@ public class Booking
     /// </summary>
     [JsonPropertyName(BookingFields.Id)] public long Id { get; set; }
 
+    /// <summary>
+    /// Gets or sets the organization reference. Maps to API field '<c>org</c>'.
+    /// </summary>
     [JsonPropertyName(BookingFields.Org)] public Organization? Org { get; set; }
 
     /// <summary>

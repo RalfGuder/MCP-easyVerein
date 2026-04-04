@@ -10,10 +10,19 @@ internal class BookingQuery
     /// <summary>Gets or sets an optional booking identifier filter.</summary>
     internal long? Id { get; set; }
 
+    /// <summary>Gets or sets optional search terms to filter bookings.</summary>
     public string[]? Search { get; set; }
+
+    /// <summary>Gets or sets an optional exact date filter.</summary>
     public string? Date { get; set; }
+
+    /// <summary>Gets or sets an optional filter for dates greater than the specified value.</summary>
     public string? DateGt { get; set; }
+
+    /// <summary>Gets or sets an optional filter for dates less than the specified value.</summary>
     public string? DateLt { get; set; }
+
+    /// <summary>Gets or sets an optional ordering criterion for the results.</summary>
     public string? Ordering { get; set; }
 
     /// <summary>The base field selection query requesting all booking fields.</summary>

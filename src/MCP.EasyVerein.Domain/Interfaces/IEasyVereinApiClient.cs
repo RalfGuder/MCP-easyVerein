@@ -132,9 +132,13 @@ public interface IEasyVereinApiClient
     Task DeleteEventAsync(long id, CancellationToken ct = default);
 
     // Bookings
-    /// <summary>Lists bookings, optionally filtered by ID.</summary>
+    /// <summary>Lists bookings, optionally filtered by ID, date range, ordering, or search terms.</summary>
     /// <param name="id">Optional booking ID to filter by.</param>
-    /// <param name="search"></param>
+    /// <param name="date">Optional exact date filter.</param>
+    /// <param name="dateGt">Optional filter for dates greater than the specified value.</param>
+    /// <param name="dateLt">Optional filter for dates less than the specified value.</param>
+    /// <param name="ordering">Optional ordering criterion for the results.</param>
+    /// <param name="search">Optional search terms to filter bookings.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching bookings.</returns>
     Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default, CancellationToken ct = default);

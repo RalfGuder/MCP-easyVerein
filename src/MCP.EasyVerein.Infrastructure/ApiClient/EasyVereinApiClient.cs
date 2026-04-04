@@ -13,8 +13,13 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient;
 /// </summary>
 public class EasyVereinApiClient : IEasyVereinApiClient
 {
+    /// <summary>The easyVerein configuration containing API key, base URL, and version.</summary>
     private readonly EasyVereinConfiguration _config;
+
+    /// <summary>The HTTP client used for all API requests.</summary>
     private readonly HttpClient _httpClient;
+
+    /// <summary>The JSON serializer options used for request and response serialization.</summary>
     private readonly JsonSerializerOptions _jsonOptions;
 
     /// <summary>
@@ -321,9 +326,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
     // --- Bookings (FR-045) ---
 
-    /// <summary>Lists bookings with optional ID filter and automatic pagination.</summary>
+    /// <summary>Lists bookings with optional filters and automatic pagination.</summary>
     /// <param name="id">Optional filter by booking identifier.</param>
-    /// <param name="search"></param>
+    /// <param name="date">Optional exact date filter.</param>
+    /// <param name="dateGt">Optional filter for dates greater than the specified value.</param>
+    /// <param name="dateLt">Optional filter for dates less than the specified value.</param>
+    /// <param name="ordering">Optional ordering criterion for the results.</param>
+    /// <param name="search">Optional search terms to filter bookings.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="Booking"/> records.</returns>
     public async Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,

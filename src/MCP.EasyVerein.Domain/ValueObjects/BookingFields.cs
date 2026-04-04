@@ -45,12 +45,16 @@ internal static class BookingFields
     /// </summary>
     internal const string Date = "date";
 
+    /// <summary>API filter field name for dates greater than a given value.</summary>
     internal const string DateGt = "date__gt";
 
+    /// <summary>API filter field name for dates less than a given value.</summary>
     internal const string DateLt = "date__lt";
-    
+
+    /// <summary>API field name for the date after which the booking is deleted.</summary>
     internal const string DeleteAfterDate = "_deleteAfterDate";
-    
+
+    /// <summary>API field name for the user who deleted the booking.</summary>
     internal const string DeletedBy = "_deletedBy";
 
     /// <summary>
@@ -63,7 +67,10 @@ internal static class BookingFields
     /// </summary>
     internal const string Id = "id";
 
+    /// <summary>API query parameter for result ordering.</summary>
     internal const string Ordering = "ordering";
+
+    /// <summary>API field name for the organization reference.</summary>
     internal const string Org = "org";
 
     /// <summary>
@@ -81,6 +88,7 @@ internal static class BookingFields
     /// </summary>
     internal const string RelatedInvoice = "relatedInvoice";
 
+    /// <summary>API query parameter for full-text search.</summary>
     internal const string Search = "search";
 
     /// <summary>API field name for the sphere (area).</summary>

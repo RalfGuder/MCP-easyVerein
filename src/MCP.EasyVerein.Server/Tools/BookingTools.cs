@@ -17,6 +17,11 @@ public sealed class BookingTools(IEasyVereinApiClient client)
     /// Lists bookings with an optional ID filter and automatic pagination.
     /// </summary>
     /// <param name="id">Optional booking ID filter.</param>
+    /// <param name="date">The date.</param>
+    /// <param name="dateGt">The date gt.</param>
+    /// <param name="dateLt">The date lt.</param>
+    /// <param name="search">The search.</param>
+    /// <param name="ordering">The ordering.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string containing matching bookings, or an error message.</returns>
     [McpServerTool(Name = "list_bookings"), Description("List all bookings")]
@@ -25,7 +30,8 @@ public sealed class BookingTools(IEasyVereinApiClient client)
         [Description("Booking date")] string? date,
         [Description("Booking date greater than")] string? dateGt,
         [Description("Booking date less than")] string? dateLt,
-        [Description("Search terms")] string[]? search, string? ordering, CancellationToken ct)
+        [Description("Search terms")] string[]? search, 
+        [Description("Ordering criteria")] string? ordering, CancellationToken ct)
     {
         try
         {
