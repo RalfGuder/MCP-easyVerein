@@ -1,0 +1,119 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Jede Nacht um 02:00 UTC
+  workflow_dispatch:       # Manueller Start möglich
+
+env:
+  VERSION_PREFIX: "1.0.0"
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: .NET SDK einrichten
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: NuGet-Pakete wiederherstellen
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release -p:Version=${{ env.VERSION_PREFIX }}-nightly.${{ github.run_number }}
+
+      - name: Tests ausführen
+        run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
+
+  publish:
+    name: Publish (${{ matrix.rid }})
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    strategy:
+      matrix:
+        rid: [ linux-x64, win-x64, osx-x64, osx-arm64 ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: .NET SDK einrichten
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish
+        run: >
+          dotnet publish src/MCP.EasyVerein.Server/MCP.EasyVerein.Server.csproj
+          --configuration Release
+          --runtime ${{ matrix.rid }}
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:Version=${{ env.VERSION_PREFIX }}-nightly.${{ github.run_number }}
+          -o publish/${{ matrix.rid }}
+
+      - name: Artefakt packen
+        run: |
+          cd publish/${{ matrix.rid }}
+          tar -czf ../../mcp-easyverein-${{ matrix.rid }}.tar.gz .
+
+      - name: Artefakt hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-easyverein-${{ matrix.rid }}
+          path: mcp-easyverein-${{ matrix.rid }}.tar.gz
+
+  release:
+    name: Nightly Release
+    runs-on: ubuntu-latest
+    needs: publish
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Artefakte herunterladen
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Vorheriges Nightly-Release löschen
+        run: gh release delete nightly --yes --cleanup-tag || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Nightly-Release erstellen
+        run: |
+          gh release create nightly \
+            --title "Nightly Build $(date -u +%Y-%m-%d)" \
+            --notes "$(cat <<'EOF'
+          Automatischer Nightly Build vom $(date -u +%Y-%m-%d %H:%M) UTC.
+
+          **Version:** ${{ env.VERSION_PREFIX }}-nightly.${{ github.run_number }}
+
+          > :warning: Dies ist ein Vorab-Release und nicht für den Produktiveinsatz vorgesehen.
+
+          ### Plattformen
+          | Datei | Plattform |
+          |-------|-----------|
+          | `mcp-easyverein-linux-x64.tar.gz` | Linux x64 |
+          | `mcp-easyverein-win-x64.tar.gz` | Windows x64 |
+          | `mcp-easyverein-osx-x64.tar.gz` | macOS x64 (Intel) |
+          | `mcp-easyverein-osx-arm64.tar.gz` | macOS ARM64 (Apple Silicon) |
+          EOF
+          )" \
+            --prerelease \
+            --target main \
+            artifacts/*.tar.gz
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

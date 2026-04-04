@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  VERSION_PREFIX: "1.0.0"
+  BUILD_NUMBER: ${{ github.run_number }}
+
 jobs:
   build:
     name: Build & Test (${{ matrix.os }})
@@ -27,7 +31,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release -p:Version=${{ env.VERSION_PREFIX }}.${{ env.BUILD_NUMBER }}
 
       - name: Tests ausführen
         run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
@@ -49,4 +53,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Docker-Image bauen
-        run: docker build -t mcp-easyverein:${{ github.sha }} .
+        run: docker build --build-arg VERSION=${{ env.VERSION_PREFIX }}.${{ env.BUILD_NUMBER }} -t mcp-easyverein:${{ env.VERSION_PREFIX }}.${{ env.BUILD_NUMBER }} .
