@@ -24,7 +24,7 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     public async Task<string> ListMembers(
         [Description("The ID of a member")]long? id,
         [Description("The membership number of a member")] string? membershipNumber,
-        string[]? search , CancellationToken ct)
+        [Description("Search terms for the member")] string[]? search , CancellationToken ct)
     {
         try
         {
@@ -44,7 +44,8 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the member, or a not-found message.</returns>
     [McpServerTool(Name="get_member"), Description("Retrieve a member using their ID.")]
-    public async Task<string> GetMember([Description("The ID of the member")] long id, CancellationToken ct)
+    public async Task<string> GetMember(
+        [Description("The ID of the member")] long id, CancellationToken ct)
     {
         var member = await client.GetMemberAsync(id, ct);
         return member != null
@@ -107,7 +108,8 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A confirmation message.</returns>
     [McpServerTool(Name="delete_member"), Description("Delete a member. Only authorized users are able to perform this action!")]
-    public async Task<string> DeleteMember([Description("The ID of the member")] long id, CancellationToken ct)
+    public async Task<string> DeleteMember(
+        [Description("The ID of the member")] long id, CancellationToken ct)
     {
         await client.DeleteMemberAsync(id, ct);
         return $"Member with ID {id} has been deleted.";

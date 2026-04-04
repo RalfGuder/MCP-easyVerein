@@ -134,9 +134,10 @@ public interface IEasyVereinApiClient
     // Bookings
     /// <summary>Lists bookings, optionally filtered by ID.</summary>
     /// <param name="id">Optional booking ID to filter by.</param>
+    /// <param name="search"></param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching bookings.</returns>
-    Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, CancellationToken ct = default);
+    Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default, CancellationToken ct = default);
 
     /// <summary>Gets a single booking by ID.</summary>
     /// <param name="id">The booking ID.</param>

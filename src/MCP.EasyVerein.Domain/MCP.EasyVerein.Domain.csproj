@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="MCP.EasyVerein.Infrastructure" />
+    <InternalsVisibleTo Include="MCP.EasyVerein.Server" />
+    <InternalsVisibleTo Include="MCP.EasyVerein.Domain.Tests" />
+  </ItemGroup>
+
 </Project>

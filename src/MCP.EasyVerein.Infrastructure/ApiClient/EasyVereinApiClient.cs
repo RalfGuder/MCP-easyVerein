@@ -323,11 +323,19 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
     /// <summary>Lists bookings with optional ID filter and automatic pagination.</summary>
     /// <param name="id">Optional filter by booking identifier.</param>
+    /// <param name="search"></param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="Booking"/> records.</returns>
-    public async Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,
+        CancellationToken ct = default)
     {
         ApiQueries.BookingQuery.Id = id;
+        ApiQueries.BookingQuery.Search = search;
+        ApiQueries.BookingQuery.Date = date;
+        ApiQueries.BookingQuery.DateGt = dateGt;
+        ApiQueries.BookingQuery.DateLt = dateLt;
+        ApiQueries.BookingQuery.Ordering = ordering;
+
         return await HandleListResponseWithPagination<Booking>(
             BuildListUrl("booking", ApiQueries.Booking), ct);
     }

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
+using MCP.EasyVerein.Domain.ValueObjects;
 using ModelContextProtocol.Server;
 
 namespace MCP.EasyVerein.Server.Tools;
@@ -20,11 +21,15 @@ public sealed class BookingTools(IEasyVereinApiClient client)
     /// <returns>A JSON string containing matching bookings, or an error message.</returns>
     [McpServerTool(Name = "list_bookings"), Description("List all bookings")]
     public async Task<string> ListBookings(
-        [Description("The ID of a booking")] long? id, CancellationToken ct)
+        [Description("The ID of a booking")] long? id, 
+        [Description("Booking date")] string? date,
+        [Description("Booking date greater than")] string? dateGt,
+        [Description("Booking date less than")] string? dateLt,
+        [Description("Search terms")] string[]? search, string? ordering, CancellationToken ct)
     {
         try
         {
-            var bookings = await client.ListBookingsAsync(id, ct);
+            var bookings = await client.ListBookingsAsync(id, date, dateGt, dateLt, ordering, search, ct);
             return JsonSerializer.Serialize(bookings, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception ex)
@@ -113,10 +118,10 @@ public sealed class BookingTools(IEasyVereinApiClient client)
         try
         {
             var patch = new Dictionary<string, object>();
-            if (amount != null) patch["amount"] = amount;
-            if (description != null) patch["description"] = description;
-            if (date != null) patch["date"] = date;
-            if (receiver != null) patch["receiver"] = receiver;
+            if (amount != null) patch[BookingFields.Amount] = amount;
+            if (description != null) patch[BookingFields.Description] = description;
+            if (date != null) patch[BookingFields.Date] = date;
+            if (receiver != null) patch[BookingFields.Receiver] = receiver;
 
             var updated = await client.UpdateBookingAsync(id, patch, ct);
             return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
