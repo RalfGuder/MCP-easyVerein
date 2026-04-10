@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
+using MCP.EasyVerein.Domain.ValueObjects;
 using ModelContextProtocol.Server;
 
 namespace MCP.EasyVerein.Server.Tools;
@@ -24,7 +25,7 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     public async Task<string> ListMembers(
         [Description("The ID of a member")]long? id,
         [Description("The membership number of a member")] string? membershipNumber,
-        string[]? search , CancellationToken ct)
+        [Description("Search terms for the member")] string[]? search , CancellationToken ct)
     {
         try
         {
@@ -44,12 +45,21 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the member, or a not-found message.</returns>
     [McpServerTool(Name="get_member"), Description("Retrieve a member using their ID.")]
-    public async Task<string> GetMember([Description("The ID of the member")] long id, CancellationToken ct)
+    public async Task<string> GetMember(
+        [Description("The ID of the member")] long id, CancellationToken ct)
     {
-        var member = await client.GetMemberAsync(id, ct);
-        return member != null
-            ? JsonSerializer.Serialize(member, new JsonSerializerOptions { WriteIndented = true })
-            : $"Member with ID {id} not found.";
+        try
+        {
+            var member = await client.GetMemberAsync(id, ct);
+            return member != null
+                ? JsonSerializer.Serialize(member, new JsonSerializerOptions { WriteIndented = true })
+                : $"Member with ID {id} not found.";
+        }
+        catch (Exception ex)
+        {
+            return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
+        }
+
     }
 
     /// <summary>
@@ -69,35 +79,75 @@ public sealed class MemberTools(IEasyVereinApiClient client)
         [Description("The private email of the new member")] string? privateEmail,
         CancellationToken ct)
     {
-        var contactDetails = new ContactDetails
+        try
         {
-            FirstName = firstName,
-            FamilyName = familyName,
-            PrivateEmail = privateEmail
-        };
-        var created = await client.CreateMemberAsync(emailOrUserName, contactDetails, ct);
-        return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            var contactDetails = new ContactDetails
+            {
+                FirstName = firstName,
+                FamilyName = familyName,
+                PrivateEmail = privateEmail
+            };
+            var created = await client.CreateMemberAsync(emailOrUserName, contactDetails, ct);
+            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch (Exception e)
+        {
+            return $"ERROR: {e.GetType().Name}: {e.Message}\nInner: {e.InnerException?.Message}";
+        }
+
     }
 
     /// <summary>
     /// Updates an existing member's data. Only the provided fields are modified (PATCH semantics).
     /// </summary>
     /// <param name="id">The unique identifier of the member to update.</param>
-    /// <param name="emailOrUserName">An optional new email or username.</param>
     /// <param name="membershipNumber">An optional new membership number.</param>
+    /// <param name="resignationDate">An optional new resignation date.</param>
+    /// <param name="resignationNoticeDate">An optional new resignation notice date.</param>
+    /// <param name="joinDate">The join date.</param>
+    /// <param name="declarationOfApplication">The declaration of application.</param>
+    /// <param name="paymentStartDate">The payment start date.</param>
+    /// <param name="paymentAmount">The payment amount.</param>
+    /// <param name="paymentIntervalMonths">The payment intervall months.</param>
+    /// <param name="relatedMember">The related member.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the updated member.</returns>
     [McpServerTool(Name="update_member"), Description("Check if the user is permitted to change values and if so, update")]
     public async Task<string> UpdateMember(
         [Description("The ID of the member")] long id,
-        [Description("The email or user name of the member")] string? emailOrUserName,
-        [Description("The membership number of a member")] string? membershipNumber, CancellationToken ct)
+        [Description("The membership number of a member")] string? membershipNumber, 
+        [Description("The resignation date of the member")] DateTime? resignationDate, 
+        [Description("The resignation notice date of the member")] DateTime? resignationNoticeDate,
+        [Description("The join date of the member")] DateTime? joinDate, 
+        [Description("The declaration of application of the member")] string? declarationOfApplication, 
+        [Description("The payment start date of the member")] DateTime? paymentStartDate,
+        [Description("The payment amount of the member")] decimal? paymentAmount,
+        [Description("The payment interval in months")] int? paymentIntervalMonths,
+        [Description("The related member ID")] long? relatedMember,
+        [Description("Use balance for membership fee")] bool? useBalanceForMembershipFee, CancellationToken ct)
     {
-        var member = new Member { Id = id };
-        if (emailOrUserName != null) member.EmailOrUserName = emailOrUserName;
-        if (membershipNumber != null) member.MembershipNumber = membershipNumber;
-        var updated = await client.UpdateMemberAsync(id, member, ct);
-        return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+        try
+        {
+            var patchData = new Dictionary<string, object>();
+            if (membershipNumber != null) patchData[MemberFields.MembershipNumber] = membershipNumber;
+            if (resignationDate != null) patchData[MemberFields.ResignationDate] = resignationDate;
+            if (resignationNoticeDate != null) patchData[MemberFields.ResignationNoticeDate] = resignationNoticeDate;
+            if (joinDate != null) patchData[MemberFields.JoinDate] = joinDate;
+            if (declarationOfApplication != null) patchData[MemberFields.DeclarationOfApplication] = declarationOfApplication;
+            if (paymentStartDate != null) patchData[MemberFields.PaymentStartDate] = paymentStartDate;
+            if (paymentAmount != null) patchData[MemberFields.PaymentAmount] = paymentAmount;
+            if (paymentIntervalMonths != null) patchData[MemberFields.PaymentIntervalMonths] = paymentIntervalMonths;
+            if (relatedMember != null) patchData[MemberFields.RelatedMember] = relatedMember;
+            if (useBalanceForMembershipFee != null) patchData[MemberFields.UseBalanceForMembershipFee] = useBalanceForMembershipFee;
+
+            var updated = await client.UpdateMemberAsync(id, patchData, ct);
+            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+
+        }
+        catch (Exception e)
+        {
+            return $"ERROR: {e.GetType().Name}: {e.Message}\nInner: {e.InnerException?.Message}";
+        }
     }
 
     /// <summary>
@@ -107,9 +157,18 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A confirmation message.</returns>
     [McpServerTool(Name="delete_member"), Description("Delete a member. Only authorized users are able to perform this action!")]
-    public async Task<string> DeleteMember([Description("The ID of the member")] long id, CancellationToken ct)
+    public async Task<string> DeleteMember(
+        [Description("The ID of the member")] long id, CancellationToken ct)
     {
-        await client.DeleteMemberAsync(id, ct);
-        return $"Member with ID {id} has been deleted.";
+        try
+        {
+            await client.DeleteMemberAsync(id, ct);
+            return $"Member with ID {id} has been deleted.";
+
+        }
+        catch (Exception e)
+        {
+            return $"ERROR: {e.GetType().Name}: {e.Message}\nInner: {e.InnerException?.Message}";
+        }
     }
 }

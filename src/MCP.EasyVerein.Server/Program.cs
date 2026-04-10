@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ModelContextProtocol.Server;
+using System.Text.Json.Serialization;
 
 // Intercept --help before host startup (FR-044)
 if (args.Contains("--help") || args.Contains("-h"))
@@ -60,7 +60,6 @@ builder.Services
 
 var app = builder.Build();
 await app.RunAsync();
-var xx = app.Services.GetService<MemberTools>();
 
 /// <summary>
 /// Prints the CLI usage help text with all available parameters, environment variables, and defaults.

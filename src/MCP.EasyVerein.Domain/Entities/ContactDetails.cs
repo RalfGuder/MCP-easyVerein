@@ -4,6 +4,7 @@ using MCP.EasyVerein.Domain.ValueObjects;
 namespace MCP.EasyVerein.Domain.Entities;
 
 /// <summary>Represents the contact details of a member from the easyVerein API.</summary>
+[JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 public class ContactDetails
 {
     /// <summary>Gets whether the address is a company address. Maps to API field '<c>addressCompany</c>'.</summary>

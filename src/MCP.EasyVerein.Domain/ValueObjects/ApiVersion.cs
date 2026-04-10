@@ -5,12 +5,19 @@ namespace MCP.EasyVerein.Domain.ValueObjects;
 /// </summary>
 public sealed class ApiVersion
 {
+    /// <summary>The list of all supported API version strings.</summary>
     private static readonly IReadOnlyList<string> _supportedVersions = new[] { "v1.4", "v1.5", "v1.6", "v1.7" };
+
+    /// <summary>The default API version string used when none is specified.</summary>
     private const string DefaultVersion = "v1.7";
 
     /// <summary>Gets the version string.</summary>
     public string Version { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiVersion"/> class with the given version string.
+    /// </summary>
+    /// <param name="version">The validated version string.</param>
     private ApiVersion(string version)
     {
         Version = version;
