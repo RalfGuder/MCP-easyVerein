@@ -6,16 +6,17 @@ namespace MCP.EasyVerein.Domain.Entities;
 /// <summary>
 /// Represents an association member from the easyVerein API.
 /// </summary>
+[JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 public class Member
 {
     /// <summary>
-    /// Gets or sets the application date. Maps to API field ' <c>_applicationDate</c>'.
+    /// Gets or sets the application date. Maps to API field <c>_applicationDate</c>.
     /// </summary>
     [JsonPropertyName(MemberFields.ApplicationDate)] 
     public DateTime? ApplicationDate { get; set; }
 
     /// <summary>
-    /// Gets or sets the date the application was accepted. Maps to API field ' <c>_applicationWasAcceptedAt</c>'.
+    /// Gets or sets the date the application was accepted. Maps to API field <c>_applicationWasAcceptedAt</c>.
     /// </summary>
     [JsonPropertyName(MemberFields.ApplicationWasAcceptedAt)] 
     public DateTime? ApplicationWasAcceptedAt { get; set; }

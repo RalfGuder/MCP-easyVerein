@@ -89,22 +89,16 @@ public sealed class ContactDetailsTools(IEasyVereinApiClient client)
     /// Updates existing contact details. Only the provided fields are modified (PATCH semantics).
     /// </summary>
     /// <param name="id">The unique identifier of the contact details to update.</param>
-    /// <param name="firstName">An optional new first name.</param>
-    /// <param name="familyName">An optional new family name.</param>
-    /// <param name="privateEmail">An optional new private email address.</param>
+    /// <param name="contactDetails">The contact details.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the updated contact details, or an error message.</returns>
     [McpServerTool, Description("Update contact details")]
-    public async Task<string> UpdateContactDetails(long id, string? firstName, string? familyName, string? privateEmail, CancellationToken ct)
+    public async Task<string> UpdateContactDetails(long id, ContactDetails contactDetails, CancellationToken ct)
     {
         try
         {
-            var patch = new Dictionary<string, object>();
-            if (firstName != null) patch["firstName"] = firstName;
-            if (familyName != null) patch["familyName"] = familyName;
-            if (privateEmail != null) patch["privateEmail"] = privateEmail;
 
-            var updated = await client.UpdateContactDetailsAsync(id, patch, ct);
+            var updated = await client.UpdateContactDetailsAsync(id, contactDetails, ct);
             return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception ex)
