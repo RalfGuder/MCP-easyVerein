@@ -62,13 +62,12 @@ internal static class ApiQueries
         "closingDescription,useAddressBalance}";
 
     /// <summary>
-    /// Query string for event endpoints specifying all requested fields.
+    /// Shared <see cref="EventQuery"/> instance used to build event query strings with optional filters.
     /// </summary>
-    public const string Event =
-        "query={id,name,description,prologue,note,start,end,allDay," +
-        "locationName,locationObject,parent," +
-        "minParticipators,maxParticipators," +
-        "startParticipation,endParticipation,access,weekdays," +
-        "sendMailCheck,showMemberarea,isPublic,massParticipations," +
-        "canceled,isReservation,creator,reservationParentEvent}";
+    internal static readonly EventQuery EventQuery = new();
+
+    /// <summary>
+    /// Gets the current event query string including field selection and any active filters.
+    /// </summary>
+    internal static string Event => EventQuery.ToString();
 }
