@@ -243,13 +243,38 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<Event>(response, ct);
     }
 
-    /// <summary>
-    /// Retrieves all events with automatic pagination.
-    /// </summary>
+    /// <summary>Lists events with optional filters and automatic pagination.</summary>
+    /// <param name="name">Optional name filter.</param>
+    /// <param name="startGte">Optional start date greater than or equal filter.</param>
+    /// <param name="startLte">Optional start date less than or equal filter.</param>
+    /// <param name="endGte">Optional end date greater than or equal filter.</param>
+    /// <param name="endLte">Optional end date less than or equal filter.</param>
+    /// <param name="calendar">Optional calendar ID filter.</param>
+    /// <param name="canceled">Optional canceled filter.</param>
+    /// <param name="isPublic">Optional public visibility filter.</param>
+    /// <param name="idIn">Optional comma-separated IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
     /// <param name="ct">Cancellation token.</param>
-    /// <returns>A read-only list of all <see cref="Event"/> records.</returns>
-    public async Task<IReadOnlyList<Event>> GetEventsAsync(CancellationToken ct = default)
+    /// <returns>A read-only list of matching <see cref="Event"/> records.</returns>
+    public async Task<IReadOnlyList<Event>> ListEventsAsync(string? name = null, string? startGte = null,
+        string? startLte = null, string? endGte = null, string? endLte = null,
+        string? calendar = null, string? canceled = null, string? isPublic = null,
+        string? idIn = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
     {
+        ApiQueries.EventQuery.Name = name;
+        ApiQueries.EventQuery.StartGte = startGte;
+        ApiQueries.EventQuery.StartLte = startLte;
+        ApiQueries.EventQuery.EndGte = endGte;
+        ApiQueries.EventQuery.EndLte = endLte;
+        ApiQueries.EventQuery.Calendar = calendar;
+        ApiQueries.EventQuery.Canceled = canceled;
+        ApiQueries.EventQuery.IsPublic = isPublic;
+        ApiQueries.EventQuery.IdIn = idIn;
+        ApiQueries.EventQuery.Ordering = ordering;
+        ApiQueries.EventQuery.Search = search;
+
         return await HandleListResponseWithPagination<Event>(
             BuildListUrl("event", ApiQueries.Event), ct);
     }
