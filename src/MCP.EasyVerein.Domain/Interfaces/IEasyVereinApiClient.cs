@@ -11,6 +11,12 @@ public interface IEasyVereinApiClient
     /// <returns>The created booking.</returns>
     Task<Booking> CreateBookingAsync(Booking booking, CancellationToken ct = default);
 
+    /// <summary>Creates a new calendar.</summary>
+    /// <param name="calendar">The calendar to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created calendar.</returns>
+    Task<Calendar> CreateCalendarAsync(Calendar calendar, CancellationToken ct = default);
+
     /// <summary>Creates a new contact details record.</summary>
     /// <param name="contact">The contact details to create.</param>
     /// <param name="ct">Cancellation token.</param>
@@ -42,6 +48,11 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteBookingAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Deletes a calendar by ID.</summary>
+    /// <param name="id">The calendar ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteCalendarAsync(long id, CancellationToken ct = default);
+
     /// <summary>Deletes a contact details record by ID.</summary>
     /// <param name="id">The contact details ID to delete.</param>
     /// <param name="ct">Cancellation token.</param>
@@ -67,6 +78,12 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The booking, or <c>null</c> if not found.</returns>
     Task<Booking?> GetBookingAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Gets a single calendar by ID.</summary>
+    /// <param name="id">The calendar ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The calendar, or <c>null</c> if not found.</returns>
+    Task<Calendar?> GetCalendarAsync(long id, CancellationToken ct = default);
 
     /// <summary>Gets a single contact details record by ID.</summary>
     /// <param name="id">The contact details ID.</param>
@@ -114,6 +131,24 @@ public interface IEasyVereinApiClient
     /// <returns>A read-only list of matching bookings.</returns>
     Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default, CancellationToken ct = default);
 
+    /// <summary>Lists calendars, optionally filtered by name, color, short, ordering, or search terms.</summary>
+    /// <param name="name">Optional name filter.</param>
+    /// <param name="color">Optional color filter.</param>
+    /// <param name="short_">Optional short name filter.</param>
+    /// <param name="nameNot">Optional name negation filter.</param>
+    /// <param name="colorNot">Optional color negation filter.</param>
+    /// <param name="shortNot">Optional short name negation filter.</param>
+    /// <param name="idIn">Optional comma-separated IDs filter.</param>
+    /// <param name="allowedGroups">Optional allowed groups filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching calendars.</returns>
+    Task<IReadOnlyList<Calendar>> ListCalendarsAsync(string? name = null, string? color = null,
+        string? short_ = null, string? nameNot = null, string? colorNot = null,
+        string? shortNot = null, string? idIn = null, string? allowedGroups = null,
+        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+
     /// <summary>Lists contact details, optionally filtered by ID, first name, family name, or full name.</summary>
     /// <param name="id">Optional contact details ID to filter by.</param>
     /// <param name="firstName">Optional first name to filter by.</param>
@@ -137,6 +172,13 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The updated booking.</returns>
     Task<Booking> UpdateBookingAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Partially updates a calendar.</summary>
+    /// <param name="id">The calendar ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated calendar.</returns>
+    Task<Calendar> UpdateCalendarAsync(long id, object patchData, CancellationToken ct = default);
 
     /// <summary>Partially updates a contact details record.</summary>
     /// <param name="id">The contact details ID to update.</param>

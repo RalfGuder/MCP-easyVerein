@@ -36,6 +36,16 @@ internal static class ApiQueries
     internal static string Booking => BookingQuery.ToString();
 
     /// <summary>
+    /// Shared <see cref="CalendarQuery"/> instance used to build calendar query strings with optional filters.
+    /// </summary>
+    internal static readonly CalendarQuery CalendarQuery = new();
+
+    /// <summary>
+    /// Gets the current calendar query string including field selection and any active filters.
+    /// </summary>
+    internal static string Calendar => CalendarQuery.ToString();
+
+    /// <summary>
     /// Query string for invoice endpoints specifying all requested fields.
     /// </summary>
     public const string Invoice =

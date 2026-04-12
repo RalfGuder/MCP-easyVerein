@@ -54,6 +54,17 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<Booking>(response, ct);
     }
 
+    /// <summary>Creates a new calendar via the API.</summary>
+    /// <param name="calendar">The calendar to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="Calendar"/> as returned by the API.</returns>
+    public async Task<Calendar> CreateCalendarAsync(Calendar calendar, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("calendar"), calendar, ct), ct);
+        return await HandleResponse<Calendar>(response, ct);
+    }
+
     /// <summary>
     /// Creates a new contact details record via the API.
     /// </summary>
@@ -121,6 +132,16 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         await EnsureSuccessOrThrowAsync(response, ct);
     }
 
+    /// <summary>Deletes a calendar by its identifier.</summary>
+    /// <param name="id">The unique identifier of the calendar to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteCalendarAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"calendar/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
     /// <summary>
     /// Deletes a contact details record by its identifier.
     /// </summary>
@@ -179,6 +200,18 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             () => _httpClient.GetAsync(BuildGetUrl($"booking/{id}", ApiQueries.Booking), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Booking>(response, ct);
+    }
+
+    /// <summary>Retrieves a single calendar by its identifier.</summary>
+    /// <param name="id">The unique identifier of the calendar.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The <see cref="Calendar"/> if found; otherwise <c>null</c>.</returns>
+    public async Task<Calendar?> GetCalendarAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"calendar/{id}", ApiQueries.Calendar), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<Calendar>(response, ct);
     }
 
     /// <summary>
@@ -284,6 +317,39 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             BuildListUrl("booking", ApiQueries.Booking), ct);
     }
 
+    /// <summary>Lists calendars with optional filters and automatic pagination.</summary>
+    /// <param name="name">Optional name filter.</param>
+    /// <param name="color">Optional color filter.</param>
+    /// <param name="short_">Optional short name filter.</param>
+    /// <param name="nameNot">Optional name negation filter.</param>
+    /// <param name="colorNot">Optional color negation filter.</param>
+    /// <param name="shortNot">Optional short name negation filter.</param>
+    /// <param name="idIn">Optional comma-separated IDs filter.</param>
+    /// <param name="allowedGroups">Optional allowed groups filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching <see cref="Calendar"/> records.</returns>
+    public async Task<IReadOnlyList<Calendar>> ListCalendarsAsync(string? name = null, string? color = null,
+        string? short_ = null, string? nameNot = null, string? colorNot = null,
+        string? shortNot = null, string? idIn = null, string? allowedGroups = null,
+        string? ordering = null, string[]? search = null, CancellationToken ct = default)
+    {
+        ApiQueries.CalendarQuery.Name = name;
+        ApiQueries.CalendarQuery.Color = color;
+        ApiQueries.CalendarQuery.Short = short_;
+        ApiQueries.CalendarQuery.NameNot = nameNot;
+        ApiQueries.CalendarQuery.ColorNot = colorNot;
+        ApiQueries.CalendarQuery.ShortNot = shortNot;
+        ApiQueries.CalendarQuery.IdIn = idIn;
+        ApiQueries.CalendarQuery.AllowedGroups = allowedGroups;
+        ApiQueries.CalendarQuery.Ordering = ordering;
+        ApiQueries.CalendarQuery.Search = search;
+
+        return await HandleListResponseWithPagination<Calendar>(
+            BuildListUrl("calendar", ApiQueries.Calendar), ct);
+    }
+
     /// <summary>
     /// Lists contact details with optional filters and automatic pagination.
     /// </summary>
@@ -335,6 +401,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         var response = await SendWithErrorHandling(
             () => _httpClient.PatchAsync(BuildUrl($"booking/{id}"), content, ct), ct);
         return await HandleResponse<Booking>(response, ct);
+    }
+
+    /// <summary>Partially updates a calendar with a patch dictionary.</summary>
+    /// <param name="id">The unique identifier of the calendar to update.</param>
+    /// <param name="patchData">An object containing only the fields to update.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="Calendar"/> as returned by the API.</returns>
+    public async Task<Calendar> UpdateCalendarAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"calendar/{id}"), content, ct), ct);
+        return await HandleResponse<Calendar>(response, ct);
     }
 
     /// <summary>
