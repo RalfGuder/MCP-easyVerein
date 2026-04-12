@@ -305,6 +305,69 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBookingsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // Calendars
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListCalendars_ReturnsCalendars()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new { id = 1, name = "Kulturverein", color = "#f9e4c6", @short = "KVMi" }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListCalendarsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Kulturverein", result[0].Name);
+        Assert.Equal("#f9e4c6", result[0].Color);
+    }
+
+    [Fact]
+    public async Task GetCalendar_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetCalendarAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task ListCalendars_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListCalendarsAsync());
+    }
+
+    [Fact]
+    public async Task ListCalendars_SendsQueryParameter()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCalendarsAsync();
+
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.Contains("query=", handler.LastRequestUri!.Query);
+        Assert.Contains("limit=100", handler.LastRequestUri!.Query);
+    }
 }
 
 // ------------------------------------------------------------------ //
