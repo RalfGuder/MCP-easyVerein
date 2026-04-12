@@ -97,10 +97,25 @@ public interface IEasyVereinApiClient
     /// <returns>The event, or <c>null</c> if not found.</returns>
     Task<Event?> GetEventAsync(long id, CancellationToken ct = default);
 
-    /// <summary>Gets all events.</summary>
+    /// <summary>Lists events, optionally filtered by name, date range, calendar, and other criteria.</summary>
+    /// <param name="name">Optional name filter.</param>
+    /// <param name="startGte">Optional start date greater than or equal filter (ISO 8601).</param>
+    /// <param name="startLte">Optional start date less than or equal filter (ISO 8601).</param>
+    /// <param name="endGte">Optional end date greater than or equal filter (ISO 8601).</param>
+    /// <param name="endLte">Optional end date less than or equal filter (ISO 8601).</param>
+    /// <param name="calendar">Optional calendar ID filter.</param>
+    /// <param name="canceled">Optional canceled filter.</param>
+    /// <param name="isPublic">Optional public visibility filter.</param>
+    /// <param name="idIn">Optional comma-separated IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
     /// <param name="ct">Cancellation token.</param>
-    /// <returns>A read-only list of all events.</returns>
-    Task<IReadOnlyList<Event>> GetEventsAsync(CancellationToken ct = default);
+    /// <returns>A read-only list of matching events.</returns>
+    Task<IReadOnlyList<Event>> ListEventsAsync(string? name = null, string? startGte = null,
+        string? startLte = null, string? endGte = null, string? endLte = null,
+        string? calendar = null, string? canceled = null, string? isPublic = null,
+        string? idIn = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
 
     /// <summary>Gets a single invoice by ID.</summary>
     /// <param name="id">The invoice ID.</param>

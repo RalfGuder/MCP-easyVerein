@@ -53,5 +53,29 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string Creator = "creator";
         /// <summary>API field name for the reservation parent event reference.</summary>
         public const string ReservationParentEvent = "reservationParentEvent";
+
+        /// <summary>API field name for the calendar reference.</summary>
+        public const string Calendar = "calendar";
+
+        /// <summary>API filter field name for start date greater than or equal.</summary>
+        public const string StartGte = "start__gte";
+
+        /// <summary>API filter field name for start date less than or equal.</summary>
+        public const string StartLte = "start__lte";
+
+        /// <summary>API filter field name for end date greater than or equal.</summary>
+        public const string EndGte = "end__gte";
+
+        /// <summary>API filter field name for end date less than or equal.</summary>
+        public const string EndLte = "end__lte";
+
+        /// <summary>API filter field name for filtering by multiple IDs.</summary>
+        public const string IdIn = "id__in";
+
+        /// <summary>API query parameter for result ordering.</summary>
+        public const string Ordering = "ordering";
+
+        /// <summary>API query parameter for full-text search.</summary>
+        public const string Search = "search";
     }
 }

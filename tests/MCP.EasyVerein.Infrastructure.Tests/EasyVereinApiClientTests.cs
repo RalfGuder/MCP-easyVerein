@@ -217,7 +217,7 @@ public class EasyVereinApiClientTests
     // ------------------------------------------------------------------ //
 
     [Fact]
-    public async Task GetEvents_ReturnsEvents()
+    public async Task ListEvents_ReturnsEvents()
     {
         var json = JsonSerializer.Serialize(new
         {
@@ -230,10 +230,37 @@ public class EasyVereinApiClientTests
         var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
         var client = CreateClient(handler);
 
-        var result = await client.GetEventsAsync();
+        var result = await client.ListEventsAsync();
 
         Assert.Single(result);
         Assert.Equal("Jahresversammlung", result[0].Name);
+    }
+
+    [Fact]
+    public async Task ListEvents_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListEventsAsync());
+    }
+
+    [Fact]
+    public async Task ListEvents_SendsQueryParameter()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListEventsAsync();
+
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.Contains("query=", handler.LastRequestUri!.Query);
+        Assert.Contains("limit=100", handler.LastRequestUri!.Query);
     }
 
     // ------------------------------------------------------------------ //
