@@ -53,7 +53,11 @@ internal class EventQuery
             EventFields.End + "," +
             EventFields.AllDay + "," +
             EventFields.LocationName + "," +
-            EventFields.LocationObject + "," +
+            EventFields.LocationObject + 
+            "{" +
+                LocationFields.Id + "," +
+                LocationFields.Name +
+            "}," +
             EventFields.Parent + "," +
             EventFields.MinParticipators + "," +
             EventFields.MaxParticipators + "," +
