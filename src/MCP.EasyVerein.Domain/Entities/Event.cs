@@ -9,25 +9,25 @@ namespace MCP.EasyVerein.Domain.Entities;
 public class Event
 {
     /// <summary>
-    /// Gets or sets the unique identifier. Maps to API field ' <c>id</c>'.
+    /// Gets or sets the unique identifier. Maps to API field '<c>id</c>'.
     /// </summary>
     [JsonPropertyName(EventFields.Id)] 
     public long Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the event name. Maps to API field ' <c>name</c>'.
+    /// Gets or sets the event name. Maps to API field '<c>name</c>'.
     /// </summary>
     [JsonPropertyName(EventFields.Name)] 
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the event description. Maps to API field ' <c>description</c>'.
+    /// Gets or sets the event description. Maps to API field '<c>description</c>'.
     /// </summary>
     [JsonPropertyName(EventFields.Description)] 
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the prologue text displayed before the event details. Maps to API field ' <c>prologue</c>'.
+    /// Gets or sets the prologue text displayed before the event details. Maps to API field '<c>prologue</c>'.
     /// </summary>
     [JsonPropertyName(EventFields.Prologue)] 
     public string? Prologue { get; set; }
@@ -155,6 +155,12 @@ public class Event
     /// <summary>
     /// Gets or sets the parent event ID for reservations. Maps to API field ' <c>reservationParentEvent</c>'.
     /// </summary>
-    [JsonPropertyName(EventFields.ReservationParentEvent)] 
+    [JsonPropertyName(EventFields.ReservationParentEvent)]
     public long? ReservationParentEvent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the calendar reference. Maps to API field '<c>calendar</c>'.
+    /// </summary>
+    [JsonPropertyName(EventFields.Calendar)]
+    public Calendar? Calendar { get; set; }
 }

@@ -68,4 +68,34 @@ public class EventEntityTests
         Assert.Equal(42L, ev.Creator);
         Assert.Equal(11L, ev.ReservationParentEvent);
     }
+
+    [Fact]
+    public void JsonPropertyNames_WithCalendar_AreCorrect()
+    {
+        var json = """
+            {
+                "id": 335703210,
+                "name": "Mitgliederversammlung",
+                "start": "2025-11-03T19:00:00",
+                "end": "2025-11-03T21:00:00",
+                "allDay": false,
+                "calendar": {"id": 335702286},
+                "canceled": false,
+                "isPublic": false,
+                "sendMailCheck": false,
+                "showMemberarea": false,
+                "massParticipations": false,
+                "isReservation": false
+            }
+            """;
+
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = false };
+        var ev = JsonSerializer.Deserialize<Event>(json, options);
+
+        Assert.NotNull(ev);
+        Assert.Equal(335703210L, ev.Id);
+        Assert.Equal("Mitgliederversammlung", ev.Name);
+        Assert.NotNull(ev.Calendar);
+        Assert.Equal(335702286L, ev.Calendar.Id);
+    }
 }
