@@ -58,7 +58,10 @@ internal class EventQuery
                 LocationFields.Id + "," +
                 LocationFields.Name +
             "}," +
-            EventFields.Parent + "," +
+            EventFields.Parent + 
+            "{" + 
+                EventFields.Id + 
+            "}," +
             EventFields.MinParticipators + "," +
             EventFields.MaxParticipators + "," +
             EventFields.StartParticipation + "," +

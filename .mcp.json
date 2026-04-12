@@ -4,7 +4,9 @@
       "command": "dotnet",
       "args": ["run", "--project", "src/MCP.EasyVerein.Server"],
       "env": {
-        "EASYVEREIN_API_VERSION": "v1.7"
+        "EASYVEREIN_API_VERSION": "v1.7",
+		"EASYVEREIN_API_KEY": "f904e954e95234e9623ac4428e3d38cf9e08c565",
+		"EASYVEREIN_API_URL": "https://easyverein.com/api"
       }
     }
   }
