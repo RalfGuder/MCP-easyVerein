@@ -116,29 +116,29 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     public async Task<string> UpdateMember(
         [Description("The ID of the member")] long id,
         [Description("The membership number of a member")] string? membershipNumber, 
-        [Description("The resignation date of the member")] DateTime? resignationDate, 
-        [Description("The resignation notice date of the member")] DateTime? resignationNoticeDate,
-        [Description("The join date of the member")] DateTime? joinDate, 
-        [Description("The declaration of application of the member")] string? declarationOfApplication, 
-        [Description("The payment start date of the member")] DateTime? paymentStartDate,
-        [Description("The payment amount of the member")] decimal? paymentAmount,
-        [Description("The payment interval in months")] int? paymentIntervalMonths,
-        [Description("The related member ID")] long? relatedMember,
-        [Description("Use balance for membership fee")] bool? useBalanceForMembershipFee, CancellationToken ct)
+        [Description("The resignation date of the member (ISO 8601)")] string? resignationDate,
+        [Description("The resignation notice date of the member (ISO 8601)")] string? resignationNoticeDate,
+        [Description("The join date of the member (ISO 8601)")] string? joinDate,
+        [Description("The declaration of application of the member")] string? declarationOfApplication,
+        [Description("The payment start date of the member (ISO 8601)")] string? paymentStartDate,
+        [Description("The payment amount of the member")] string? paymentAmount,
+        [Description("The payment interval in months")] string? paymentIntervalMonths,
+        [Description("The related member ID")] string? relatedMember,
+        [Description("Use balance for membership fee (true/false)")] string? useBalanceForMembershipFee, CancellationToken ct)
     {
         try
         {
             var patchData = new Dictionary<string, object>();
-            if (membershipNumber != null) patchData[MemberFields.MembershipNumber] = membershipNumber;
-            if (resignationDate != null) patchData[MemberFields.ResignationDate] = resignationDate;
-            if (resignationNoticeDate != null) patchData[MemberFields.ResignationNoticeDate] = resignationNoticeDate;
-            if (joinDate != null) patchData[MemberFields.JoinDate] = joinDate;
-            if (declarationOfApplication != null) patchData[MemberFields.DeclarationOfApplication] = declarationOfApplication;
-            if (paymentStartDate != null) patchData[MemberFields.PaymentStartDate] = paymentStartDate;
-            if (paymentAmount != null) patchData[MemberFields.PaymentAmount] = paymentAmount;
-            if (paymentIntervalMonths != null) patchData[MemberFields.PaymentIntervalMonths] = paymentIntervalMonths;
-            if (relatedMember != null) patchData[MemberFields.RelatedMember] = relatedMember;
-            if (useBalanceForMembershipFee != null) patchData[MemberFields.UseBalanceForMembershipFee] = useBalanceForMembershipFee;
+            if (HasValue(membershipNumber)) patchData[MemberFields.MembershipNumber] = membershipNumber!;
+            if (HasValue(resignationDate) && DateTime.TryParse(resignationDate, out var resignationDateVal)) patchData[MemberFields.ResignationDate] = resignationDateVal;
+            if (HasValue(resignationNoticeDate) && DateTime.TryParse(resignationNoticeDate, out var resignationNoticeDateVal)) patchData[MemberFields.ResignationNoticeDate] = resignationNoticeDateVal;
+            if (HasValue(joinDate) && DateTime.TryParse(joinDate, out var joinDateVal)) patchData[MemberFields.JoinDate] = joinDateVal;
+            if (HasValue(declarationOfApplication)) patchData[MemberFields.DeclarationOfApplication] = declarationOfApplication!;
+            if (HasValue(paymentStartDate) && DateTime.TryParse(paymentStartDate, out var paymentStartDateVal)) patchData[MemberFields.PaymentStartDate] = paymentStartDateVal;
+            if (HasValue(paymentAmount) && decimal.TryParse(paymentAmount, System.Globalization.CultureInfo.InvariantCulture, out var paymentAmountVal)) patchData[MemberFields.PaymentAmount] = paymentAmountVal;
+            if (HasValue(paymentIntervalMonths) && int.TryParse(paymentIntervalMonths, out var paymentIntervalMonthsVal)) patchData[MemberFields.PaymentIntervalMonths] = paymentIntervalMonthsVal;
+            if (HasValue(relatedMember) && long.TryParse(relatedMember, out var relatedMemberVal)) patchData[MemberFields.RelatedMember] = relatedMemberVal;
+            if (HasValue(useBalanceForMembershipFee) && bool.TryParse(useBalanceForMembershipFee, out var useBalanceVal)) patchData[MemberFields.UseBalanceForMembershipFee] = useBalanceVal;
 
             var updated = await client.UpdateMemberAsync(id, patchData, ct);
             return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
@@ -171,4 +171,8 @@ public sealed class MemberTools(IEasyVereinApiClient client)
             return $"ERROR: {e.GetType().Name}: {e.Message}\nInner: {e.InnerException?.Message}";
         }
     }
+
+    /// <summary>Checks whether a string parameter has a real value (not null, empty, or the literal "null").</summary>
+    private static bool HasValue(string? value) =>
+        !string.IsNullOrEmpty(value) && !value.Equals("null", StringComparison.OrdinalIgnoreCase);
 }

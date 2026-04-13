@@ -141,11 +141,11 @@ public class ContactDetails
 
     /// <summary>Gets whether the invoice address is a company address. Maps to API field '<c>invoiceCompany</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.InvoiceCompany)]
-    public bool InvoiceCompany { get; init; }
+    public bool? InvoiceCompany { get; init; }
 
     /// <summary>Gets whether this contact is a company. Maps to API field '<c>_isCompany</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.IsCompany)]
-    public bool IsCompany { get; init; }
+    public bool? IsCompany { get; init; }
 
     /// <summary>Gets the method of payment. Maps to API field '<c>methodOfPayment</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.MethodOfPayment)]
@@ -189,7 +189,7 @@ public class ContactDetails
 
     /// <summary>Gets whether invoices are sent to the company email. Maps to API field '<c>sendInvoiceCompanyMail</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.SendInvoiceCompanyMail)]
-    public bool SendInvoiceCompanyMail { get; init; }
+    public bool? SendInvoiceCompanyMail { get; init; }
 
     /// <summary>Gets the SEPA mandate date. Maps to API field '<c>sepaDate</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.SepaDate)]

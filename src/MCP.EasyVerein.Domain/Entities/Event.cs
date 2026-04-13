@@ -69,10 +69,10 @@ public class Event
     public Location? LocationObject { get; set; }
 
     /// <summary>
-    /// Gets or sets the parent event ID for recurring events. Maps to API field ' <c>parent</c>'.
+    /// Gets or sets the parent event URL reference for recurring events. Maps to API field ' <c>parent</c>'.
     /// </summary>
-    [JsonPropertyName(EventFields.Parent)] 
-    public Event? Parent { get; set; }
+    [JsonPropertyName(EventFields.Parent)]
+    public string? Parent { get; set; }
 
     /// <summary>
     /// Gets or sets the minimum number of participants. Maps to API field ' <c>minParticipators</c>'.

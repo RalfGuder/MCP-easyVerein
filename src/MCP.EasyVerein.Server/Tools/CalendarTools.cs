@@ -93,18 +93,22 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
         [Description("Hex color value (e.g. '#FF5733')")] string? color,
         [Description("Short name / abbreviation (max 4 chars, must be unique)")] string? short_,
         [Description("Array of member group IDs with access")] long[]? allowedGroupIds,
-        [Description("Delete events when calendar is deleted (default: false)")] bool? deleteEventsAfterDeletion,
+        [Description("Delete events when calendar is deleted (true/false, default: false)")] string? deleteEventsAfterDeletion,
         CancellationToken ct)
     {
         try
         {
+            bool? deleteFlag = null;
+            if (deleteEventsAfterDeletion != null && bool.TryParse(deleteEventsAfterDeletion, out var deleteVal))
+                deleteFlag = deleteVal;
+
             var calendar = new Calendar
             {
                 Name = name,
                 Color = color,
                 Short = short_,
                 AllowedGroups = allowedGroupIds?.Select(id => new MemberGroup { Id = id }).ToArray(),
-                DeleteEventsAfterDeletion = deleteEventsAfterDeletion
+                DeleteEventsAfterDeletion = deleteFlag
             };
             var created = await client.CreateCalendarAsync(calendar, ct);
             return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
@@ -133,18 +137,18 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
         [Description("The new hex color value")] string? color,
         [Description("The new short name")] string? short_,
         [Description("New array of member group IDs")] long[]? allowedGroupIds,
-        [Description("New value for delete-events-after-deletion flag")] bool? deleteEventsAfterDeletion,
+        [Description("New value for delete-events-after-deletion flag (true/false)")] string? deleteEventsAfterDeletion,
         CancellationToken ct)
     {
         try
         {
             var patch = new Dictionary<string, object>();
-            if (name != null) patch[CalendarFields.Name] = name;
-            if (color != null) patch[CalendarFields.Color] = color;
-            if (short_ != null) patch[CalendarFields.Short] = short_;
+            if (HasValue(name)) patch[CalendarFields.Name] = name!;
+            if (HasValue(color)) patch[CalendarFields.Color] = color!;
+            if (HasValue(short_)) patch[CalendarFields.Short] = short_!;
             if (allowedGroupIds != null)
                 patch[CalendarFields.AllowedGroups] = allowedGroupIds.Select(gid => new MemberGroup { Id = gid }).ToArray();
-            if (deleteEventsAfterDeletion != null) patch[CalendarFields.DeleteEventsAfterDeletion] = deleteEventsAfterDeletion;
+            if (HasValue(deleteEventsAfterDeletion) && bool.TryParse(deleteEventsAfterDeletion, out var deleteVal)) patch[CalendarFields.DeleteEventsAfterDeletion] = deleteVal;
 
             var updated = await client.UpdateCalendarAsync(id, patch, ct);
             return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
@@ -175,4 +179,8 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
             return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
         }
     }
+
+    /// <summary>Checks whether a string parameter has a real value (not null, empty, or the literal "null").</summary>
+    private static bool HasValue(string? value) =>
+        !string.IsNullOrEmpty(value) && !value.Equals("null", StringComparison.OrdinalIgnoreCase);
 }

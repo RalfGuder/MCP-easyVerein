@@ -128,25 +128,24 @@ public sealed class EventTools(IEasyVereinApiClient client)
         [Description("The new location name")] string? locationName,
         [Description("The new start date (ISO 8601)")] string? start,
         [Description("The new end date (ISO 8601)")] string? end,
-        [Description("Whether this is an all-day event")] bool? allDay,
-        [Description("Whether the event is canceled")] bool? canceled,
-        [Description("Whether the event is publicly visible")] bool? isPublic,
+        [Description("Whether this is an all-day event (true/false)")] string? allDay,
+        [Description("Whether the event is canceled (true/false)")] string? canceled,
+        [Description("Whether the event is publicly visible (true/false)")] string? isPublic,
         CancellationToken ct)
     {
         try
         {
             var patch = new Dictionary<string, object>();
-            if (name != null) patch[EventFields.Name] = name;
-            if (description != null) patch[EventFields.Description] = description;
-            if (locationName != null) patch[EventFields.LocationName] = locationName;
-            if (start != null) patch[EventFields.Start] = start;
-            if (end != null) patch[EventFields.End] = end;
-            if (allDay != null) patch[EventFields.AllDay] = allDay;
-            if (canceled != null) patch[EventFields.Canceled] = canceled;
-            if (isPublic != null) patch[EventFields.IsPublic] = isPublic;
+            if (HasValue(name)) patch[EventFields.Name] = name!;
+            if (HasValue(description)) patch[EventFields.Description] = description!;
+            if (HasValue(locationName)) patch[EventFields.LocationName] = locationName!;
+            if (HasValue(start)) patch[EventFields.Start] = start!;
+            if (HasValue(end)) patch[EventFields.End] = end!;
+            if (HasValue(allDay) && bool.TryParse(allDay, out var allDayVal)) patch[EventFields.AllDay] = allDayVal;
+            if (HasValue(canceled) && bool.TryParse(canceled, out var canceledVal)) patch[EventFields.Canceled] = canceledVal;
+            if (HasValue(isPublic) && bool.TryParse(isPublic, out var isPublicVal)) patch[EventFields.IsPublic] = isPublicVal;
 
-            var updated = await client.UpdateEventAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return await client.UpdateEventAsync(id, patch, ct);
         }
         catch (Exception ex)
         {
@@ -174,4 +173,8 @@ public sealed class EventTools(IEasyVereinApiClient client)
             return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
         }
     }
+
+    /// <summary>Checks whether a string parameter has a real value (not null, empty, or the literal "null").</summary>
+    private static bool HasValue(string? value) =>
+        !string.IsNullOrEmpty(value) && !value.Equals("null", StringComparison.OrdinalIgnoreCase);
 }

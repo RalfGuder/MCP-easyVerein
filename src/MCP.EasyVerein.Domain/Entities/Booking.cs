@@ -27,7 +27,7 @@ public class Booking
     /// <summary>
     /// Gets or sets whether the booking is blocked. Maps to API field ' <c>blocked</c>'.
     /// </summary>
-    [JsonPropertyName(BookingFields.Blocked)] public bool Blocked { get; set; }
+    [JsonPropertyName(BookingFields.Blocked)] public bool? Blocked { get; set; }
 
     /// <summary>
     /// Gets or sets the booking project reference. Maps to API field ' <c>bookingProject</c>'.
@@ -97,5 +97,5 @@ public class Booking
     /// <summary>
     /// Gets or sets whether this is a Twingle donation. Maps to API field ' <c>twingleDonation</c>'.
     /// </summary>
-    [JsonPropertyName(BookingFields.TwingleDonation)] public bool TwingleDonation { get; set; }
+    [JsonPropertyName(BookingFields.TwingleDonation)] public bool? TwingleDonation { get; set; }
 }

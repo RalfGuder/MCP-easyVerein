@@ -40,7 +40,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
         // Authentifizierung (FR-002)
         _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {config.ApiKey}");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"{config.ApiKey}");
     }
 
     /// <summary>Creates a new booking via the API.</summary>
@@ -466,13 +466,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="patchData">The patch data.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The updated <see cref="Event" /> as returned by the API.</returns>
-    public async Task<Event> UpdateEventAsync(long id, object patchData, CancellationToken ct = default)
+    public async Task<string> UpdateEventAsync(long id, object patchData, CancellationToken ct = default)
     {
         var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         var response = await SendWithErrorHandling(
             () => _httpClient.PatchAsync(BuildUrl($"event/{id}"), content, ct), ct);
-        return await HandleResponse<Event>(response, ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+        return await response.Content.ReadAsStringAsync(ct);
     }
 
     /// <summary>
@@ -516,7 +517,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <returns>The fully constructed GET URL.</returns>
     private string BuildGetUrl(string resource, string? query)
     {
-        return string.IsNullOrEmpty(query) ? $"{BuildUrl(resource)}" : $"{BuildUrl(resource)}{Uri.EscapeDataString(query)}";
+        return string.IsNullOrEmpty(query) ? $"{BuildUrl(resource)}" : $"{BuildUrl(resource)}?{query}";
     }
 
     /// <summary>
