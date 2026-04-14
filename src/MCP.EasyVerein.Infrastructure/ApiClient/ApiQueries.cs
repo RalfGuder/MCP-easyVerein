@@ -6,6 +6,16 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient;
 internal static class ApiQueries
 {
     /// <summary>
+    /// Shared <see cref="AnnouncementQuery"/> instance used to build announcement query strings with optional filters.
+    /// </summary>
+    internal static readonly AnnouncementQuery AnnouncementQuery = new();
+
+    /// <summary>
+    /// Gets the current announcement query string including field selection and any active filters.
+    /// </summary>
+    internal static string Announcement => AnnouncementQuery.ToString();
+
+    /// <summary>
     /// Shared <see cref="MemberQuery"/> instance used to build member query strings with optional filters.
     /// </summary>
     internal static readonly MemberQuery MemberQuery = new();
