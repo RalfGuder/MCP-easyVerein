@@ -37,7 +37,7 @@ public class EasyVereinApiClientTests
         _ = new EasyVereinApiClient(httpClient, config);
 
         Assert.Contains(httpClient.DefaultRequestHeaders.GetValues("Authorization"),
-            v => v == "Bearer my-secret-token");
+            v => v == "Token my-secret-token");
     }
 
     // ------------------------------------------------------------------ //

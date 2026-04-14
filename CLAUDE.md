@@ -94,7 +94,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7 (Default: v1.7)
 | Member         | US-0001    | list, get, create, update (PATCH), delete                |
 | ContactDetails | US-0001    | list, get, create, update (PATCH), delete                |
 | Invoice        | US-0001    | list, get, create, delete                                |
-| Event          | US-0001    | list, get, create, delete                                |
+| Event          | US-0001    | list, get, create, update (PATCH), delete                |
 | Booking        | US-0009    | list, get, create, update (PATCH), delete                |
 | Calendar       | US-0014    | list, get, create, update (PATCH), delete                |
 
@@ -104,7 +104,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7 (Default: v1.7)
 - **PUT** (vollständiges Ersetzen): 28 Ressourcen unterstützen zusätzlich PUT
 - **Nur PATCH** (kein PUT): booking-project, contact-details-log, custom-field-collection, custom-filter, custom-tax-rate, dosb-sport, invoice-item, organization-settings, organization-token, pass, pass-field, pass-template, passcreator-integration, protocol-upload, task-comment, voting, voting-question, wastebasket
 - Unsere MCP-Tools nutzen ausschließlich **PATCH** (`HttpClient.PatchAsync`) für Updates
-- Invoice und Event haben noch kein Update-Tool implementiert
+- Invoice hat noch kein Update-Tool implementiert
 
 ### Nächste anstehende Endpoints
 
@@ -112,15 +112,15 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7 (Default: v1.7)
 - US-0011: Bank Account
 - US-0012: Billing Account
 - US-0013: Booking Project
-- US-0015: Contact Details Log
+- US-0015: Chairman Level
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (23)
+- **Domain.Tests** — Entity- und Value-Object-Tests (24)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (21)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (23)
 - **Server.Tests** — noch leer (Platzhalter)
-- **Gesamt: 57 Tests**
+- **Gesamt: 60 Tests**
 
 ## Repository
 
