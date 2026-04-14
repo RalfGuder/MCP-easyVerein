@@ -19,8 +19,8 @@ public class EventEntityTests
                 "end": "2026-05-01T12:00:00",
                 "allDay": false,
                 "locationName": "Vereinsheim",
-                "locationObject": "https://easyverein.com/api/v1.7/location/7",
-                "parent": 3,
+                "locationObject": {"id": 7},
+                "parent": "3",
                 "minParticipators": 5,
                 "maxParticipators": 50,
                 "startParticipation": "2026-04-01T00:00:00",
@@ -51,8 +51,9 @@ public class EventEntityTests
         Assert.Equal(new DateTime(2026, 5, 1, 12, 0, 0), ev.End);
         Assert.False(ev.AllDay);
         Assert.Equal("Vereinsheim", ev.LocationName);
-        Assert.Equal("https://easyverein.com/api/v1.7/location/7", ev.LocationObject);
-        Assert.Equal(3L, ev.Parent);
+        Assert.NotNull(ev.LocationObject);
+        Assert.Equal(7, ev.LocationObject.Id);
+        Assert.Equal("3", ev.Parent);
         Assert.Equal(5, ev.MinParticipants);
         Assert.Equal(50, ev.MaxParticipants);
         Assert.Equal(new DateTime(2026, 4, 1, 0, 0, 0), ev.StartParticipation);

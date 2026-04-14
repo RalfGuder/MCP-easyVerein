@@ -32,12 +32,12 @@ public class EasyVereinApiClientTests
     {
         var handler = new FakeHttpHandler(HttpStatusCode.OK, "{}");
         var httpClient = new HttpClient(handler);
-        var config = new EasyVereinConfiguration { ApiKey = "my-secret-token" };
+        var config = new EasyVereinConfiguration { ApiKey = "Bearer my-secret-token" };
 
         _ = new EasyVereinApiClient(httpClient, config);
 
         Assert.Contains(httpClient.DefaultRequestHeaders.GetValues("Authorization"),
-            v => v == "Token my-secret-token");
+            v => v == "Bearer my-secret-token");
     }
 
     // ------------------------------------------------------------------ //
