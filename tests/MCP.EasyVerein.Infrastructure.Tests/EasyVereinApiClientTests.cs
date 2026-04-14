@@ -395,6 +395,51 @@ public class EasyVereinApiClientTests
         Assert.Contains("query=", handler.LastRequestUri!.Query);
         Assert.Contains("limit=100", handler.LastRequestUri!.Query);
     }
+
+    // ------------------------------------------------------------------ //
+    // Announcements
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListAnnouncements_ReturnsAnnouncements()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new { id = 1, text = "<p>Willkommen</p>", showBanner = true, isDismissible = false, isPublic = true, showForNormalMembers = true }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListAnnouncementsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("<p>Willkommen</p>", result[0].Text);
+        Assert.True(result[0].ShowBanner);
+    }
+
+    [Fact]
+    public async Task GetAnnouncement_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetAnnouncementAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task ListAnnouncements_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListAnnouncementsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //
