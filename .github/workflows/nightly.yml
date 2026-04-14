@@ -94,17 +94,12 @@ jobs:
           path: artifacts
           merge-multiple: true
 
-      - name: Vorheriges Nightly-Release löschen
-        run: gh release delete nightly --yes --cleanup-tag || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Nightly-Release erstellen
         run: |
-          gh release create nightly \
-            --title "Nightly Build $(date -u +%Y-%m-%d)" \
-            --notes "$(cat <<'EOF'
-          Automatischer Nightly Build vom $(date -u +%Y-%m-%d %H:%M) UTC.
+          gh release create "v${{ needs.build-and-test.outputs.nightly-version }}" \
+            --title "Nightly Build ${{ needs.build-and-test.outputs.nightly-version }}" \
+            --notes "$(cat <<EOF
+          Automatischer Nightly Build vom $(date -u +%Y-%m-%d\ %H:%M) UTC.
 
           **Version:** ${{ needs.build-and-test.outputs.nightly-version }}
 
@@ -113,14 +108,25 @@ jobs:
           ### Plattformen
           | Datei | Plattform |
           |-------|-----------|
-          | `mcp-easyverein-linux-x64.tar.gz` | Linux x64 |
-          | `mcp-easyverein-win-x64.tar.gz` | Windows x64 |
-          | `mcp-easyverein-osx-x64.tar.gz` | macOS x64 (Intel) |
-          | `mcp-easyverein-osx-arm64.tar.gz` | macOS ARM64 (Apple Silicon) |
+          | mcp-easyverein-linux-x64.tar.gz | Linux x64 |
+          | mcp-easyverein-win-x64.tar.gz | Windows x64 |
+          | mcp-easyverein-osx-x64.tar.gz | macOS x64 (Intel) |
+          | mcp-easyverein-osx-arm64.tar.gz | macOS ARM64 (Apple Silicon) |
           EOF
           )" \
             --prerelease \
             --target main \
             artifacts/*.tar.gz
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Alte Nightly-Releases aufräumen (behalte die letzten 5)
+        run: |
+          gh release list --json tagName,isPrerelease \
+            --jq '[.[] | select(.isPrerelease and (.tagName | startswith("v1.0.0-nightly.")))] | sort_by(.tagName) | reverse | .[5:][] | .tagName' \
+          | while read -r tag; do
+              echo "Lösche altes Nightly-Release: $tag"
+              gh release delete "$tag" --yes --cleanup-tag || true
+            done
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
