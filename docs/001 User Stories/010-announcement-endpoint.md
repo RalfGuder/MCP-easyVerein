@@ -10,14 +10,14 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `Announcement`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `AnnouncementFields`-Konstanten
-- [ ] **ValueObject `AnnouncementFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `AnnouncementQuery.cs`:** Filterung nach ID, Datum und Mitglied
-- [ ] **API-Client:** `ListAnnouncementsAsync`, `GetAnnouncementAsync`, `CreateAnnouncementAsync`, `UpdateAnnouncementAsync`, `DeleteAnnouncementAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
-- [ ] **MCP-Tools:** `AnnouncementTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
+- [x] **Entity `Announcement`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `AnnouncementFields`-Konstanten
+- [x] **ValueObject `AnnouncementFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `AnnouncementQuery.cs`:** Filterung nach ID, Datum und Mitglied
+- [x] **API-Client:** `ListAnnouncementsAsync`, `GetAnnouncementAsync`, `CreateAnnouncementAsync`, `UpdateAnnouncementAsync`, `DeleteAnnouncementAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
+- [x] **MCP-Tools:** `AnnouncementTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
 
 ## Aufgaben
 
