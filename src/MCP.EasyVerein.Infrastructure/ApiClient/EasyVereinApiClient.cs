@@ -43,6 +43,73 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"{config.ApiKey}");
     }
 
+    // ------------------------------------------------------------------ //
+    // Announcements
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new announcement via the API.</summary>
+    /// <param name="announcement">The announcement to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="Announcement"/> as returned by the API.</returns>
+    public async Task<Announcement> CreateAnnouncementAsync(Announcement announcement, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("announcement"), announcement, ct), ct);
+        return await HandleResponse<Announcement>(response, ct);
+    }
+
+    /// <summary>Deletes an announcement by ID.</summary>
+    /// <param name="id">The unique identifier of the announcement to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteAnnouncementAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"announcement/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single announcement by ID.</summary>
+    /// <param name="id">The unique identifier of the announcement.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The announcement, or <c>null</c> if not found.</returns>
+    public async Task<Announcement?> GetAnnouncementAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"announcement/{id}", ApiQueries.Announcement), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<Announcement>(response, ct);
+    }
+
+    /// <summary>Lists announcements with optional filters.</summary>
+    /// <param name="ordering">Sort order.</param>
+    /// <param name="search">Search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of announcements.</returns>
+    public async Task<IReadOnlyList<Announcement>> ListAnnouncementsAsync(
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        ApiQueries.AnnouncementQuery.Ordering = ordering;
+        ApiQueries.AnnouncementQuery.Search = search;
+
+        return await HandleListResponseWithPagination<Announcement>(
+            BuildListUrl("announcement", ApiQueries.Announcement), ct);
+    }
+
+    /// <summary>Updates an announcement with PATCH semantics.</summary>
+    /// <param name="id">The unique identifier of the announcement to update.</param>
+    /// <param name="patchData">The patch data.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="Announcement"/> as returned by the API.</returns>
+    public async Task<Announcement> UpdateAnnouncementAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"announcement/{id}"), content, ct), ct);
+        return await HandleResponse<Announcement>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

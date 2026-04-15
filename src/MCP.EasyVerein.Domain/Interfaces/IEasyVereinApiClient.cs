@@ -5,6 +5,23 @@ namespace MCP.EasyVerein.Domain.Interfaces;
 /// <summary>Defines the contract for communicating with the easyVerein REST API.</summary>
 public interface IEasyVereinApiClient
 {
+    /// <summary>Lists all announcements, optionally filtered.</summary>
+    Task<IReadOnlyList<Announcement>> ListAnnouncementsAsync(
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single announcement by ID.</summary>
+    Task<Announcement?> GetAnnouncementAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new announcement.</summary>
+    Task<Announcement> CreateAnnouncementAsync(Announcement announcement, CancellationToken ct = default);
+
+    /// <summary>Updates an announcement with PATCH semantics.</summary>
+    Task<Announcement> UpdateAnnouncementAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes an announcement.</summary>
+    Task DeleteAnnouncementAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
