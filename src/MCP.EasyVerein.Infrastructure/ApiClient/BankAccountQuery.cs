@@ -57,17 +57,17 @@ internal class BankAccountQuery
         var parts = new List<string> { FieldQuery };
 
         if (!string.IsNullOrEmpty(Name))
-            parts.Add($"{BankAccountFields.Name}={Name}");
+            parts.Add($"{BankAccountFields.Name}={Uri.EscapeDataString(Name)}");
         if (!string.IsNullOrEmpty(Iban))
-            parts.Add($"{BankAccountFields.Iban}={Iban}");
+            parts.Add($"{BankAccountFields.Iban}={Uri.EscapeDataString(Iban)}");
         if (!string.IsNullOrEmpty(Bic))
-            parts.Add($"{BankAccountFields.Bic}={Bic}");
+            parts.Add($"{BankAccountFields.Bic}={Uri.EscapeDataString(Bic)}");
         if (!string.IsNullOrEmpty(AccountHolder))
-            parts.Add($"{BankAccountFields.AccountHolder}={AccountHolder}");
+            parts.Add($"{BankAccountFields.AccountHolder}={Uri.EscapeDataString(AccountHolder)}");
         if (!string.IsNullOrEmpty(BankName))
-            parts.Add($"{BankAccountFields.BankName}={BankName}");
+            parts.Add($"{BankAccountFields.BankName}={Uri.EscapeDataString(BankName)}");
         if (!string.IsNullOrEmpty(IdIn))
-            parts.Add($"{BankAccountFields.IdIn}={IdIn}");
+            parts.Add($"{BankAccountFields.IdIn}={Uri.EscapeDataString(IdIn)}");
         if (!string.IsNullOrEmpty(Ordering))
             parts.Add($"{BankAccountFields.Ordering}={Ordering}");
         if (Search != null && Search.Length != 0)
