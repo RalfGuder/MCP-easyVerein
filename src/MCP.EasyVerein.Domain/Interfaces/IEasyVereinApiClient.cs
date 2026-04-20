@@ -22,6 +22,46 @@ public interface IEasyVereinApiClient
     /// <summary>Deletes an announcement.</summary>
     Task DeleteAnnouncementAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists all bank accounts, optionally filtered.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="iban">Optional IBAN filter (exact match).</param>
+    /// <param name="bic">Optional BIC filter (exact match).</param>
+    /// <param name="accountHolder">Optional account-holder filter.</param>
+    /// <param name="bankName">Optional bank-name filter.</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<IReadOnlyList<BankAccount>> ListBankAccountsAsync(
+        string? name = null, string? iban = null, string? bic = null,
+        string? accountHolder = null, string? bankName = null,
+        string? idIn = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single bank account by ID.</summary>
+    /// <param name="id">The bank account ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The bank account, or <c>null</c> if not found.</returns>
+    Task<BankAccount?> GetBankAccountAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new bank account.</summary>
+    /// <param name="bankAccount">The bank account to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created bank account.</returns>
+    Task<BankAccount> CreateBankAccountAsync(BankAccount bankAccount, CancellationToken ct = default);
+
+    /// <summary>Partially updates a bank account (PATCH semantics).</summary>
+    /// <param name="id">The bank account ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated bank account.</returns>
+    Task<BankAccount> UpdateBankAccountAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a bank account by ID.</summary>
+    /// <param name="id">The bank account ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteBankAccountAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
