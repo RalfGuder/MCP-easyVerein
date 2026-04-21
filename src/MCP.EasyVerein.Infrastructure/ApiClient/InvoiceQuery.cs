@@ -62,7 +62,23 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
                 InvoiceFields.SelectionAccount + "," +
                 InvoiceFields.RemoveFileOnDelete + "," +
                 InvoiceFields.CustomPaymentMethod + "," +
-                InvoiceFields.IsReceipt +
+                InvoiceFields.IsReceipt + "," +
+                InvoiceFields.Org + "," +
+                InvoiceFields.Path + "," +
+                InvoiceFields.InvoiceItems + "," +
+                InvoiceFields.Charges + "," +
+                InvoiceFields.Tax + "," +
+                InvoiceFields.PaymentDifference + "," +
+                InvoiceFields.CancelInvoice + "," +
+                InvoiceFields.IsTaxRatePerInvoiceItem + "," +
+                InvoiceFields.IsSubjectToTax + "," +
+                InvoiceFields.Mode + "," +
+                InvoiceFields.OfferStatus + "," +
+                InvoiceFields.OfferValidUntil + "," +
+                InvoiceFields.OfferNumber + "," +
+                InvoiceFields.RelatedOffer + "," +
+                InvoiceFields.ClosingDescription + "," +
+                InvoiceFields.UseAddressBalance +
             "}";
 
         /// <summary>
