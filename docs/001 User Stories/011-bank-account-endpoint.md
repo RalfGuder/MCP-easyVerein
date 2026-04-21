@@ -10,14 +10,14 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `BankAccount`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `BankAccountFields`-Konstanten
-- [ ] **ValueObject `BankAccountFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `BankAccountQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
-- [ ] **API-Client:** `ListBankAccountsAsync`, `GetBankAccountAsync`, `CreateBankAccountAsync`, `UpdateBankAccountAsync`, `DeleteBankAccountAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
-- [ ] **MCP-Tools:** `BankAccountTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
+- [x] **Entity `BankAccount`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `BankAccountFields`-Konstanten
+- [x] **ValueObject `BankAccountFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `BankAccountQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
+- [x] **API-Client:** `ListBankAccountsAsync`, `GetBankAccountAsync`, `CreateBankAccountAsync`, `UpdateBankAccountAsync`, `DeleteBankAccountAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
+- [x] **MCP-Tools:** `BankAccountTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
 
 ## Aufgaben
 
@@ -42,3 +42,5 @@
 - Pagination: `?limit=100`, automatisch `next`-URL folgen
 - Architektur konsistent mit bestehenden Entities
 - Priorität: **Mittel**
+
+**Status:** Implementiert am 2026-04-20 auf Branch `feature/US-0011-bank-account-endpoint`.

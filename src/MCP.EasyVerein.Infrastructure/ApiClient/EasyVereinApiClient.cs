@@ -110,6 +110,87 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<Announcement>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Bank Accounts
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new bank account via the API.</summary>
+    /// <param name="bankAccount">The bank account to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="BankAccount"/> as returned by the API.</returns>
+    public async Task<BankAccount> CreateBankAccountAsync(BankAccount bankAccount, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("bank-account"), bankAccount, ct), ct);
+        return await HandleResponse<BankAccount>(response, ct);
+    }
+
+    /// <summary>Deletes a bank account by ID.</summary>
+    /// <param name="id">The bank account ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteBankAccountAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"bank-account/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single bank account by ID.</summary>
+    /// <param name="id">The bank account ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The bank account, or <c>null</c> if not found.</returns>
+    public async Task<BankAccount?> GetBankAccountAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"bank-account/{id}", ApiQueries.BankAccount), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<BankAccount>(response, ct);
+    }
+
+    /// <summary>Lists bank accounts with optional filters and automatic pagination.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="iban">Optional IBAN filter (exact match).</param>
+    /// <param name="bic">Optional BIC filter (exact match).</param>
+    /// <param name="accountHolder">Optional account-holder filter.</param>
+    /// <param name="bankName">Optional bank-name filter.</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching bank accounts.</returns>
+    public async Task<IReadOnlyList<BankAccount>> ListBankAccountsAsync(
+        string? name = null, string? iban = null, string? bic = null,
+        string? accountHolder = null, string? bankName = null,
+        string? idIn = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        ApiQueries.BankAccountQuery.Name = name;
+        ApiQueries.BankAccountQuery.Iban = iban;
+        ApiQueries.BankAccountQuery.Bic = bic;
+        ApiQueries.BankAccountQuery.AccountHolder = accountHolder;
+        ApiQueries.BankAccountQuery.BankName = bankName;
+        ApiQueries.BankAccountQuery.IdIn = idIn;
+        ApiQueries.BankAccountQuery.Ordering = ordering;
+        ApiQueries.BankAccountQuery.Search = search;
+
+        return await HandleListResponseWithPagination<BankAccount>(
+            BuildListUrl("bank-account", ApiQueries.BankAccount), ct);
+    }
+
+    /// <summary>Updates a bank account with PATCH semantics.</summary>
+    /// <param name="id">The bank account ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="BankAccount"/> as returned by the API.</returns>
+    public async Task<BankAccount> UpdateBankAccountAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"bank-account/{id}"), content, ct), ct);
+        return await HandleResponse<BankAccount>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

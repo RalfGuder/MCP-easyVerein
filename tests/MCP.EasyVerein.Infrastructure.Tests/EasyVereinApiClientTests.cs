@@ -440,6 +440,60 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListAnnouncementsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // Bank Accounts
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListBankAccounts_ReturnsBankAccounts()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Vereinskonto",
+                    IBAN = "DE89370400440532013000",
+                    BIC = "COBADEFFXXX",
+                    accountHolder = "TSV Musterhausen e.V.",
+                    bankName = "Sparkasse"
+                }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListBankAccountsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Vereinskonto", result[0].Name);
+        Assert.Equal("DE89370400440532013000", result[0].Iban);
+        Assert.Equal("COBADEFFXXX", result[0].Bic);
+    }
+
+    [Fact]
+    public async Task GetBankAccount_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetBankAccountAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task ListBankAccounts_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBankAccountsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //
