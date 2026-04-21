@@ -422,3 +422,6 @@ FodyWeavers.xsd
 
 # Obsidian
 docs/.obsidian/
+
+# Local MCP config (contains secrets)
+.mcp.json
