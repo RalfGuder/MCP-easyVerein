@@ -26,4 +26,10 @@
     <ProjectReference Include="..\..\src\MCP.EasyVerein.Domain\MCP.EasyVerein.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Fixtures\invoice-real-response.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
