@@ -83,7 +83,7 @@ Neue Endpoints folgen immer dem gleichen Ablauf:
 
 ### API-Versionen
 
-Unterstützt: v1.4, v1.5, v1.6, v1.7 (Default: v1.7)
+Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 
 ## Projektstatus
 
