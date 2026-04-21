@@ -26,6 +26,16 @@ internal static class ApiQueries
     internal static string BankAccount => BankAccountQuery.ToString();
 
     /// <summary>
+    /// Shared <see cref="BillingAccountQuery"/> instance used to build billing-account query strings with optional filters.
+    /// </summary>
+    internal static readonly BillingAccountQuery BillingAccountQuery = new();
+
+    /// <summary>
+    /// Gets the current billing-account query string including field selection and any active filters.
+    /// </summary>
+    internal static string BillingAccount => BillingAccountQuery.ToString();
+
+    /// <summary>
     /// Shared <see cref="MemberQuery"/> instance used to build member query strings with optional filters.
     /// </summary>
     internal static readonly MemberQuery MemberQuery = new();

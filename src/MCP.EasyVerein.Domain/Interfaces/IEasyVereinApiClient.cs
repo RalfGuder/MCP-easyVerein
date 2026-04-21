@@ -62,6 +62,52 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteBankAccountAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists all billing accounts, optionally filtered.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="skr">Optional SKR chart filter.</param>
+    /// <param name="skrIn">Optional comma-separated SKR charts filter.</param>
+    /// <param name="numberGte">Optional number greater-or-equal filter.</param>
+    /// <param name="numberLte">Optional number less-or-equal filter.</param>
+    /// <param name="deleted">Optional deleted-flag filter ("true"/"false").</param>
+    /// <param name="accountingPlanIsNull">Optional accountingPlan-is-null filter ("true"/"false").</param>
+    /// <param name="showOwnBillingAccounts">Optional filter to show only own billing accounts ("true"/"false").</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<IReadOnlyList<BillingAccount>> ListBillingAccountsAsync(
+        string? name = null, string? idIn = null,
+        string? skr = null, string? skrIn = null,
+        string? numberGte = null, string? numberLte = null,
+        string? deleted = null, string? accountingPlanIsNull = null,
+        string? showOwnBillingAccounts = null,
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single billing account by ID.</summary>
+    /// <param name="id">The billing account ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The billing account, or <c>null</c> if not found.</returns>
+    Task<BillingAccount?> GetBillingAccountAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new billing account.</summary>
+    /// <param name="billingAccount">The billing account to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created billing account.</returns>
+    Task<BillingAccount> CreateBillingAccountAsync(BillingAccount billingAccount, CancellationToken ct = default);
+
+    /// <summary>Partially updates a billing account (PATCH semantics).</summary>
+    /// <param name="id">The billing account ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated billing account.</returns>
+    Task<BillingAccount> UpdateBillingAccountAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a billing account by ID.</summary>
+    /// <param name="id">The billing account ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteBillingAccountAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

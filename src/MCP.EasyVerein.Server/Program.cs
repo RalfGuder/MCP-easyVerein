@@ -59,7 +59,8 @@ builder.Services
     .WithTools<BookingTools>()
     .WithTools<CalendarTools>()
     .WithTools<AnnouncementTools>()
-    .WithTools<BankAccountTools>();
+    .WithTools<BankAccountTools>()
+    .WithTools<BillingAccountTools>();
 
 var app = builder.Build();
 await app.RunAsync();

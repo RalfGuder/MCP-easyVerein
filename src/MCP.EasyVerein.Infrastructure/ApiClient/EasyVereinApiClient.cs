@@ -191,6 +191,96 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<BankAccount>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Billing Accounts
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new billing account via the API.</summary>
+    /// <param name="billingAccount">The billing account to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="BillingAccount"/> as returned by the API.</returns>
+    public async Task<BillingAccount> CreateBillingAccountAsync(BillingAccount billingAccount, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("billing-account"), billingAccount, ct), ct);
+        return await HandleResponse<BillingAccount>(response, ct);
+    }
+
+    /// <summary>Deletes a billing account by ID.</summary>
+    /// <param name="id">The billing account ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteBillingAccountAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"billing-account/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single billing account by ID.</summary>
+    /// <param name="id">The billing account ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The billing account, or <c>null</c> if not found.</returns>
+    public async Task<BillingAccount?> GetBillingAccountAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"billing-account/{id}", ApiQueries.BillingAccount), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<BillingAccount>(response, ct);
+    }
+
+    /// <summary>Lists billing accounts with optional filters and automatic pagination.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="skr">Optional SKR chart filter.</param>
+    /// <param name="skrIn">Optional comma-separated SKR charts filter.</param>
+    /// <param name="numberGte">Optional number greater-or-equal filter.</param>
+    /// <param name="numberLte">Optional number less-or-equal filter.</param>
+    /// <param name="deleted">Optional deleted-flag filter ("true"/"false").</param>
+    /// <param name="accountingPlanIsNull">Optional accountingPlan-is-null filter ("true"/"false").</param>
+    /// <param name="showOwnBillingAccounts">Optional filter to show only own billing accounts ("true"/"false").</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching billing accounts.</returns>
+    public async Task<IReadOnlyList<BillingAccount>> ListBillingAccountsAsync(
+        string? name = null, string? idIn = null,
+        string? skr = null, string? skrIn = null,
+        string? numberGte = null, string? numberLte = null,
+        string? deleted = null, string? accountingPlanIsNull = null,
+        string? showOwnBillingAccounts = null,
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        ApiQueries.BillingAccountQuery.Name = name;
+        ApiQueries.BillingAccountQuery.IdIn = idIn;
+        ApiQueries.BillingAccountQuery.Skr = skr;
+        ApiQueries.BillingAccountQuery.SkrIn = skrIn;
+        ApiQueries.BillingAccountQuery.NumberGte = numberGte;
+        ApiQueries.BillingAccountQuery.NumberLte = numberLte;
+        ApiQueries.BillingAccountQuery.Deleted = deleted;
+        ApiQueries.BillingAccountQuery.AccountingPlanIsNull = accountingPlanIsNull;
+        ApiQueries.BillingAccountQuery.ShowOwnBillingAccounts = showOwnBillingAccounts;
+        ApiQueries.BillingAccountQuery.Ordering = ordering;
+        ApiQueries.BillingAccountQuery.Search = search;
+
+        return await HandleListResponseWithPagination<BillingAccount>(
+            BuildListUrl("billing-account", ApiQueries.BillingAccount), ct);
+    }
+
+    /// <summary>Updates a billing account with PATCH semantics.</summary>
+    /// <param name="id">The billing account ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="BillingAccount"/> as returned by the API.</returns>
+    public async Task<BillingAccount> UpdateBillingAccountAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"billing-account/{id}"), content, ct), ct);
+        return await HandleResponse<BillingAccount>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
