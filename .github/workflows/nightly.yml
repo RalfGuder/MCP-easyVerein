@@ -121,10 +121,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Alte Nightly-Releases aufräumen (behalte die letzten 5)
+      - name: Alte Nightly-Releases aufräumen (behalte nur das neueste)
         run: |
           gh release list --json tagName,isPrerelease \
-            --jq '[.[] | select(.isPrerelease and (.tagName | startswith("v1.0.0-nightly.")))] | sort_by(.tagName) | reverse | .[5:][] | .tagName' \
+            --jq '[.[] | select(.isPrerelease and (.tagName | startswith("v1.0.0-nightly.")))] | sort_by(.tagName) | reverse | .[1:][] | .tagName' \
           | while read -r tag; do
               echo "Lösche altes Nightly-Release: $tag"
               gh release delete "$tag" --yes --cleanup-tag || true
