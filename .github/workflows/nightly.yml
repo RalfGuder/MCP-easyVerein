@@ -76,6 +76,7 @@ jobs:
         with:
           name: mcp-easyverein-${{ matrix.rid }}
           path: mcp-easyverein-${{ matrix.rid }}.tar.gz
+          retention-days: 1
 
   release:
     name: Nightly Release
