@@ -13,10 +13,14 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string BankAccount = "bankAccount";
         /// <summary>API field name for the call state delay in days.</summary>
         public const string CallStateDelayDays = "callStateDelayDays";
+        /// <summary>API field name for the cancel-invoice reference.</summary>
+        public const string CancelInvoice = "cancelInvoice";
         /// <summary>API field name for the canceled invoice reference.</summary>
         public const string CanceledInvoice = "canceledInvoice";
         /// <summary>API field name for the cancellation description.</summary>
         public const string CancellationDescription = "cancellationDescription";
+        /// <summary>API field name for the payment-processor charges object.</summary>
+        public const string Charges = "charges";
         /// <summary>API field name for the closing description.</summary>
         public const string ClosingDescription = "closingDescription";
         /// <summary>API field name for the creation date of recurring invoices.</summary>
@@ -27,6 +31,10 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string Date = "date";
         /// <summary>API field name for the date the invoice was sent.</summary>
         public const string DateSent = "dateSent";
+        /// <summary>API field name for the scheduled deletion date.</summary>
+        public const string DeleteAfterDate = "_deleteAfterDate";
+        /// <summary>API field name for the deleting user reference.</summary>
+        public const string DeletedBy = "_deletedBy";
         /// <summary>API field name for the invoice description.</summary>
         public const string Description = "description";
         /// <summary>API field name for the due date.</summary>
@@ -37,6 +45,8 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string Guid = "guid";
         /// <summary>API field name for the unique invoice identifier.</summary>
         public const string Id = "id";
+        /// <summary>API field name for the list of invoice-item references.</summary>
+        public const string InvoiceItems = "invoiceItems";
         /// <summary>API field name for the invoice number.</summary>
         public const string InvoiceNumber = "invNumber";
         /// <summary>API field name for whether the invoice is a draft.</summary>
@@ -45,6 +55,10 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string IsReceipt = "isReceipt";
         /// <summary>API field name for whether the invoice is a request.</summary>
         public const string IsRequest = "isRequest";
+        /// <summary>API field name for the flag marking VAT liability.</summary>
+        public const string IsSubjectToTax = "_isSubjectToTax";
+        /// <summary>API field name for the flag marking per-item tax rates.</summary>
+        public const string IsTaxRatePerInvoiceItem = "_isTaxRatePerInvoiceItem";
         /// <summary>API field name for whether the invoice is a template.</summary>
         public const string IsTemplate = "isTemplate";
         /// <summary>API field name for the invoice kind.</summary>
@@ -57,8 +71,14 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string OfferStatus = "offerStatus";
         /// <summary>API field name for the offer validity end date.</summary>
         public const string OfferValidUntil = "offerValidUntil";
+        /// <summary>API field name for the organisation reference.</summary>
+        public const string Org = "org";
+        /// <summary>API field name for the file path / download URL.</summary>
+        public const string Path = "path";
         /// <summary>API field name for whether the invoice was paid by the user.</summary>
         public const string PayedFromUser = "payedFromUser";
+        /// <summary>API field name for the payment difference amount.</summary>
+        public const string PaymentDifference = "paymentDifference";
         /// <summary>API field name for the payment information.</summary>
         public const string PaymentInformation = "paymentInformation";
         /// <summary>API field name for the invoice receiver.</summary>
@@ -79,6 +99,8 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string Search = "search";
         /// <summary>API field name for the selection account.</summary>
         public const string SelectionAccount = "selectionAcc";
+        /// <summary>API field name for the tax amount.</summary>
+        public const string Tax = "tax";
         /// <summary>API field name for the tax name.</summary>
         public const string TaxName = "taxName";
         /// <summary>API field name for the tax rate.</summary>
