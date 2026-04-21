@@ -10,14 +10,14 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `BillingAccount`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `BillingAccountFields`-Konstanten
-- [ ] **ValueObject `BillingAccountFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `BillingAccountQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
-- [ ] **API-Client:** `ListBillingAccountsAsync`, `GetBillingAccountAsync`, `CreateBillingAccountAsync`, `UpdateBillingAccountAsync`, `DeleteBillingAccountAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
-- [ ] **MCP-Tools:** `BillingAccountTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
+- [x] **Entity `BillingAccount`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `BillingAccountFields`-Konstanten
+- [x] **ValueObject `BillingAccountFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `BillingAccountQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
+- [x] **API-Client:** `ListBillingAccountsAsync`, `GetBillingAccountAsync`, `CreateBillingAccountAsync`, `UpdateBillingAccountAsync`, `DeleteBillingAccountAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
+- [x] **MCP-Tools:** `BillingAccountTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
 
 ## Aufgaben
 

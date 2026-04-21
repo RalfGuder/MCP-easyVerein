@@ -494,6 +494,161 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBankAccountsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // Billing Accounts
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListBillingAccounts_ReturnsBillingAccounts()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Buchungskonto 1200",
+                    number = 1200,
+                    defaultSphere = 9,
+                    excludeInEur = false,
+                    skr = "42",
+                    accountingPlan = 7,
+                    deleted = false,
+                    linkedBookings = 3
+                }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListBillingAccountsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Buchungskonto 1200", result[0].Name);
+        Assert.Equal(1200, result[0].Number);
+        Assert.Equal(9, result[0].DefaultSphere);
+        Assert.Equal(3, result[0].LinkedBookings);
+    }
+
+    [Fact]
+    public async Task ListBillingAccounts_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListBillingAccountsAsync(
+            name: "Buchungskonto",
+            skr: "42",
+            numberGte: "1000",
+            numberLte: "1999",
+            deleted: "false",
+            showOwnBillingAccounts: "true",
+            ordering: "number");
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.Contains("name=Buchungskonto", query);
+        Assert.Contains("skr=42", query);
+        Assert.Contains("number__gte=1000", query);
+        Assert.Contains("number__lte=1999", query);
+        Assert.Contains("deleted=false", query);
+        Assert.Contains("showOwnBillingAccounts=true", query);
+        Assert.Contains("ordering=number", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task GetBillingAccount_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetBillingAccountAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateBillingAccount_PostsEntityAndReturnsCreated()
+    {
+        var createdJson = JsonSerializer.Serialize(new
+        {
+            id = 123,
+            name = "Neues Konto",
+            number = 1400,
+            defaultSphere = 9,
+            excludeInEur = false
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateBillingAccountAsync(new BillingAccount
+        {
+            Name = "Neues Konto",
+            Number = 1400,
+            DefaultSphere = 9,
+            ExcludeInEur = false
+        });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal("Neues Konto", created.Name);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/billing-account", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task UpdateBillingAccount_SendsPatchDictionary()
+    {
+        var updatedJson = JsonSerializer.Serialize(new
+        {
+            id = 5,
+            name = "Renamed",
+            number = 1500
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object>
+        {
+            ["name"] = "Renamed",
+            ["number"] = 1500
+        };
+        var updated = await client.UpdateBillingAccountAsync(5, patch);
+
+        Assert.Equal("Renamed", updated.Name);
+        Assert.Equal(1500, updated.Number);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/billing-account/5", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task DeleteBillingAccount_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteBillingAccountAsync(42);
+
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/billing-account/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListBillingAccounts_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBillingAccountsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //
