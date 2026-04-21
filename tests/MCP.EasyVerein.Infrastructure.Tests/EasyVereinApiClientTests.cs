@@ -649,6 +649,154 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBillingAccountsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // Booking Projects
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListBookingProjects_ReturnsBookingProjects()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Sommerfest 2026",
+                    color = "#ff8800",
+                    @short = "SF26",
+                    budget = 1500.75,
+                    completed = false,
+                    projectCostCentre = "KST-123"
+                }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListBookingProjectsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Sommerfest 2026", result[0].Name);
+        Assert.Equal("SF26", result[0].Short);
+        Assert.Equal(1500.75m, result[0].Budget);
+    }
+
+    [Fact]
+    public async Task ListBookingProjects_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListBookingProjectsAsync(
+            name: "Sommerfest",
+            @short: "SF",
+            completed: "false",
+            budgetGt: "100",
+            budgetLt: "2000",
+            ordering: "name");
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.Contains("name=Sommerfest", query);
+        Assert.Contains("short=SF", query);
+        Assert.Contains("completed=false", query);
+        Assert.Contains("budget__gt=100", query);
+        Assert.Contains("budget__lt=2000", query);
+        Assert.Contains("ordering=name", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task GetBookingProject_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetBookingProjectAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateBookingProject_PostsEntityAndReturnsCreated()
+    {
+        var createdJson = JsonSerializer.Serialize(new
+        {
+            id = 123,
+            name = "Neues Projekt",
+            budget = 500.0,
+            completed = false
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateBookingProjectAsync(new BookingProject
+        {
+            Name = "Neues Projekt",
+            Budget = 500m,
+            Completed = false
+        });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal("Neues Projekt", created.Name);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/booking-project", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task UpdateBookingProject_SendsPatchDictionary()
+    {
+        var updatedJson = JsonSerializer.Serialize(new
+        {
+            id = 5,
+            name = "Renamed",
+            completed = true
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object>
+        {
+            ["name"] = "Renamed",
+            ["completed"] = true
+        };
+        var updated = await client.UpdateBookingProjectAsync(5, patch);
+
+        Assert.Equal("Renamed", updated.Name);
+        Assert.True(updated.Completed);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/booking-project/5", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task DeleteBookingProject_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteBookingProjectAsync(42);
+
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/booking-project/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListBookingProjects_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBookingProjectsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //
