@@ -56,4 +56,17 @@ public class ApiVersionTests
         var closest = ApiVersion.GetClosestVersion("v1.6");
         Assert.NotNull(closest);
     }
+
+    [Fact]
+    public void SupportedVersions_Contains_V20()
+    {
+        Assert.Contains("v2.0", ApiVersion.SupportedVersions);
+    }
+
+    [Fact]
+    public void Create_WithV20_Succeeds()
+    {
+        var version = ApiVersion.Create("v2.0");
+        Assert.Equal("v2.0", version.Version);
+    }
 }

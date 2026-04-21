@@ -6,7 +6,7 @@ namespace MCP.EasyVerein.Domain.ValueObjects;
 public sealed class ApiVersion
 {
     /// <summary>The list of all supported API version strings.</summary>
-    private static readonly IReadOnlyList<string> _supportedVersions = new[] { "v1.4", "v1.5", "v1.6", "v1.7" };
+    private static readonly IReadOnlyList<string> _supportedVersions = new[] { "v1.4", "v1.5", "v1.6", "v1.7", "v2.0" };
 
     /// <summary>The default API version string used when none is specified.</summary>
     private const string DefaultVersion = "v1.7";
