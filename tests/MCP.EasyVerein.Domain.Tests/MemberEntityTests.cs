@@ -130,4 +130,44 @@ public class MemberEntityTests
         Assert.Equal("Anna Schmidt", member.FullName);
         Assert.True(member.IsActive);
     }
+
+    [Fact]
+    public void Deserialize_V17Fixture_FullContactDetailsEmbedded()
+    {
+        var json = File.ReadAllText(Path.Combine("Fixtures", "member-v1.7.json"));
+
+        var member = JsonSerializer.Deserialize<Member>(json);
+
+        Assert.NotNull(member);
+        Assert.Equal(4410903L, member!.Id);
+        Assert.Equal("144", member.MembershipNumber);
+        Assert.NotNull(member.ContactDetails);
+        Assert.Equal(335684097L, member.ContactDetails!.Id);
+        Assert.Equal("Rose", member.ContactDetails.FamilyName);
+        Assert.Equal("Kathleen", member.ContactDetails.FirstName);
+        Assert.Equal(0.00m, member.PaymentAmount);
+        Assert.Null(member.ChairmanPermissionGroup);
+        Assert.Null(member.ChairmanPermissionGroupId);
+    }
+
+    [Fact]
+    public void Deserialize_V20Fixture_ContactDetailsAsUrlRef()
+    {
+        var json = File.ReadAllText(Path.Combine("Fixtures", "member-v2.0.json"));
+
+        var member = JsonSerializer.Deserialize<Member>(json);
+
+        Assert.NotNull(member);
+        Assert.Equal(4410903L, member!.Id);
+        Assert.Equal("144", member.MembershipNumber);
+        Assert.NotNull(member.ContactDetails);
+        Assert.Equal(335684097L, member.ContactDetails!.Id);
+        // ContactDetails.FamilyName is `string` (non-nullable) with default string.Empty,
+        // so URL-ref parses leave it as empty rather than null.
+        Assert.Equal(string.Empty, member.ContactDetails.FamilyName);
+        Assert.Equal(0.00m, member.PaymentAmount);
+        Assert.Equal("https://easyverein.com/api/v2.0/chairman-level/335682768",
+                     member.ChairmanPermissionGroup);
+        Assert.Equal(335682768L, member.ChairmanPermissionGroupId);
+    }
 }
