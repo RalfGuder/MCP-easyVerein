@@ -16,7 +16,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        # Reduced from [ubuntu, windows, macos] to ubuntu-only to conserve
+        # Actions minutes on the private-repo budget. Windows uses 2x minutes,
+        # macOS uses 10x — keeping only ubuntu saves ~92 % of CI minutes per PR.
+        # Cross-platform publishing is still covered by the nightly workflow.
+        os: [ ubuntu-latest ]
 
     steps:
       - name: Checkout
