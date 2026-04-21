@@ -110,7 +110,7 @@ Ausgangspunkt: `Member.ChairmanPermissionGroup` wechselt Typ von `int?` zu `stri
 - [ ] `FlexibleDecimalConverter` liest Zahl, String-Zahl und Null; schreibt als Zahl oder Null.
 - [ ] `MemberContactDetailsConverter` liest Null, Object (→ voller `ContactDetails`), URL-String (→ nur `Id`); schreibt Object oder Null.
 - [ ] v1.7-Fixture deserialisiert: `ContactDetails.FamilyName == "Rose"`, `PaymentAmount == 0.00m`, `ChairmanPermissionGroup == null`, `ChairmanPermissionGroupId == null`.
-- [ ] v2.0-Fixture deserialisiert: `ContactDetails.Id == 335684097`, `ContactDetails.FamilyName == null`, `PaymentAmount == 0.00m`, `ChairmanPermissionGroup == "https://easyverein.com/api/v2.0/chairman-level/335682768"`, `ChairmanPermissionGroupId == 335682768`.
+- [ ] v2.0-Fixture deserialisiert: `ContactDetails.Id == 335684097`, `ContactDetails.FamilyName == string.Empty` (entity-defined non-null default), `PaymentAmount == 0.00m`, `ChairmanPermissionGroup == "https://easyverein.com/api/v2.0/chairman-level/335682768"`, `ChairmanPermissionGroupId == 335682768`.
 - [ ] Alle bestehenden Tests in Domain/Application/Infrastructure bleiben grün.
 - [ ] Coverage ≥ 70 %.
 - [ ] GitHub-Issue **US-0057** angelegt, verlinkt mit User-Story-Markdown.

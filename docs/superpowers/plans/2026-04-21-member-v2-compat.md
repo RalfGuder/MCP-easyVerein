@@ -622,7 +622,9 @@ Open `tests/MCP.EasyVerein.Domain.Tests/MemberEntityTests.cs`. Add these two xUn
         Assert.Equal("144", member.MembershipNumber);
         Assert.NotNull(member.ContactDetails);
         Assert.Equal(335684097L, member.ContactDetails!.Id);
-        Assert.Null(member.ContactDetails.FamilyName);
+        // ContactDetails.FamilyName is `string` (non-nullable) with default string.Empty,
+        // so URL-ref parses leave it as empty rather than null.
+        Assert.Equal(string.Empty, member.ContactDetails.FamilyName);
         Assert.Equal(0.00m, member.PaymentAmount);
         Assert.Equal("https://easyverein.com/api/v2.0/chairman-level/335682768",
                      member.ChairmanPermissionGroup);
