@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 using MCP.EasyVerein.Domain.ValueObjects;
+using MCP.EasyVerein.Domain.Converters;
+using MCP.EasyVerein.Domain.Helpers;
 
 namespace MCP.EasyVerein.Domain.Entities;
 
@@ -40,15 +42,26 @@ public class Member
     public bool BulletinBoardNewPostNotification { get; set; }
 
     /// <summary>
-    /// Gets or sets the chairman permission group ID. Maps to API field ' <c>_chairmanPermissionGroup</c>'.
+    /// Gets or sets the chairman permission group URL reference (v2.0) or null (v1.7).
+    /// Maps to API field ' <c>_chairmanPermissionGroup</c>'.
     /// </summary>
-    [JsonPropertyName(MemberFields.ChairmanPermissionGroup)] 
-    public int? ChairmanPermissionGroup { get; set; }
+    [JsonPropertyName(MemberFields.ChairmanPermissionGroup)]
+    public string? ChairmanPermissionGroup { get; set; }
+
+    /// <summary>
+    /// Gets the numeric chairman-level id extracted from <see cref="ChairmanPermissionGroup"/>,
+    /// or <c>null</c> if the field is null or not a resource URL.
+    /// </summary>
+    [JsonIgnore]
+    public long? ChairmanPermissionGroupId => UrlReference.ExtractId(ChairmanPermissionGroup);
 
     /// <summary>
     /// Gets or sets the associated contact details. Maps to API field ' <c>contactDetails</c>'.
+    /// In v1.7 this is an embedded object; in v2.0 it is a URL reference from which only
+    /// the <see cref="Entities.ContactDetails.Id"/> is populated.
     /// </summary>
-    [JsonPropertyName(MemberFields.ContactDetails)] 
+    [JsonPropertyName(MemberFields.ContactDetails)]
+    [JsonConverter(typeof(MemberContactDetailsConverter))]
     public ContactDetails? ContactDetails { get; set; }
 
     /// <summary>
@@ -138,8 +151,10 @@ public class Member
 
     /// <summary>
     /// Gets or sets the payment amount. Maps to API field ' <c>paymentAmount</c>'.
+    /// Accepts both number (v1.7) and string-number (v2.0) wire shapes.
     /// </summary>
-    [JsonPropertyName(MemberFields.PaymentAmount)] 
+    [JsonPropertyName(MemberFields.PaymentAmount)]
+    [JsonConverter(typeof(FlexibleDecimalConverter))]
     public decimal? PaymentAmount { get; set; }
 
     /// <summary>
