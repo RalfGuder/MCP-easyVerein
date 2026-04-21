@@ -281,6 +281,88 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<BillingAccount>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Booking Projects
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new booking project via the API.</summary>
+    /// <param name="project">The booking project to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="BookingProject"/> as returned by the API.</returns>
+    public async Task<BookingProject> CreateBookingProjectAsync(BookingProject project, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("booking-project"), project, ct), ct);
+        return await HandleResponse<BookingProject>(response, ct);
+    }
+
+    /// <summary>Deletes a booking project by ID.</summary>
+    /// <param name="id">The booking project ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteBookingProjectAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"booking-project/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single booking project by ID.</summary>
+    /// <param name="id">The booking project ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The booking project, or <c>null</c> if not found.</returns>
+    public async Task<BookingProject?> GetBookingProjectAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"booking-project/{id}", ApiQueries.BookingProject), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<BookingProject>(response, ct);
+    }
+
+    /// <summary>Lists booking projects with optional filters and automatic pagination.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="short">Optional short label filter.</param>
+    /// <param name="completed">Optional completed-flag filter ("true"/"false").</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="budgetGt">Optional budget greater-than filter.</param>
+    /// <param name="budgetLt">Optional budget less-than filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching booking projects.</returns>
+    public async Task<IReadOnlyList<BookingProject>> ListBookingProjectsAsync(
+        string? name = null, string? @short = null,
+        string? completed = null, string? idIn = null,
+        string? budgetGt = null, string? budgetLt = null,
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        ApiQueries.BookingProjectQuery.Name = name;
+        ApiQueries.BookingProjectQuery.Short = @short;
+        ApiQueries.BookingProjectQuery.Completed = completed;
+        ApiQueries.BookingProjectQuery.IdIn = idIn;
+        ApiQueries.BookingProjectQuery.BudgetGt = budgetGt;
+        ApiQueries.BookingProjectQuery.BudgetLt = budgetLt;
+        ApiQueries.BookingProjectQuery.Ordering = ordering;
+        ApiQueries.BookingProjectQuery.Search = search;
+
+        return await HandleListResponseWithPagination<BookingProject>(
+            BuildListUrl("booking-project", ApiQueries.BookingProject), ct);
+    }
+
+    /// <summary>Updates a booking project with PATCH semantics.</summary>
+    /// <param name="id">The booking project ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="BookingProject"/> as returned by the API.</returns>
+    public async Task<BookingProject> UpdateBookingProjectAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"booking-project/{id}"), content, ct), ct);
+        return await HandleResponse<BookingProject>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

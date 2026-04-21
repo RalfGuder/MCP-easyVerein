@@ -108,6 +108,47 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteBillingAccountAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists all booking projects, optionally filtered.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="short">Optional short label filter (exact match).</param>
+    /// <param name="completed">Optional completed-flag filter ("true"/"false").</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="budgetGt">Optional budget greater-than filter.</param>
+    /// <param name="budgetLt">Optional budget less-than filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<IReadOnlyList<BookingProject>> ListBookingProjectsAsync(
+        string? name = null, string? @short = null,
+        string? completed = null, string? idIn = null,
+        string? budgetGt = null, string? budgetLt = null,
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single booking project by ID.</summary>
+    /// <param name="id">The booking project ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The booking project, or <c>null</c> if not found.</returns>
+    Task<BookingProject?> GetBookingProjectAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new booking project.</summary>
+    /// <param name="project">The booking project to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created booking project.</returns>
+    Task<BookingProject> CreateBookingProjectAsync(BookingProject project, CancellationToken ct = default);
+
+    /// <summary>Partially updates a booking project (PATCH semantics).</summary>
+    /// <param name="id">The booking project ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated booking project.</returns>
+    Task<BookingProject> UpdateBookingProjectAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a booking project by ID.</summary>
+    /// <param name="id">The booking project ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteBookingProjectAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

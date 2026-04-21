@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 
 ## Projektstatus
 
-### Implementierte Endpoints (9)
+### Implementierte Endpoints (10)
 
 | Endpoint       | User Story | MCP-Tools                                                |
 |----------------|------------|----------------------------------------------------------|
@@ -100,6 +100,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 | Announcement   | US-0010    | list, get, create, update (PATCH), delete                |
 | BankAccount    | US-0011    | list, get, create, update (PATCH), delete                |
 | BillingAccount | US-0012    | list, get, create, update (PATCH), delete                |
+| BookingProject | US-0013    | list, get, create, update (PATCH), delete                |
 
 ### HTTP-Methoden in der easyVerein API v1.7
 
@@ -111,17 +112,16 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 
 ### Nächste anstehende Endpoints
 
-- US-0013: Booking Project
 - US-0015: Chairman Level
 - US-0016: Contact Details Group
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (63)
+- **Domain.Tests** — Entity- und Value-Object-Tests (65)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (36)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (43)
 - **Server.Tests** — noch leer (Platzhalter)
-- **Gesamt: 112 Tests**
+- **Gesamt: 121 Tests**
 
 ## Repository
 
