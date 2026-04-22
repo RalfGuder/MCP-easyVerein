@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json;
+using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -11,7 +12,7 @@ namespace MCP.EasyVerein.Server.Tools;
 /// MCP tools for managing bookings via the easyVerein API.
 /// </summary>
 [McpServerToolType]
-public sealed class BookingTools(IEasyVereinApiClient client)
+public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfiguration config)
 {
     /// <summary>
     /// Lists bookings with an optional ID filter and automatic pagination.
@@ -119,6 +120,7 @@ public sealed class BookingTools(IEasyVereinApiClient client)
         [Description("The new description")] string? description,
         [Description("The new date (ISO 8601)")] string? date,
         [Description("The new receiver")] string? receiver,
+        [Description("The new booking-project ID (the numeric ID of the target booking-project; the tool builds the full resource URL)")] long? bookingProjectId,
         CancellationToken ct)
     {
         try
@@ -128,6 +130,8 @@ public sealed class BookingTools(IEasyVereinApiClient client)
             if (description != null) patch[BookingFields.Description] = description;
             if (date != null) patch[BookingFields.Date] = date;
             if (receiver != null) patch[BookingFields.Receiver] = receiver;
+            if (bookingProjectId != null)
+                patch[BookingFields.BookingProject] = $"{config.GetVersionedBaseUrl()}/booking-project/{bookingProjectId.Value}";
 
             var updated = await client.UpdateBookingAsync(id, patch, ct);
             return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
