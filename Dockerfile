@@ -21,6 +21,6 @@ COPY --from=build /app/publish .
 
 ENV EASYVEREIN_API_TOKEN=""
 ENV EASYVEREIN_BASE_URL="https://easyverein.com/api"
-ENV EASYVEREIN_API_VERSION="v1.7"
+ENV EASYVEREIN_API_VERSION="v2.0"
 
 ENTRYPOINT ["dotnet", "MCP.EasyVerein.Server.dll"]

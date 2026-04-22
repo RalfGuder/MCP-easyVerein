@@ -80,7 +80,7 @@ static void PrintHelp()
         Optionen:
           --api-key <value>      API-Schlüssel        (Env: EASYVEREIN_API_KEY)
           --api-url <value>      API-Basis-URL        (Env: EASYVEREIN_API_URL,     Standard: https://easyverein.com/api)
-          --api-version <value>  API-Version          (Env: EASYVEREIN_API_VERSION, Standard: v1.7)
+          --api-version <value>  API-Version          (Env: EASYVEREIN_API_VERSION, Standard: v2.0)
           --help, -h             Diese Hilfe anzeigen
 
         Priorität: CLI-Parameter > Umgebungsvariablen > Standardwerte

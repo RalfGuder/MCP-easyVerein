@@ -11,9 +11,9 @@ public class ApiVersionTests
     }
 
     [Fact]
-    public void Default_Is_V17()
+    public void Default_Is_V20()
     {
-        Assert.Equal("v1.7", ApiVersion.Default.Version);
+        Assert.Equal("v2.0", ApiVersion.Default.Version);
     }
 
     [Fact]
