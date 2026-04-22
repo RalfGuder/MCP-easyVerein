@@ -121,6 +121,7 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
         [Description("The new date (ISO 8601)")] string? date,
         [Description("The new receiver")] string? receiver,
         [Description("The new booking-project ID (the numeric ID of the target booking-project; the tool builds the full resource URL)")] long? bookingProjectId,
+        [Description("The new billing-account ID (SKR42 account; the numeric ID of the billing-account entry; the tool builds the full resource URL)")] long? billingAccountId,
         [Description("The new SKR42 sphere (integer). Typical values: 1=ideeller Bereich, 2=Vermögensverwaltung, 3=Zweckbetrieb, 4=wirtschaftlicher Geschäftsbetrieb, 9=unkategorisiert (default)")] long? sphere,
         CancellationToken ct)
     {
@@ -133,6 +134,8 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
             if (receiver != null) patch[BookingFields.Receiver] = receiver;
             if (bookingProjectId != null)
                 patch[BookingFields.BookingProject] = $"{config.GetVersionedBaseUrl()}/booking-project/{bookingProjectId.Value}";
+            if (billingAccountId != null)
+                patch[BookingFields.BillingAccount] = $"{config.GetVersionedBaseUrl()}/billing-account/{billingAccountId.Value}";
             if (sphere != null) patch[BookingFields.Sphere] = sphere;
 
             var updated = await client.UpdateBookingAsync(id, patch, ct);
