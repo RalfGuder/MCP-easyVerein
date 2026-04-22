@@ -10,14 +10,14 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `ChairmanLevel`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `ChairmanLevelFields`-Konstanten
-- [ ] **ValueObject `ChairmanLevelFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `ChairmanLevelQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
-- [ ] **API-Client:** `ListChairmanLevelsAsync`, `GetChairmanLevelAsync`, `CreateChairmanLevelAsync`, `UpdateChairmanLevelAsync`, `DeleteChairmanLevelAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
-- [ ] **MCP-Tools:** `ChairmanLevelTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
+- [x] **Entity `ChairmanLevel`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `ChairmanLevelFields`-Konstanten
+- [x] **ValueObject `ChairmanLevelFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `ChairmanLevelQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
+- [x] **API-Client:** `ListChairmanLevelsAsync`, `GetChairmanLevelAsync`, `CreateChairmanLevelAsync`, `UpdateChairmanLevelAsync`, `DeleteChairmanLevelAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
+- [x] **MCP-Tools:** `ChairmanLevelTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
 
 ## Aufgaben
 

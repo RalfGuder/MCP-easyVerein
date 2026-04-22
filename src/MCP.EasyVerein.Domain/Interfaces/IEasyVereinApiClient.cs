@@ -149,6 +149,42 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteBookingProjectAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists all chairman levels, optionally filtered.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="short">Optional short label filter (exact match).</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<IReadOnlyList<ChairmanLevel>> ListChairmanLevelsAsync(
+        string? name = null, string? @short = null,
+        string? idIn = null, string? ordering = null,
+        string[]? search = null, CancellationToken ct = default);
+
+    /// <summary>Gets a single chairman level by ID.</summary>
+    /// <param name="id">The chairman level ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The chairman level, or <c>null</c> if not found.</returns>
+    Task<ChairmanLevel?> GetChairmanLevelAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new chairman level.</summary>
+    /// <param name="level">The chairman level to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created chairman level.</returns>
+    Task<ChairmanLevel> CreateChairmanLevelAsync(ChairmanLevel level, CancellationToken ct = default);
+
+    /// <summary>Partially updates a chairman level (PATCH semantics).</summary>
+    /// <param name="id">The chairman level ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated chairman level.</returns>
+    Task<ChairmanLevel> UpdateChairmanLevelAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a chairman level by ID.</summary>
+    /// <param name="id">The chairman level ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteChairmanLevelAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

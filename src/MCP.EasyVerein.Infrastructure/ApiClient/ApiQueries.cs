@@ -46,6 +46,16 @@ internal static class ApiQueries
     internal static string BookingProject => BookingProjectQuery.ToString();
 
     /// <summary>
+    /// Shared <see cref="ChairmanLevelQuery"/> instance used to build chairman-level query strings with optional filters.
+    /// </summary>
+    internal static readonly ChairmanLevelQuery ChairmanLevelQuery = new();
+
+    /// <summary>
+    /// Gets the current chairman-level query string including field selection and any active filters.
+    /// </summary>
+    internal static string ChairmanLevel => ChairmanLevelQuery.ToString();
+
+    /// <summary>
     /// Shared <see cref="MemberQuery"/> instance used to build member query strings with optional filters.
     /// </summary>
     internal static readonly MemberQuery MemberQuery = new();

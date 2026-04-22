@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 
 ## Projektstatus
 
-### Implementierte Endpoints (10)
+### Implementierte Endpoints (11)
 
 | Endpoint       | User Story | MCP-Tools                                                |
 |----------------|------------|----------------------------------------------------------|
@@ -101,6 +101,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 | BankAccount    | US-0011    | list, get, create, update (PATCH), delete                |
 | BillingAccount | US-0012    | list, get, create, update (PATCH), delete                |
 | BookingProject | US-0013    | list, get, create, update (PATCH), delete                |
+| ChairmanLevel  | US-0015    | list, get, create, update (PATCH), delete                |
 
 ### HTTP-Methoden in der easyVerein API v1.7
 
@@ -112,8 +113,8 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 
 ### Nächste anstehende Endpoints
 
-- US-0015: Chairman Level
 - US-0016: Contact Details Group
+- US-0017: Contact Details Log
 
 ### Teststruktur
 
@@ -121,7 +122,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
 - **Application.Tests** — Konfigurationsauflösung (13)
 - **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (43)
 - **Server.Tests** — noch leer (Platzhalter)
-- **Gesamt: 121 Tests**
+- **Gesamt: 130 Tests** (US-0015 bringt +9, Regressions-Test `Constructor_SetsAuthorizationHeader` aus dem v2-Support ist rot und wartet auf separaten Fix)
 
 ## Repository
 
