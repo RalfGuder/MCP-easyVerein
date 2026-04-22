@@ -57,25 +57,31 @@ public sealed class BookingProjectTools(IEasyVereinApiClient client)
         }
     }
 
-    /// <summary>Creates a new booking project in easyVerein.</summary>
+    /// <summary>Creates a new booking project in easyVerein. Injects API-required defaults for optional fields.</summary>
     [McpServerTool(Name = "create_booking_project"), Description("Create a new booking project")]
     public async Task<string> CreateBookingProject(
         [Description("The booking project name (required, max 200 chars)")] string name,
-        [Description("Hex color (max 7 chars, e.g. '#ff8800')")] string? color,
-        [Description("Short label (max 4 chars)")] string? @short,
-        [Description("Budget amount (decimal)")] decimal? budget,
-        [Description("Completed flag")] bool? completed,
-        [Description("Project cost centre")] string? projectCostCentre,
+        [Description("Short label (required by easyVerein, max 4 chars, must be unique)")] string? @short,
+        [Description("Hex color (max 7 chars, e.g. '#ff8800'). Optional.")] string? color,
+        [Description("Budget amount (decimal). Default: 0")] decimal? budget,
+        [Description("Completed flag. Default: false")] bool? completed,
+        [Description("Project cost centre. Default: empty string")] string? projectCostCentre,
         CancellationToken ct)
     {
         try
         {
-            var project = new BookingProject { Name = name };
+            if (!HasValue(@short))
+                return "ERROR: 'short' is required — easyVerein rejects creation without a short label (max 4 chars, must be unique per project).";
+
+            var project = new BookingProject
+            {
+                Name = name,
+                Short = @short,
+                Budget = budget ?? 0m,
+                Completed = completed ?? false,
+                ProjectCostCentre = HasValue(projectCostCentre) ? projectCostCentre : string.Empty
+            };
             if (HasValue(color)) project.Color = color;
-            if (HasValue(@short)) project.Short = @short;
-            if (budget.HasValue) project.Budget = budget.Value;
-            if (completed.HasValue) project.Completed = completed.Value;
-            if (HasValue(projectCostCentre)) project.ProjectCostCentre = projectCostCentre;
 
             var created = await client.CreateBookingProjectAsync(project, ct);
             return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
