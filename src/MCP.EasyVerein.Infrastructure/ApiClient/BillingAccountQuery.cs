@@ -50,7 +50,6 @@ internal class BillingAccountQuery
             BillingAccountFields.DefaultSphere + "," +
             BillingAccountFields.ExcludeInEur + "," +
             BillingAccountFields.Skr + "," +
-            BillingAccountFields.AccountingPlan + "," +
             BillingAccountFields.Deleted + "," +
             BillingAccountFields.LinkedBookings +
         "}";

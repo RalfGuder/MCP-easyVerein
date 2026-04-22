@@ -16,7 +16,6 @@ public class BillingAccountEntityTests
                 "defaultSphere": 9,
                 "excludeInEur": false,
                 "skr": "42",
-                "accountingPlan": 7,
                 "deleted": false,
                 "linkedBookings": 15
             }
@@ -32,7 +31,6 @@ public class BillingAccountEntityTests
         Assert.Equal(9, account.DefaultSphere);
         Assert.False(account.ExcludeInEur);
         Assert.Equal("42", account.Skr);
-        Assert.Equal(7L, account.AccountingPlan);
         Assert.False(account.Deleted);
         Assert.Equal(15, account.LinkedBookings);
     }
@@ -57,7 +55,6 @@ public class BillingAccountEntityTests
         Assert.Null(account.DefaultSphere);
         Assert.Null(account.ExcludeInEur);
         Assert.Null(account.Skr);
-        Assert.Null(account.AccountingPlan);
         Assert.Null(account.Deleted);
         Assert.Null(account.LinkedBookings);
     }
