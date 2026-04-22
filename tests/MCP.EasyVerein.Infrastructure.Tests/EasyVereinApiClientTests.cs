@@ -989,6 +989,46 @@ public class EasyVereinApiClientTests
         Assert.NotNull(handler.LastRequestContentLength);
         Assert.True(handler.LastRequestContentLength > 0);
     }
+
+    // ------------------------------------------------------------------ //
+    // POST body serialisation — null properties must be omitted so that
+    // easyVerein keeps the server-side default instead of being overwritten
+    // with "null". (US-0058)
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task CreateInvoice_OmitsNullProperties_FromJsonBody()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateInvoiceAsync(new Invoice
+        {
+            InvoiceNumber = "R-001",
+            TotalPrice = 99.99m,
+            Description = "Unit test"
+        });
+
+        Assert.NotNull(handler.LastRequestBody);
+        var body = handler.LastRequestBody!;
+
+        Assert.Contains("\"invNumber\":\"R-001\"", body);
+        Assert.Contains("\"totalPrice\":99.99", body);
+        Assert.Contains("\"description\":\"Unit test\"", body);
+
+        // Nullable properties that were not set must not appear in the JSON body.
+        Assert.DoesNotContain("\"kind\"", body);
+        Assert.DoesNotContain("\"refNumber\"", body);
+        Assert.DoesNotContain("\"paymentInformation\"", body);
+        Assert.DoesNotContain("\"actualCallStateName\"", body);
+        Assert.DoesNotContain("\"callStateDelayDays\"", body);
+        Assert.DoesNotContain("\"accnumber\"", body);
+        Assert.DoesNotContain("\"guid\"", body);
+        Assert.DoesNotContain("\"mode\"", body);
+        Assert.DoesNotContain("\"offerStatus\"", body);
+        Assert.DoesNotContain("\"relatedAddress\"", body);
+        Assert.DoesNotContain("\"bankAccount\"", body);
+    }
 }
 
 // ------------------------------------------------------------------ //
@@ -1066,6 +1106,9 @@ public class CapturingFakeHttpHandler : HttpMessageHandler
     /// <summary>Gets whether the last captured request sent <c>Transfer-Encoding: chunked</c> instead of a fixed length.</summary>
     public bool LastRequestUsedChunkedEncoding { get; private set; }
 
+    /// <summary>Gets the raw request body of the last captured request as a UTF-8 string, or <c>null</c> if absent.</summary>
+    public string? LastRequestBody { get; private set; }
+
     public CapturingFakeHttpHandler(HttpStatusCode statusCode, string content)
     {
         _statusCode = statusCode;
@@ -1086,6 +1129,7 @@ public class CapturingFakeHttpHandler : HttpMessageHandler
             // Force body materialization so Content-Length is populated on fixed-length content.
             await request.Content.LoadIntoBufferAsync();
             LastRequestContentLength = request.Content.Headers.ContentLength;
+            LastRequestBody = await request.Content.ReadAsStringAsync(cancellationToken);
         }
 
         return new HttpResponseMessage

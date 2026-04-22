@@ -59,13 +59,33 @@ public sealed class InvoiceTools
     /// </summary>
     /// <param name="invoiceNumber">The invoice number.</param>
     /// <param name="totalPrice">The total price of the invoice.</param>
-    /// <param name="description">An optional description.</param>
-    /// <param name="kind">The invoice type (e.g. "invoice", "credit").</param>
+    /// <param name="description">Payment description / statement text.</param>
+    /// <param name="kind">Invoice kind. Allowed: 'Balance', 'Donation', 'Membership', 'Revenue', 'Expense', 'Cancel', 'Credit', 'Selfissuedreceipt'.</param>
+    /// <param name="refNumber">Invoice-specific reference number.</param>
+    /// <param name="paymentInformation">Payment information. Allowed: 'Nothing', 'Account', 'Debit', 'Cash'.</param>
+    /// <param name="actualCallStateName">Name of the current dunning/call state.</param>
+    /// <param name="callStateDelayDays">Delay in days for the current dunning state.</param>
+    /// <param name="accnumber">DATEV account number.</param>
+    /// <param name="guid">DATEV invoice GUID.</param>
+    /// <param name="mode">Invoice mode (e.g. 'invoice', 'offer', 'offer_template').</param>
+    /// <param name="offerStatus">Offer status (only relevant when mode is an offer variant).</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the created invoice.</returns>
-    [McpServerTool(Name = "create_invoice"), Description("Creates a new invoice and retuns the new entry, or responds an error if something fails")]
+    [McpServerTool(Name = "create_invoice"), Description("Creates a new invoice and returns the new entry, or responds an error if something fails. Supported kinds: Balance, Donation, Membership, Revenue, Expense, Cancel, Credit, Selfissuedreceipt. Supported paymentInformation: Nothing, Account, Debit, Cash. Supported modes: invoice, offer, offer_template.")]
     public async Task<string> CreateInvoice(
-        string? invoiceNumber, decimal totalPrice, string? description, string? kind, CancellationToken ct)
+        string? invoiceNumber,
+        decimal totalPrice,
+        string? description,
+        string? kind,
+        string? refNumber,
+        string? paymentInformation,
+        string? actualCallStateName,
+        int? callStateDelayDays,
+        int? accnumber,
+        string? guid,
+        string? mode,
+        string? offerStatus,
+        CancellationToken ct)
     {
         try
         {
@@ -74,7 +94,15 @@ public sealed class InvoiceTools
                 InvoiceNumber = invoiceNumber,
                 TotalPrice = totalPrice,
                 Description = description,
-                Kind = kind
+                Kind = kind,
+                RefNumber = refNumber,
+                PaymentInformation = paymentInformation,
+                ActualCallStateName = actualCallStateName,
+                CallStateDelayDays = callStateDelayDays,
+                AccountNumber = accnumber,
+                Guid = guid,
+                Mode = mode,
+                OfferStatus = offerStatus
             };
             var created = await _client.CreateInvoiceAsync(invoice, ct);
             return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
