@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Domain.Converters;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
 using System.Text.Json.Serialization;
@@ -85,9 +86,13 @@ public class Booking
     [JsonPropertyName(BookingFields.Receiver)] public string? Receiver { get; set; }
 
     /// <summary>
-    /// Gets or sets the related invoice IDs. Maps to API field ' <c>relatedInvoice</c>'.
+    /// Gets or sets the related invoices. Maps to API field ' <c>relatedInvoice</c>'. In v1.7 and GET
+    /// responses each element is an embedded invoice object; in v2.0 PATCH responses elements are
+    /// URL references — <see cref="FlexibleInvoiceListConverter"/> handles both shapes.
     /// </summary>
-    [JsonPropertyName(BookingFields.RelatedInvoice)] public List<Invoice>? RelatedInvoice { get; set; }
+    [JsonPropertyName(BookingFields.RelatedInvoice)]
+    [JsonConverter(typeof(FlexibleInvoiceListConverter))]
+    public List<Invoice>? RelatedInvoice { get; set; }
 
     /// <summary>
     /// Gets or sets the sphere (area). Maps to API field ' <c>sphere</c>'.
