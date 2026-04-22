@@ -939,6 +939,56 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListChairmanLevelsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // HTTP Transport — POST regression coverage for issue:
+    // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
+    // (Length Required). All Create*Async methods must send the body as
+    // fixed-length StringContent (i.e. expose Content-Length).
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task CreateBookingProject_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"name\":\"X\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateBookingProjectAsync(new BookingProject { Name = "X" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task CreateChairmanLevel_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"name\":\"Y\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateChairmanLevelAsync(new ChairmanLevel { Name = "Y" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding);
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task CreateAnnouncement_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"title\":\"Z\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateAnnouncementAsync(new Announcement { Text = "Z" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding);
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
 }
 
 // ------------------------------------------------------------------ //
@@ -1004,7 +1054,17 @@ public class CapturingFakeHttpHandler : HttpMessageHandler
     private readonly HttpStatusCode _statusCode;
     private readonly string _content;
 
+    /// <summary>Gets the URI of the last captured request.</summary>
     public Uri? LastRequestUri { get; private set; }
+
+    /// <summary>Gets the HTTP method of the last captured request.</summary>
+    public HttpMethod? LastRequestMethod { get; private set; }
+
+    /// <summary>Gets the <c>Content-Length</c> of the last captured request body, or <c>null</c> if absent.</summary>
+    public long? LastRequestContentLength { get; private set; }
+
+    /// <summary>Gets whether the last captured request sent <c>Transfer-Encoding: chunked</c> instead of a fixed length.</summary>
+    public bool LastRequestUsedChunkedEncoding { get; private set; }
 
     public CapturingFakeHttpHandler(HttpStatusCode statusCode, string content)
     {
@@ -1012,14 +1072,26 @@ public class CapturingFakeHttpHandler : HttpMessageHandler
         _content = content;
     }
 
-    protected override Task<HttpResponseMessage> SendAsync(
+    protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request, CancellationToken cancellationToken)
     {
         LastRequestUri = request.RequestUri;
-        return Task.FromResult(new HttpResponseMessage
+        LastRequestMethod = request.Method;
+        LastRequestUsedChunkedEncoding =
+            request.Headers.TransferEncodingChunked == true ||
+            (request.Headers.TransferEncoding?.Any(v => v.Value == "chunked") ?? false);
+
+        if (request.Content != null)
+        {
+            // Force body materialization so Content-Length is populated on fixed-length content.
+            await request.Content.LoadIntoBufferAsync();
+            LastRequestContentLength = request.Content.Headers.ContentLength;
+        }
+
+        return new HttpResponseMessage
         {
             StatusCode = _statusCode,
             Content = new StringContent(_content, System.Text.Encoding.UTF8, "application/json")
-        });
+        };
     }
 }

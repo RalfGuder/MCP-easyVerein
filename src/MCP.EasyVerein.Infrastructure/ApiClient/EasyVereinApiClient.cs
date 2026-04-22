@@ -526,7 +526,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         var createdContact = await CreateContactDetailsAsync(contactDetails, ct);
         var payload = new { emailOrUserName, contactDetails = createdContact.Id };
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("member"), payload, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("member"), BuildJsonContent(payload), ct), ct);
         return await HandleResponse<Member>(response, ct);
     }
 
