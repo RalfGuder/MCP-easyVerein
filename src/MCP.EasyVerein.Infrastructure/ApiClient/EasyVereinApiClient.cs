@@ -35,7 +35,8 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
         // Authentifizierung (FR-002)
