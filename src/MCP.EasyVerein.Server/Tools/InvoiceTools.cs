@@ -67,15 +67,23 @@ public sealed class InvoiceTools
     public async Task<string> CreateInvoice(
         string? invoiceNumber, decimal totalPrice, string? description, string? kind, CancellationToken ct)
     {
-        var invoice = new Invoice
+        try
         {
-            InvoiceNumber = invoiceNumber,
-            TotalPrice = totalPrice,
-            Description = description,
-            Kind = kind
-        };
-        var created = await _client.CreateInvoiceAsync(invoice, ct);
-        return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            var invoice = new Invoice
+            {
+                InvoiceNumber = invoiceNumber,
+                TotalPrice = totalPrice,
+                Description = description,
+                Kind = kind
+            };
+            var created = await _client.CreateInvoiceAsync(invoice, ct);
+            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch (Exception ex)
+        {
+            return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
+        }
+
     }
 
     /// <summary>
