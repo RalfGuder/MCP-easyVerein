@@ -1,11 +1,12 @@
 using System.Text.Json.Serialization;
+using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
 
 namespace MCP.EasyVerein.Domain.Entities;
 
 /// <summary>Represents the contact details of a member from the easyVerein API.</summary>
 [JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
-public class ContactDetails
+public class ContactDetails : IHasId
 {
     /// <summary>Gets whether the address is a company address. Maps to API field '<c>addressCompany</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.AddressCompany)]
@@ -131,9 +132,9 @@ public class ContactDetails
     [JsonPropertyName(ContactDetailsFields.Iban)]
     public string? Iban { get; init; }
 
-    /// <summary>Gets the unique identifier. Maps to API field '<c>id</c>'.</summary>
+    /// <summary>Gets or sets the unique identifier. Maps to API field '<c>id</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.Id)]
-    public long Id { get; init; }
+    public long Id { get; set; }
 
     /// <summary>Gets the internal note. Maps to API field '<c>internalNote</c>'.</summary>
     [JsonPropertyName(ContactDetailsFields.InternalNote)]

@@ -5,11 +5,11 @@ using MCP.EasyVerein.Domain.Entities;
 
 namespace MCP.EasyVerein.Domain.Tests;
 
-public class FlexibleInvoiceListConverterTests
+public class FlexibleReferenceListConverterTests
 {
     private sealed class Wrapper
     {
-        [JsonConverter(typeof(FlexibleInvoiceListConverter))]
+        [JsonConverter(typeof(FlexibleReferenceListConverter<Invoice>))]
         public List<Invoice>? Value { get; set; }
     }
 

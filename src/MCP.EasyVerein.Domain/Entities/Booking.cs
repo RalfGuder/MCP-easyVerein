@@ -8,7 +8,7 @@ namespace MCP.EasyVerein.Domain.Entities;
 /// <summary>
 /// Represents a booking from the easyVerein API.
 /// </summary>
-public class Booking
+public class Booking : IHasId
 {
     /// <summary>
     /// Gets or sets the booking amount. Maps to API field ' <c>amount</c>'.
@@ -16,14 +16,20 @@ public class Booking
     [JsonPropertyName(BookingFields.Amount)] public decimal? Amount { get; set; }
 
     /// <summary>
-    /// Gets or sets the bank account reference. Maps to API field ' <c>bankAccount</c>'.
+    /// Gets or sets the bank account reference. Maps to API field ' <c>bankAccount</c>'. May arrive as
+    /// embedded object or URL reference — handled by <see cref="FlexibleReferenceConverter{T}"/>.
     /// </summary>
-    [JsonPropertyName(BookingFields.BankAccount)] public BankAccount? BankAccount { get; set; }
+    [JsonPropertyName(BookingFields.BankAccount)]
+    [JsonConverter(typeof(FlexibleReferenceConverter<BankAccount>))]
+    public BankAccount? BankAccount { get; set; }
 
     /// <summary>
-    /// Gets or sets the billing account reference. Maps to API field ' <c>billingAccount</c>'.
+    /// Gets or sets the billing account reference. Maps to API field ' <c>billingAccount</c>'. May arrive as
+    /// embedded object or URL reference — handled by <see cref="FlexibleReferenceConverter{T}"/>.
     /// </summary>
-    [JsonPropertyName(BookingFields.BillingAccount)] public BillingAccount? BillingAccount { get; set; }
+    [JsonPropertyName(BookingFields.BillingAccount)]
+    [JsonConverter(typeof(FlexibleReferenceConverter<BillingAccount>))]
+    public BillingAccount? BillingAccount { get; set; }
 
     /// <summary>
     /// Gets or sets whether the booking is blocked. Maps to API field ' <c>blocked</c>'.
@@ -71,9 +77,12 @@ public class Booking
     [JsonPropertyName(BookingFields.Id)] public long Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the organization reference. Maps to API field '<c>org</c>'.
+    /// Gets or sets the organization reference. Maps to API field '<c>org</c>'. May arrive as embedded
+    /// object or URL reference — handled by <see cref="FlexibleReferenceConverter{T}"/>.
     /// </summary>
-    [JsonPropertyName(BookingFields.Org)] public Organization? Org { get; set; }
+    [JsonPropertyName(BookingFields.Org)]
+    [JsonConverter(typeof(FlexibleReferenceConverter<Organization>))]
+    public Organization? Org { get; set; }
 
     /// <summary>
     /// Gets or sets the payment difference. Maps to API field ' <c>paymentDifference</c>'.
@@ -86,12 +95,12 @@ public class Booking
     [JsonPropertyName(BookingFields.Receiver)] public string? Receiver { get; set; }
 
     /// <summary>
-    /// Gets or sets the related invoices. Maps to API field ' <c>relatedInvoice</c>'. In v1.7 and GET
-    /// responses each element is an embedded invoice object; in v2.0 PATCH responses elements are
-    /// URL references — <see cref="FlexibleInvoiceListConverter"/> handles both shapes.
+    /// Gets or sets the related invoices. Maps to API field ' <c>relatedInvoice</c>'. Elements may
+    /// arrive as embedded invoice objects (v1.7, GET) or URL references (v2.0 PATCH) — handled by
+    /// <see cref="FlexibleReferenceListConverter{T}"/>.
     /// </summary>
     [JsonPropertyName(BookingFields.RelatedInvoice)]
-    [JsonConverter(typeof(FlexibleInvoiceListConverter))]
+    [JsonConverter(typeof(FlexibleReferenceListConverter<Invoice>))]
     public List<Invoice>? RelatedInvoice { get; set; }
 
     /// <summary>
