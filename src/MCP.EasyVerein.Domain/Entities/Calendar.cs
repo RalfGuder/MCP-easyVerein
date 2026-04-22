@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
 using System.Text.Json.Serialization;
 
@@ -6,7 +7,7 @@ namespace MCP.EasyVerein.Domain.Entities;
 /// <summary>
 /// Represents a calendar from the easyVerein API.
 /// </summary>
-public class Calendar
+public class Calendar : IHasId
 {
     /// <summary>
     /// Gets or sets the unique identifier. Maps to API field '<c>id</c>'.

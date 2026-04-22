@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
 
 namespace MCP.EasyVerein.Domain.Entities;
@@ -6,7 +7,7 @@ namespace MCP.EasyVerein.Domain.Entities;
 /// <summary>
 /// Represents an event from the easyVerein API.
 /// </summary>
-public class Event
+public class Event : IHasId
 {
     /// <summary>
     /// Gets or sets the unique identifier. Maps to API field '<c>id</c>'.

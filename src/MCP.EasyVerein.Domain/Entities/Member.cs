@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
 using MCP.EasyVerein.Domain.Converters;
 using MCP.EasyVerein.Domain.Helpers;
@@ -9,7 +10,7 @@ namespace MCP.EasyVerein.Domain.Entities;
 /// Represents an association member from the easyVerein API.
 /// </summary>
 [JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
-public class Member
+public class Member : IHasId
 {
     /// <summary>
     /// Gets or sets the application date. Maps to API field <c>_applicationDate</c>.
@@ -61,7 +62,7 @@ public class Member
     /// the <see cref="Entities.ContactDetails.Id"/> is populated.
     /// </summary>
     [JsonPropertyName(MemberFields.ContactDetails)]
-    [JsonConverter(typeof(MemberContactDetailsConverter))]
+    [JsonConverter(typeof(FlexibleReferenceConverter<ContactDetails>))]
     public ContactDetails? ContactDetails { get; set; }
 
     /// <summary>
