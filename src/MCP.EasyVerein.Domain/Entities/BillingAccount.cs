@@ -33,10 +33,6 @@ public class BillingAccount : IHasId
     [JsonPropertyName(BillingAccountFields.Skr)]
     public string? Skr { get; set; }
 
-    /// <summary>Gets or sets the related accounting plan ID. Maps to API field '<c>accountingPlan</c>'.</summary>
-    [JsonPropertyName(BillingAccountFields.AccountingPlan)]
-    public long? AccountingPlan { get; set; }
-
     /// <summary>Gets or sets the soft-delete flag. Maps to API field '<c>deleted</c>'.</summary>
     [JsonPropertyName(BillingAccountFields.Deleted)]
     public bool? Deleted { get; set; }

@@ -576,6 +576,35 @@ public class EasyVereinApiClientTests
         Assert.Null(result);
     }
 
+    /// <summary>
+    /// Regression for US-0059: the <c>accountingPlan</c> field is not a
+    /// billing-account response field in any easyVerein API version.
+    /// Requesting it via the <c>query=</c> selector caused HTTP 400
+    /// ("'accountingPlan' field is not found") on v2.0.
+    /// </summary>
+    [Fact]
+    public async Task ListBillingAccounts_DoesNotRequestAccountingPlanField_InQuerySelector()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListBillingAccountsAsync();
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+
+        // The query= selector must not ask for a non-existent response field.
+        // The literal "{accountingPlan}" or "accountingPlan," or "accountingPlan}" must not appear.
+        Assert.DoesNotContain("{accountingPlan,", query);
+        Assert.DoesNotContain(",accountingPlan,", query);
+        Assert.DoesNotContain(",accountingPlan}", query);
+    }
+
     [Fact]
     public async Task CreateBillingAccount_PostsEntityAndReturnsCreated()
     {

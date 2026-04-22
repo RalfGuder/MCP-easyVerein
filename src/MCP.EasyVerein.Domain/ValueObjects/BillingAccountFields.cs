@@ -21,9 +21,6 @@ internal static class BillingAccountFields
     /// <summary>API field name for the SKR chart (e.g. SKR 42).</summary>
     internal const string Skr = "skr";
 
-    /// <summary>API field name for the related accounting plan ID.</summary>
-    internal const string AccountingPlan = "accountingPlan";
-
     /// <summary>API field name for the soft-delete flag.</summary>
     internal const string Deleted = "deleted";
 
