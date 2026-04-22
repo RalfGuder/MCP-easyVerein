@@ -363,6 +363,80 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<BookingProject>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Chairman Levels
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new chairman level via the API.</summary>
+    /// <param name="level">The chairman level to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="ChairmanLevel"/> as returned by the API.</returns>
+    public async Task<ChairmanLevel> CreateChairmanLevelAsync(ChairmanLevel level, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsJsonAsync(BuildUrl("chairman-level"), level, ct), ct);
+        return await HandleResponse<ChairmanLevel>(response, ct);
+    }
+
+    /// <summary>Deletes a chairman level by ID.</summary>
+    /// <param name="id">The chairman level ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteChairmanLevelAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"chairman-level/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single chairman level by ID.</summary>
+    /// <param name="id">The chairman level ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The chairman level, or <c>null</c> if not found.</returns>
+    public async Task<ChairmanLevel?> GetChairmanLevelAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"chairman-level/{id}", ApiQueries.ChairmanLevel), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<ChairmanLevel>(response, ct);
+    }
+
+    /// <summary>Lists chairman levels with optional filters and automatic pagination.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="short">Optional short label filter.</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching chairman levels.</returns>
+    public async Task<IReadOnlyList<ChairmanLevel>> ListChairmanLevelsAsync(
+        string? name = null, string? @short = null,
+        string? idIn = null, string? ordering = null,
+        string[]? search = null, CancellationToken ct = default)
+    {
+        ApiQueries.ChairmanLevelQuery.Name = name;
+        ApiQueries.ChairmanLevelQuery.Short = @short;
+        ApiQueries.ChairmanLevelQuery.IdIn = idIn;
+        ApiQueries.ChairmanLevelQuery.Ordering = ordering;
+        ApiQueries.ChairmanLevelQuery.Search = search;
+
+        return await HandleListResponseWithPagination<ChairmanLevel>(
+            BuildListUrl("chairman-level", ApiQueries.ChairmanLevel), ct);
+    }
+
+    /// <summary>Updates a chairman level with PATCH semantics.</summary>
+    /// <param name="id">The chairman level ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="ChairmanLevel"/> as returned by the API.</returns>
+    public async Task<ChairmanLevel> UpdateChairmanLevelAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"chairman-level/{id}"), content, ct), ct);
+        return await HandleResponse<ChairmanLevel>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

@@ -797,6 +797,148 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBookingProjectsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // Chairman Levels
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListChairmanLevels_ReturnsChairmanLevels()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Vorstand",
+                    color = "#336699",
+                    @short = "VS",
+                    module_members = "W",
+                    module_bookings = "N"
+                }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListChairmanLevelsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Vorstand", result[0].Name);
+        Assert.Equal("VS", result[0].Short);
+        Assert.Equal("W", result[0].ModuleMembers);
+        Assert.Equal("N", result[0].ModuleBookings);
+    }
+
+    [Fact]
+    public async Task ListChairmanLevels_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListChairmanLevelsAsync(
+            name: "Vorstand",
+            @short: "VS",
+            idIn: "1,2,3",
+            ordering: "name");
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.Contains("name=Vorstand", query);
+        Assert.Contains("short=VS", query);
+        Assert.Contains("id__in=1%2C2%2C3", query);
+        Assert.Contains("ordering=name", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task GetChairmanLevel_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetChairmanLevelAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateChairmanLevel_PostsEntityAndReturnsCreated()
+    {
+        var createdJson = JsonSerializer.Serialize(new
+        {
+            id = 123,
+            name = "Kassenwart",
+            module_account = "W"
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateChairmanLevelAsync(new ChairmanLevel
+        {
+            Name = "Kassenwart",
+            ModuleAccount = "W"
+        });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal("Kassenwart", created.Name);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/chairman-level", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task UpdateChairmanLevel_SendsPatchDictionary()
+    {
+        var updatedJson = JsonSerializer.Serialize(new
+        {
+            id = 5,
+            name = "Renamed",
+            module_members = "R"
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object>
+        {
+            ["name"] = "Renamed",
+            ["module_members"] = "R"
+        };
+        var updated = await client.UpdateChairmanLevelAsync(5, patch);
+
+        Assert.Equal("Renamed", updated.Name);
+        Assert.Equal("R", updated.ModuleMembers);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/chairman-level/5", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task DeleteChairmanLevel_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteChairmanLevelAsync(42);
+
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/chairman-level/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListChairmanLevels_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListChairmanLevelsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //
