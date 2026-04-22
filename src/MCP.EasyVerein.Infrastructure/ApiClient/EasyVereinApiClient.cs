@@ -43,6 +43,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {config.ApiKey}");
     }
 
+    /// <summary>
+    /// Serializes a payload to a JSON <see cref="StringContent"/> with a fixed <c>Content-Length</c> header.
+    /// Avoids <c>PostAsJsonAsync</c>/<c>ObjectContent</c>, which sends the body with
+    /// <c>Transfer-Encoding: chunked</c> — easyVerein's reverse proxy rejects chunked POSTs with HTTP 411.
+    /// </summary>
+    /// <typeparam name="T">The payload type.</typeparam>
+    /// <param name="payload">The payload to serialize.</param>
+    /// <returns>A JSON <see cref="StringContent"/> with explicit length.</returns>
+    private StringContent BuildJsonContent<T>(T payload)
+    {
+        var json = JsonSerializer.Serialize(payload, _jsonOptions);
+        return new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+    }
+
     // ------------------------------------------------------------------ //
     // Announcements
     // ------------------------------------------------------------------ //
@@ -54,7 +68,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Announcement> CreateAnnouncementAsync(Announcement announcement, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("announcement"), announcement, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("announcement"), BuildJsonContent(announcement), ct), ct);
         return await HandleResponse<Announcement>(response, ct);
     }
 
@@ -121,7 +135,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BankAccount> CreateBankAccountAsync(BankAccount bankAccount, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("bank-account"), bankAccount, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("bank-account"), BuildJsonContent(bankAccount), ct), ct);
         return await HandleResponse<BankAccount>(response, ct);
     }
 
@@ -202,7 +216,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BillingAccount> CreateBillingAccountAsync(BillingAccount billingAccount, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("billing-account"), billingAccount, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("billing-account"), BuildJsonContent(billingAccount), ct), ct);
         return await HandleResponse<BillingAccount>(response, ct);
     }
 
@@ -292,7 +306,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BookingProject> CreateBookingProjectAsync(BookingProject project, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("booking-project"), project, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("booking-project"), BuildJsonContent(project), ct), ct);
         return await HandleResponse<BookingProject>(response, ct);
     }
 
@@ -374,7 +388,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<ChairmanLevel> CreateChairmanLevelAsync(ChairmanLevel level, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("chairman-level"), level, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("chairman-level"), BuildJsonContent(level), ct), ct);
         return await HandleResponse<ChairmanLevel>(response, ct);
     }
 
@@ -444,7 +458,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Booking> CreateBookingAsync(Booking booking, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("booking"), booking, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("booking"), BuildJsonContent(booking), ct), ct);
         return await HandleResponse<Booking>(response, ct);
     }
 
@@ -455,7 +469,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Calendar> CreateCalendarAsync(Calendar calendar, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("calendar"), calendar, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("calendar"), BuildJsonContent(calendar), ct), ct);
         return await HandleResponse<Calendar>(response, ct);
     }
 
@@ -469,7 +483,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         ContactDetails contact, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("contact-details"), contact, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("contact-details"), BuildJsonContent(contact), ct), ct);
         return await HandleResponse<ContactDetails>(response, ct);
     }
 
@@ -482,7 +496,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Event> CreateEventAsync(Event ev, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("event"), ev, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("event"), BuildJsonContent(ev), ct), ct);
         return await HandleResponse<Event>(response, ct);
     }
 
@@ -495,7 +509,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Invoice> CreateInvoiceAsync(Invoice invoice, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("invoice"), invoice, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("invoice"), BuildJsonContent(invoice), ct), ct);
         return await HandleResponse<Invoice>(response, ct);
     }
 
@@ -512,7 +526,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         var createdContact = await CreateContactDetailsAsync(contactDetails, ct);
         var payload = new { emailOrUserName, contactDetails = createdContact.Id };
         var response = await SendWithErrorHandling(
-            () => _httpClient.PostAsJsonAsync(BuildUrl("member"), payload, ct), ct);
+            () => _httpClient.PostAsync(BuildUrl("member"), BuildJsonContent(payload), ct), ct);
         return await HandleResponse<Member>(response, ct);
     }
 
