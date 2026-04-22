@@ -56,7 +56,7 @@ Lizenz: MIT.
 - **Sprache:** C# / .NET 8.0
 - **MCP SDK:** ModelContextProtocol v1.2.0 (Stdio-Transport)
 - **Testing:** xUnit 2.4.2, Moq 4.20.72, coverlet
-- **CI/CD:** GitHub Actions (Ubuntu-only für PR-Builds, um Actions-Minuten zu sparen) + Nightly Build (veröffentlicht Artefakte für Linux, Windows, macOS)
+- **CI/CD:** GitHub Actions (Matrix: ubuntu-latest, windows-latest, macos-latest gemäß README-Plattformliste) + Nightly Build (veröffentlicht Artefakte für Linux, Windows, macOS)
 - **Container:** Docker (SDK 8.0 → Runtime 8.0-alpine)
 
 ### Clean Architecture (4 Schichten)
