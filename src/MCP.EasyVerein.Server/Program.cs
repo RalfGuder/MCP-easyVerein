@@ -1,6 +1,7 @@
 using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Infrastructure.ApiClient;
+using MCP.EasyVerein.Server.Prompts;
 using MCP.EasyVerein.Server.Tools;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,7 +63,8 @@ builder.Services
     .WithTools<BankAccountTools>()
     .WithTools<BillingAccountTools>()
     .WithTools<BookingProjectTools>()
-    .WithTools<ChairmanLevelTools>();
+    .WithTools<ChairmanLevelTools>()
+    .WithPrompts<PortoBuchungenPrompt>();
 
 var app = builder.Build();
 await app.RunAsync();
