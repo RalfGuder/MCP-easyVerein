@@ -15,12 +15,12 @@ jobs:
     name: Build & Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        # Reduced from [ubuntu, windows, macos] to ubuntu-only to conserve
-        # Actions minutes on the private-repo budget. Windows uses 2x minutes,
-        # macOS uses 10x — keeping only ubuntu saves ~92 % of CI minutes per PR.
-        # Cross-platform publishing is still covered by the nightly workflow.
-        os: [ ubuntu-latest ]
+        # Mirrors the "Getestete Plattformen" list in README.md
+        # (Ubuntu 24.04, Windows 10/11, macOS 13+). Public repo — Actions
+        # minutes are unmetered for standard runners.
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     steps:
       - name: Checkout

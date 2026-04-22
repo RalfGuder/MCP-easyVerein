@@ -426,3 +426,7 @@ docs/.obsidian/
 # Local MCP config (contains secrets)
 .mcp.json
 **/*docx
+
+# Claude Code runtime state
+.claude/scheduled_tasks.lock
+
