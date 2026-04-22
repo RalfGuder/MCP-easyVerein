@@ -79,11 +79,11 @@ Neue Endpoints folgen immer dem gleichen Ablauf:
 
 1. CLI-Parameter (`--api-key`, `--api-url`, `--api-version`)
 2. Umgebungsvariablen (`EASYVEREIN_API_KEY`, `EASYVEREIN_API_URL`, `EASYVEREIN_API_VERSION`)
-3. Defaults (URL: `https://easyverein.com/api`, Version: `v1.7`)
+3. Defaults (URL: `https://easyverein.com/api`, Version: `v2.0`)
 
 ### API-Versionen
 
-Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)
+Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 

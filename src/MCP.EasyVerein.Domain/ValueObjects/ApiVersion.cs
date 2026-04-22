@@ -9,7 +9,7 @@ public sealed class ApiVersion
     private static readonly IReadOnlyList<string> _supportedVersions = new[] { "v1.4", "v1.5", "v1.6", "v1.7", "v2.0" };
 
     /// <summary>The default API version string used when none is specified.</summary>
-    private const string DefaultVersion = "v1.7";
+    private const string DefaultVersion = "v2.0";
 
     /// <summary>Gets the version string.</summary>
     public string Version { get; }
