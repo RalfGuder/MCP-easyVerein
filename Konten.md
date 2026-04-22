@@ -186,3 +186,4 @@
 | 4715 | Frauentag - Ausgaben: Musik |
 | 4716 | Frauentag - Ausgaben: Sonstige Ausgaben |
 | 4800 | Maler – Gesellige Veranstaltungen |
+| 4900 | Kulturverein – Gesellige Veranstaltungen |
