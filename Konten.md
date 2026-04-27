@@ -126,6 +126,7 @@
 | 3000 | Zweckbetrieb |
 | 3100 | Dorfscheune – Kultur |
 | 3101 | Dorfscheune – Verbrauchsmittel |
+| 3106 | Dorfscheune – Ausgaben: Sonstige Ausgaben |
 | 3200 | Dorffest – Kultur |
 | 3201 | Dorffest – Einnahmen: Eintrittsgelder |
 | 3202 | Dorffest – Einnahmen: Sonstige Einnahmen |
