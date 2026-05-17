@@ -1019,6 +1019,21 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task CreateInvoiceItem_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"title\":\"X\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateInvoiceItemAsync(new InvoiceItem { Title = "X" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
     public async Task CreateChairmanLevel_SendsFixedLengthBody_NotChunked()
     {
         var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"name\":\"Y\"}");
@@ -1156,6 +1171,15 @@ public class EasyVereinApiClientTests
         await client.DeleteInvoiceItemAsync(42);
         Assert.NotNull(handler.LastRequestUri);
         Assert.EndsWith("/invoice-item/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListInvoiceItems_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInvoiceItemsAsync());
     }
 }
 
