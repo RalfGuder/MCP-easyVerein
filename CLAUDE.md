@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 
-### Implementierte Endpoints (11)
+### Implementierte Endpoints (12)
 
 | Endpoint       | User Story | MCP-Tools                                                |
 |----------------|------------|----------------------------------------------------------|
@@ -102,6 +102,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | BillingAccount | US-0012    | list, get, create, update (PATCH), delete                |
 | BookingProject | US-0013    | list, get, create, update (PATCH), delete                |
 | ChairmanLevel  | US-0015    | list, get, create, update (PATCH), delete                |
+| InvoiceItem    | US-0028    | list, get, create, update (PATCH), delete                |
 
 ### HTTP-Methoden in der easyVerein API v1.7
 
