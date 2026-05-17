@@ -1019,6 +1019,21 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task CreateInvoiceItem_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"title\":\"X\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateInvoiceItemAsync(new InvoiceItem { Title = "X" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
     public async Task CreateChairmanLevel_SendsFixedLengthBody_NotChunked()
     {
         var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"name\":\"Y\"}");
@@ -1084,6 +1099,87 @@ public class EasyVereinApiClientTests
         Assert.DoesNotContain("\"offerStatus\"", body);
         Assert.DoesNotContain("\"relatedAddress\"", body);
         Assert.DoesNotContain("\"bankAccount\"", body);
+    }
+
+    // ------------------------------------------------------------------ //
+    // Invoice Items
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListInvoiceItems_SendsExpectedQuery()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListInvoiceItemsAsync(relatedInvoice: "469271649");
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains("relatedInvoice=469271649", query);
+        Assert.Contains("query={id,", query);
+        Assert.Contains(",costCentre,", query);
+    }
+
+    [Fact]
+    public async Task GetInvoiceItem_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+        var result = await client.GetInvoiceItemAsync(999);
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateInvoiceItem_PostsEntityAndReturnsCreated()
+    {
+        var createdJson = JsonSerializer.Serialize(new { id = 99, title = "New", sphere = 9 });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateInvoiceItemAsync(new InvoiceItem { Title = "New", Sphere = 9 });
+
+        Assert.Equal(99L, created.Id);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/invoice-item", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task UpdateInvoiceItem_SendsPatchDictionary()
+    {
+        var responseJson = JsonSerializer.Serialize(new { id = 5, sphere = 2, costCentre = "2901" });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, responseJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object> { ["sphere"] = 2, ["costCentre"] = "2901" };
+        var updated = await client.UpdateInvoiceItemAsync(5, patch);
+
+        Assert.Equal(2, updated.Sphere);
+        Assert.Equal("2901", updated.CostCentre);
+        Assert.EndsWith("/invoice-item/5", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task DeleteInvoiceItem_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+        await client.DeleteInvoiceItemAsync(42);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/invoice-item/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListInvoiceItems_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInvoiceItemsAsync());
     }
 }
 

@@ -64,6 +64,7 @@ builder.Services
     .WithTools<BillingAccountTools>()
     .WithTools<BookingProjectTools>()
     .WithTools<ChairmanLevelTools>()
+    .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 
 var app = builder.Build();

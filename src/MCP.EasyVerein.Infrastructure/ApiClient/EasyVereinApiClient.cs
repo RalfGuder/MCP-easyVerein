@@ -379,6 +379,78 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     }
 
     // ------------------------------------------------------------------ //
+    // Invoice Items
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new invoice item via the API.</summary>
+    /// <param name="item">The invoice item to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="InvoiceItem"/> as returned by the API.</returns>
+    public async Task<InvoiceItem> CreateInvoiceItemAsync(InvoiceItem item, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("invoice-item"), BuildJsonContent(item), ct), ct);
+        return await HandleResponse<InvoiceItem>(response, ct);
+    }
+
+    /// <summary>Deletes an invoice item by ID.</summary>
+    /// <param name="id">The invoice item ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteInvoiceItemAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"invoice-item/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single invoice item by ID.</summary>
+    /// <param name="id">The invoice item ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The invoice item, or <c>null</c> if not found.</returns>
+    public async Task<InvoiceItem?> GetInvoiceItemAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"invoice-item/{id}", ApiQueries.InvoiceItem), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<InvoiceItem>(response, ct);
+    }
+
+    /// <summary>Lists invoice items with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="relatedInvoice">Optional parent-invoice-ID filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching invoice items.</returns>
+    public async Task<IReadOnlyList<InvoiceItem>> ListInvoiceItemsAsync(
+        string? idIn = null, string? relatedInvoice = null,
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        ApiQueries.InvoiceItemQuery.IdIn = idIn;
+        ApiQueries.InvoiceItemQuery.RelatedInvoice = relatedInvoice;
+        ApiQueries.InvoiceItemQuery.Ordering = ordering;
+        ApiQueries.InvoiceItemQuery.Search = search;
+
+        return await HandleListResponseWithPagination<InvoiceItem>(
+            BuildListUrl("invoice-item", ApiQueries.InvoiceItem), ct);
+    }
+
+    /// <summary>Updates an invoice item with PATCH semantics.</summary>
+    /// <param name="id">The invoice item ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="InvoiceItem"/> as returned by the API.</returns>
+    public async Task<InvoiceItem> UpdateInvoiceItemAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"invoice-item/{id}"), content, ct), ct);
+        return await HandleResponse<InvoiceItem>(response, ct);
+    }
+
+    // ------------------------------------------------------------------ //
     // Chairman Levels
     // ------------------------------------------------------------------ //
 

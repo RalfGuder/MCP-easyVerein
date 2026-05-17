@@ -10,14 +10,14 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `InvoiceItem`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `InvoiceItemFields`-Konstanten
-- [ ] **ValueObject `InvoiceItemFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `InvoiceItemQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
-- [ ] **API-Client:** `ListInvoiceItemsAsync`, `GetInvoiceItemAsync`, `CreateInvoiceItemAsync`, `UpdateInvoiceItemAsync`, `DeleteInvoiceItemAsync`
-- [ ] **MCP-Tools:** `InvoiceItemTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests nach TDD (Red-Green-Refactor)
+- [x] **Entity `InvoiceItem`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `InvoiceItemFields`-Konstanten
+- [x] **ValueObject `InvoiceItemFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `InvoiceItemQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
+- [x] **API-Client:** `ListInvoiceItemsAsync`, `GetInvoiceItemAsync`, `CreateInvoiceItemAsync`, `UpdateInvoiceItemAsync`, `DeleteInvoiceItemAsync`
+- [x] **MCP-Tools:** `InvoiceItemTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests nach TDD (Red-Green-Refactor)
 
 ## Aufgaben
 
