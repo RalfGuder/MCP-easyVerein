@@ -46,6 +46,16 @@ internal static class ApiQueries
     internal static string BookingProject => BookingProjectQuery.ToString();
 
     /// <summary>
+    /// Shared <see cref="InvoiceItemQuery"/> instance used to build invoice-item query strings with optional filters.
+    /// </summary>
+    internal static readonly InvoiceItemQuery InvoiceItemQuery = new();
+
+    /// <summary>
+    /// Gets the current invoice-item query string including field selection and any active filters.
+    /// </summary>
+    internal static string InvoiceItem => InvoiceItemQuery.ToString();
+
+    /// <summary>
     /// Shared <see cref="ChairmanLevelQuery"/> instance used to build chairman-level query strings with optional filters.
     /// </summary>
     internal static readonly ChairmanLevelQuery ChairmanLevelQuery = new();

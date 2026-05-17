@@ -149,6 +149,48 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteBookingProjectAsync(long id, CancellationToken ct = default);
 
+    // ------------------------------------------------------------------ //
+    // Invoice Items
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Lists invoice items with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="relatedInvoice">Optional parent-invoice-ID filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching invoice items.</returns>
+    Task<IReadOnlyList<InvoiceItem>> ListInvoiceItemsAsync(
+        string? idIn = null,
+        string? relatedInvoice = null,
+        string? ordering = null,
+        string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single invoice item by ID.</summary>
+    /// <param name="id">The invoice item ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The invoice item, or <c>null</c> if not found.</returns>
+    Task<InvoiceItem?> GetInvoiceItemAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new invoice item via the API.</summary>
+    /// <param name="item">The invoice item to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="InvoiceItem"/> as returned by the API.</returns>
+    Task<InvoiceItem> CreateInvoiceItemAsync(InvoiceItem item, CancellationToken ct = default);
+
+    /// <summary>Updates an invoice item with PATCH semantics.</summary>
+    /// <param name="id">The invoice item ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="InvoiceItem"/> as returned by the API.</returns>
+    Task<InvoiceItem> UpdateInvoiceItemAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes an invoice item by ID.</summary>
+    /// <param name="id">The invoice item ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteInvoiceItemAsync(long id, CancellationToken ct = default);
+
     /// <summary>Lists all chairman levels, optionally filtered.</summary>
     /// <param name="name">Optional name filter (exact match).</param>
     /// <param name="short">Optional short label filter (exact match).</param>
