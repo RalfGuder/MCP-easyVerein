@@ -183,6 +183,96 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
     }
 
     /// <summary>
+    /// Creates a complete receipt (invoice + one item) and links it to a booking in one MCP call.
+    /// Orchestrates: POST /invoice (draft) - POST /invoice-item - PATCH /invoice (finalize + relatedBookings).
+    /// </summary>
+    /// <param name="bookingId">The ID of the booking this receipt should be linked to.</param>
+    /// <param name="billingAccountId">Billing-account ID for the position.</param>
+    /// <param name="sphere">SKR42 sphere for the position.</param>
+    /// <param name="costCentre">Cost centre / Kostenstelle for the position.</param>
+    /// <param name="title">Optional title for the position (defaults to a generated one).</param>
+    /// <param name="description">Optional description for the position and the invoice (defaults to the booking description).</param>
+    /// <param name="receiver">Optional receiver override (defaults to the booking's receiver).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A JSON string of the finalized invoice, or an error message.</returns>
+    [McpServerTool(Name = "create_receipt"), Description("High-level: creates a receipt invoice with one position and links it to an existing booking. Use this when classifying a booking that has no auto-generated receipt. Amount + receiver are taken from the booking.")]
+    public async Task<string> CreateReceipt(
+        [Description("The ID of the booking this receipt should be linked to (numeric)")] long bookingId,
+        [Description("Billing-account ID for the position (numeric)")] long billingAccountId,
+        [Description("SKR42 sphere for the position (1=ideell, 2=Vermoegensverwaltung, 3=Zweckbetrieb, 4=wGB, 9=unkategorisiert)")] int sphere,
+        [Description("Cost centre / Kostenstelle for the position")] string costCentre,
+        [Description("Optional title for the position (defaults to a generated one)")] string? title,
+        [Description("Optional description for the position and the invoice (defaults to the booking description)")] string? description,
+        [Description("Optional receiver override (defaults to the booking's counterpart IBAN/BIC)")] string? receiver,
+        CancellationToken ct)
+    {
+        try
+        {
+            // 1. Load the booking to determine amount, kind (expense/revenue), receiver, description.
+            var booking = await client.GetBookingAsync(bookingId, ct);
+            if (booking is null)
+                return $"ERROR: Booking with ID {bookingId} not found.";
+
+            var amount = booking.Amount ?? 0m;
+            var absAmount = Math.Abs(amount);
+            var kind = amount < 0m ? "expense" : "revenue";
+            var resolvedReceiver = HasValue(receiver) ? receiver : booking.Receiver;
+            if (!HasValue(resolvedReceiver))
+                return "ERROR: Receiver could not be resolved (neither parameter nor booking.Receiver set).";
+
+            var resolvedDescription = HasValue(description) ? description : booking.Description;
+            var resolvedTitle = HasValue(title) ? title : $"Rechnung zur Buchung {bookingId} vom {(booking.Date?.ToString("dd.MM.yyyy") ?? "?")}";
+
+            // 2. Create draft invoice.
+            var draft = new Invoice
+            {
+                Kind = kind,
+                TotalPrice = absAmount,
+                Description = resolvedDescription,
+                Receiver = resolvedReceiver,
+                PaymentInformation = "nothing",
+                Mode = "invoice",
+                IsReceipt = true,
+                IsDraft = true
+            };
+            var createdInvoice = await client.CreateInvoiceAsync(draft, ct);
+
+            // 3. Create one invoice-item with classification.
+            var item = new InvoiceItem
+            {
+                RelatedInvoice = $"{config.GetVersionedBaseUrl()}/invoice/{createdInvoice.Id}",
+                Title = resolvedTitle,
+                Quantity = 1m,
+                UnitPrice = absAmount,
+                Description = resolvedDescription,
+                TaxRate = 0m,
+                Gross = false,
+                BillingAccount = $"{config.GetVersionedBaseUrl()}/billing-account/{billingAccountId}",
+                Sphere = sphere,
+                CostCentre = costCentre
+            };
+            await client.CreateInvoiceItemAsync(item, ct);
+
+            // 4. Finalize draft + link to booking.
+            var patch = new Dictionary<string, object>
+            {
+                [InvoiceFields.IsDraft] = false,
+                [InvoiceFields.RelatedBookings] = new[]
+                {
+                    $"{config.GetVersionedBaseUrl()}/booking/{bookingId}"
+                }
+            };
+            var finalized = await client.UpdateInvoiceAsync(createdInvoice.Id, patch, ct);
+
+            return JsonSerializer.Serialize(finalized, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch (Exception ex)
+        {
+            return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
+        }
+    }
+
+    /// <summary>
     /// Deletes an invoice by its unique identifier.
     /// </summary>
     /// <param name="id">The unique identifier of the invoice to delete.</param>
