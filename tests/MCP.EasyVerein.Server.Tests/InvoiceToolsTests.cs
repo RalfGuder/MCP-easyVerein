@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Server.Tools;
@@ -8,6 +9,14 @@ namespace MCP.EasyVerein.Server.Tests;
 /// <summary>Unit tests for the <see cref="InvoiceTools"/> MCP tool wrapper.</summary>
 public class InvoiceToolsTests
 {
+    /// <summary>Creates a configuration with API URL <c>https://easyverein.com/api</c> and version <c>v2.0</c>.</summary>
+    private static EasyVereinConfiguration CreateConfig() => new()
+    {
+        ApiKey = "test",
+        ApiUrl = "https://easyverein.com/api",
+        ApiVersion = "v2.0"
+    };
+
     /// <summary>
     /// Verifies that <c>create_invoice</c> forwards every new parameter
     /// (refNumber, paymentInformation, actualCallStateName, callStateDelayDays,
@@ -23,7 +32,7 @@ public class InvoiceToolsTests
             .Callback<Invoice, CancellationToken>((inv, _) => captured = inv)
             .ReturnsAsync(new Invoice { Id = 42 });
 
-        var tools = new InvoiceTools(mock.Object);
+        var tools = new InvoiceTools(mock.Object, CreateConfig());
 
         await tools.CreateInvoice(
             invoiceNumber: "R-001",
@@ -38,6 +47,11 @@ public class InvoiceToolsTests
             guid: "datev-guid-xyz",
             mode: "invoice",
             offerStatus: "accepted",
+            receiver: null,
+            relatedAddressId: null,
+            relatedBookingIds: null,
+            isReceipt: null,
+            isDraft: null,
             ct: CancellationToken.None);
 
         Assert.NotNull(captured);
@@ -68,7 +82,7 @@ public class InvoiceToolsTests
             .Callback<Invoice, CancellationToken>((inv, _) => captured = inv)
             .ReturnsAsync(new Invoice { Id = 7 });
 
-        var tools = new InvoiceTools(mock.Object);
+        var tools = new InvoiceTools(mock.Object, CreateConfig());
 
         await tools.CreateInvoice(
             invoiceNumber: null,
@@ -83,6 +97,11 @@ public class InvoiceToolsTests
             guid: null,
             mode: null,
             offerStatus: null,
+            receiver: null,
+            relatedAddressId: null,
+            relatedBookingIds: null,
+            isReceipt: null,
+            isDraft: null,
             ct: CancellationToken.None);
 
         Assert.NotNull(captured);
@@ -94,5 +113,93 @@ public class InvoiceToolsTests
         Assert.Null(captured.Guid);
         Assert.Null(captured.Mode);
         Assert.Null(captured.OfferStatus);
+    }
+
+    /// <summary>
+    /// Verifies that <c>create_invoice</c> with <c>receiver</c> and <c>isDraft=true</c>
+    /// produces an <see cref="Invoice"/> with the receiver text set, IsDraft=true,
+    /// IsReceipt=false (default), and RelatedBookings=null (unset).
+    /// </summary>
+    [Fact]
+    public async Task CreateInvoice_WithDraftAndReceiver_PassesAllFieldsToClient()
+    {
+        var mock = new Mock<IEasyVereinApiClient>();
+        Invoice? captured = null;
+        mock.Setup(c => c.CreateInvoiceAsync(It.IsAny<Invoice>(), It.IsAny<CancellationToken>()))
+            .Callback<Invoice, CancellationToken>((inv, _) => captured = inv)
+            .ReturnsAsync((Invoice inv, CancellationToken _) => inv);
+
+        var tools = new InvoiceTools(mock.Object, CreateConfig());
+
+        await tools.CreateInvoice(
+            invoiceNumber: null,
+            totalPrice: 50m,
+            description: "Beleg",
+            kind: "Expense",
+            refNumber: null,
+            paymentInformation: null,
+            actualCallStateName: null,
+            callStateDelayDays: null,
+            accnumber: null,
+            guid: null,
+            mode: null,
+            offerStatus: null,
+            receiver: "Test",
+            relatedAddressId: null,
+            relatedBookingIds: null,
+            isReceipt: null,
+            isDraft: true,
+            ct: CancellationToken.None);
+
+        Assert.NotNull(captured);
+        Assert.Equal("Test", captured!.Receiver);
+        Assert.True(captured.IsDraft);
+        Assert.False(captured.IsReceipt);
+        Assert.Null(captured.RelatedBookings);
+        Assert.Null(captured.RelatedAddress);
+    }
+
+    /// <summary>
+    /// Verifies that <c>create_invoice</c> with <c>relatedBookingIds</c> converts every
+    /// numeric ID into a fully qualified easyVerein resource URL using the configured base.
+    /// </summary>
+    [Fact]
+    public async Task CreateInvoice_WithRelatedBookingIds_ConvertsToUrlList()
+    {
+        var mock = new Mock<IEasyVereinApiClient>();
+        Invoice? captured = null;
+        mock.Setup(c => c.CreateInvoiceAsync(It.IsAny<Invoice>(), It.IsAny<CancellationToken>()))
+            .Callback<Invoice, CancellationToken>((inv, _) => captured = inv)
+            .ReturnsAsync((Invoice inv, CancellationToken _) => inv);
+
+        var tools = new InvoiceTools(mock.Object, CreateConfig());
+
+        await tools.CreateInvoice(
+            invoiceNumber: null,
+            totalPrice: 100m,
+            description: null,
+            kind: null,
+            refNumber: null,
+            paymentInformation: null,
+            actualCallStateName: null,
+            callStateDelayDays: null,
+            accnumber: null,
+            guid: null,
+            mode: null,
+            offerStatus: null,
+            receiver: null,
+            relatedAddressId: null,
+            relatedBookingIds: new long[] { 100, 200 },
+            isReceipt: null,
+            isDraft: null,
+            ct: CancellationToken.None);
+
+        Assert.NotNull(captured);
+        Assert.NotNull(captured!.RelatedBookings);
+        Assert.Equal(new List<string>
+        {
+            "https://easyverein.com/api/v2.0/booking/100",
+            "https://easyverein.com/api/v2.0/booking/200"
+        }, captured.RelatedBookings);
     }
 }
