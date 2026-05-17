@@ -128,3 +128,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 - Owner: `RalfGuder`
 - Repo: `MCP-easyVerein`
+
+## Daily Notes
+
+Projektnotizen werden unter `docs/006 Daily Notes/YYYY-MM-DD.md` abgelegt (Markdown, Obsidian-kompatibel). Beim Tagesabschluss: Status, gemergeter PRs, neue Buchungsregeln, identifizierte Bugs, nächste Schritte zusammenfassen.
