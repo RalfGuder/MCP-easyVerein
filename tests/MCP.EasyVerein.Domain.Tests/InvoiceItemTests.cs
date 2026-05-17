@@ -2,7 +2,7 @@ using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.ValueObjects;
 
-namespace MCP.EasyVerein.Domain.Tests.Entities;
+namespace MCP.EasyVerein.Domain.Tests;
 
 public class InvoiceItemFieldsTests
 {
