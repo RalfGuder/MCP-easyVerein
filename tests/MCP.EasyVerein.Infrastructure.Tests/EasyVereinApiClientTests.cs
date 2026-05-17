@@ -605,6 +605,33 @@ public class EasyVereinApiClientTests
         Assert.DoesNotContain(",accountingPlan}", query);
     }
 
+    /// <summary>
+    /// Regression: the <c>deleted</c> field is not a billing-account response
+    /// field in easyVerein API v2.0. Requesting it via the <c>query=</c>
+    /// selector causes HTTP 400 ("'deleted' field is not found").
+    /// </summary>
+    [Fact]
+    public async Task ListBillingAccounts_DoesNotRequestDeletedField_InQuerySelector()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListBillingAccountsAsync();
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+
+        // The query= selector must not ask for a non-existent response field.
+        Assert.DoesNotContain("{deleted,", query);
+        Assert.DoesNotContain(",deleted,", query);
+        Assert.DoesNotContain(",deleted}", query);
+    }
+
     [Fact]
     public async Task CreateBillingAccount_PostsEntityAndReturnsCreated()
     {
