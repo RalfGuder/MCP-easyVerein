@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json;
+using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -11,7 +12,7 @@ namespace MCP.EasyVerein.Server.Tools;
 /// MCP tools for managing invoice items (Rechnungspositionen) via the easyVerein API.
 /// </summary>
 [McpServerToolType]
-public sealed class InvoiceItemTools(IEasyVereinApiClient client)
+public sealed class InvoiceItemTools(IEasyVereinApiClient client, EasyVereinConfiguration config)
 {
     /// <summary>Lists invoice items with optional filters and automatic pagination.</summary>
     [McpServerTool(Name = "list_invoice_items"), Description("List all invoice items")]
@@ -72,7 +73,7 @@ public sealed class InvoiceItemTools(IEasyVereinApiClient client)
         {
             var item = new InvoiceItem
             {
-                RelatedInvoice = $"https://easyverein.com/api/v2.0/invoice/{relatedInvoiceId}",
+                RelatedInvoice = $"{config.GetVersionedBaseUrl()}/invoice/{relatedInvoiceId}",
                 Title = title,
                 Quantity = quantity ?? 1m,
                 UnitPrice = unitPrice ?? 0m,
@@ -84,7 +85,7 @@ public sealed class InvoiceItemTools(IEasyVereinApiClient client)
                 CostCentre = costCentre ?? string.Empty
             };
             if (billingAccountId.HasValue)
-                item.BillingAccount = $"https://easyverein.com/api/v2.0/billing-account/{billingAccountId.Value}";
+                item.BillingAccount = $"{config.GetVersionedBaseUrl()}/billing-account/{billingAccountId.Value}";
 
             var created = await client.CreateInvoiceItemAsync(item, ct);
             return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
@@ -118,7 +119,7 @@ public sealed class InvoiceItemTools(IEasyVereinApiClient client)
             if (unitPrice.HasValue) patch[InvoiceItemFields.UnitPrice] = unitPrice.Value;
             if (taxRate.HasValue) patch[InvoiceItemFields.TaxRate] = taxRate.Value;
             if (billingAccountId.HasValue)
-                patch[InvoiceItemFields.BillingAccount] = $"https://easyverein.com/api/v2.0/billing-account/{billingAccountId.Value}";
+                patch[InvoiceItemFields.BillingAccount] = $"{config.GetVersionedBaseUrl()}/billing-account/{billingAccountId.Value}";
             if (sphere.HasValue) patch[InvoiceItemFields.Sphere] = sphere.Value;
             if (HasValue(costCentre)) patch[InvoiceItemFields.CostCentre] = costCentre!;
 
