@@ -212,6 +212,70 @@ public class EasyVereinApiClientTests
         Assert.Equal(50.00m, result[0].TotalPrice);
     }
 
+    [Fact]
+    public async Task UpdateInvoice_SendsPatchDictionary()
+    {
+        var updatedJson = JsonSerializer.Serialize(new { id = 5, description = "neu", isDraft = false });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object>
+        {
+            ["description"] = "neu",
+            ["isDraft"] = false
+        };
+        var updated = await client.UpdateInvoiceAsync(5, patch);
+
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.Equal("neu", updated.Description);
+        Assert.False(updated.IsDraft);
+        Assert.EndsWith("/invoice/5", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task UpdateInvoice_TogglesIsDraftFromTrueToFalse()
+    {
+        var updatedJson = JsonSerializer.Serialize(new { id = 7, isDraft = false });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object> { ["isDraft"] = false };
+        var updated = await client.UpdateInvoiceAsync(7, patch);
+
+        Assert.False(updated.IsDraft);
+    }
+
+    [Fact]
+    public async Task UpdateInvoice_SendsRelatedBookingsList()
+    {
+        var json = JsonSerializer.Serialize(new { id = 9 });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object>
+        {
+            ["relatedBookings"] = new[] { "https://easyverein.com/api/v2.0/booking/123" }
+        };
+        await client.UpdateInvoiceAsync(9, patch);
+
+        Assert.NotNull(handler.LastRequestBody);
+        Assert.Contains("relatedBookings", handler.LastRequestBody);
+        Assert.Contains("booking/123", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task UpdateInvoice_WithBadRequest_ThrowsWithResponseBody()
+    {
+        var errorBody = "{\"detail\":\"Invalid patch\"}";
+        var handler = new FakeHttpHandler(HttpStatusCode.BadRequest, errorBody);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object> { ["description"] = "x" };
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.UpdateInvoiceAsync(1, patch));
+
+        Assert.Contains("400", ex.Message);
+    }
+
     // ------------------------------------------------------------------ //
     // Events
     // ------------------------------------------------------------------ //

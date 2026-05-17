@@ -968,9 +968,8 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     {
         var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
         var response = await SendWithErrorHandling(
-            () => _httpClient.PatchAsJsonAsync(BuildUrl($"invoice/{id}"), content, ct), ct);
+            () => _httpClient.PatchAsync(BuildUrl($"invoice/{id}"), content, ct), ct);
         return await HandleResponse<Invoice>(response, ct);
     }
 
