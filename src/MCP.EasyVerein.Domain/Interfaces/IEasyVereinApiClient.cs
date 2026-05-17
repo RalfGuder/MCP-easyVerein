@@ -433,13 +433,11 @@ public interface IEasyVereinApiClient
     /// <returns>The raw JSON response from the API.</returns>
     Task<string> UpdateEventAsync(long id, object patchData, CancellationToken ct = default);
 
-    /// <summary>
-    /// Updates an existing invoice.
-    /// </summary>
+    /// <summary>Updates an invoice with PATCH semantics.</summary>
     /// <param name="id">The invoice ID to update.</param>
-    /// <param name="patchData">The patch data.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
     /// <param name="ct">Cancellation token.</param>
-    /// <returns>The updated invoice.</returns>
+    /// <returns>The updated <see cref="Invoice"/> as returned by the API.</returns>
     Task<Invoice> UpdateInvoiceAsync(long id, object patchData, CancellationToken ct = default);
 
     /// <summary>

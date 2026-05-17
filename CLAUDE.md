@@ -93,7 +93,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 |----------------|------------|----------------------------------------------------------|
 | Member         | US-0001    | list, get, create, update (PATCH), delete                |
 | ContactDetails | US-0001    | list, get, create, update (PATCH), delete                |
-| Invoice        | US-0001    | list, get, create, delete                                |
+| Invoice        | US-0001, US-0061 | list, get, create, update (PATCH), delete, create_receipt |
 | Event          | US-0001    | list, get, create, update (PATCH), delete                |
 | Booking        | US-0009    | list, get, create, update (PATCH), delete                |
 | Calendar       | US-0014    | list, get, create, update (PATCH), delete                |
@@ -110,7 +110,6 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 - **PUT** (vollständiges Ersetzen): 28 Ressourcen unterstützen zusätzlich PUT
 - **Nur PATCH** (kein PUT): booking-project, contact-details-log, custom-field-collection, custom-filter, custom-tax-rate, dosb-sport, invoice-item, organization-settings, organization-token, pass, pass-field, pass-template, passcreator-integration, protocol-upload, task-comment, voting, voting-question, wastebasket
 - Unsere MCP-Tools nutzen ausschließlich **PATCH** (`HttpClient.PatchAsync`) für Updates
-- Invoice hat noch kein Update-Tool implementiert
 
 ### Nächste anstehende Endpoints
 
