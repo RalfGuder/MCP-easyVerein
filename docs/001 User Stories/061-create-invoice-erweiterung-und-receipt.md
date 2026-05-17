@@ -19,17 +19,17 @@ Workaround heute (manuell via curl):
 
 ## Akzeptanzkriterien
 
-- [ ] **`create_invoice`** akzeptiert die zusätzlichen Parameter `receiver`, `relatedAddress`, `relatedBookings` (Liste numerischer Buchungs-IDs, intern zu URL-Refs konvertiert), `isReceipt`, `isDraft`. Bestehende Parameter bleiben unverändert.
-- [ ] **`update_invoice`** (neues Tool, PATCH-Semantik analog `update_booking_project`) erlaubt teilweise Aktualisierung. Mindestens unterstützt: `isDraft`, `isReceipt`, `relatedBookings`, `description`, `totalPrice`, `receiver`, `relatedAddress`, `paymentInformation`, `kind`.
-- [ ] **`create_receipt`** (neues high-level Tool) orchestriert in einem MCP-Aufruf: leerer Draft-Beleg (POST), eine Position (POST), Finalisierung mit Buchungs-Verknüpfung (PATCH). Parameter: `bookingId` (Pflicht, numerisch), `billingAccountId`, `sphere`, `costCentre`, optional `title`, `description`, `receiver`. `totalPrice` + `unitPrice` werden aus der Buchung übernommen (Betrag-absolut).
+- [x] **`create_invoice`** akzeptiert die zusätzlichen Parameter `receiver`, `relatedAddress`, `relatedBookings` (Liste numerischer Buchungs-IDs, intern zu URL-Refs konvertiert), `isReceipt`, `isDraft`. Bestehende Parameter bleiben unverändert.
+- [x] **`update_invoice`** (neues Tool, PATCH-Semantik analog `update_booking_project`) erlaubt teilweise Aktualisierung. Mindestens unterstützt: `isDraft`, `isReceipt`, `relatedBookings`, `description`, `totalPrice`, `receiver`, `relatedAddress`, `paymentInformation`, `kind`.
+- [x] **`create_receipt`** (neues high-level Tool) orchestriert in einem MCP-Aufruf: leerer Draft-Beleg (POST), eine Position (POST), Finalisierung mit Buchungs-Verknüpfung (PATCH). Parameter: `bookingId` (Pflicht, numerisch), `billingAccountId`, `sphere`, `costCentre`, optional `title`, `description`, `receiver`. `totalPrice` + `unitPrice` werden aus der Buchung übernommen (Betrag-absolut).
 - [ ] Domain-Entity `Invoice.IsDraft` (bereits vorhanden) wird im Tool durchgereicht. Falls noch nicht serialisiert: ergänzen.
-- [ ] HTTP-PATCH nutzt `_httpClient.PatchAsync` mit explizitem `StringContent` (kein chunked encoding).
-- [ ] **Tests:**
+- [x] HTTP-PATCH nutzt `_httpClient.PatchAsync` mit explizitem `StringContent` (kein chunked encoding).
+- [x] **Tests:**
   - +4 Infrastructure-Tests für `UpdateInvoiceAsync` (PATCH-Dictionary, isDraft-Toggle, relatedBookings, error path).
   - +2 Server-Tests für `create_invoice` mit neuen Feldern (receiver+isDraft setzt sich durch; relatedBookings konvertiert IDs → URLs).
   - +1 Server-Test für `create_receipt` happy path (mockt 3 HTTP-Calls in Reihenfolge POST-POST-PATCH; verifiziert Final-State).
-- [ ] CLAUDE.md "Invoice hat noch kein Update-Tool implementiert" entfernen / ändern.
-- [ ] Build sauber, alle Tests grün, Coverage über 70 %.
+- [x] CLAUDE.md "Invoice hat noch kein Update-Tool implementiert" entfernen / ändern.
+- [x] Build sauber, alle Tests grün, Coverage über 70 %.
 
 ## Aufgaben
 
