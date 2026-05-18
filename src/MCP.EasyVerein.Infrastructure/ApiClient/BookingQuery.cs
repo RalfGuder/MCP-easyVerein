@@ -25,8 +25,9 @@ internal class BookingQuery
     /// <summary>Gets or sets an optional ordering criterion for the results.</summary>
     public string? Ordering { get; set; }
 
-    /// <summary>The base field selection query requesting all booking fields.</summary>
-    private const string FieldQuery =
+    /// <summary>The base field selection query requesting all booking fields, without any filters.
+    /// Use for single-resource GETs to avoid leaking shared filter state from prior list calls.</summary>
+    internal const string FieldQuery =
         "query=" +
         "{" +
             BookingFields.Id + "," +

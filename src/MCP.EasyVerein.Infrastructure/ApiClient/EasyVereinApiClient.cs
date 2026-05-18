@@ -678,7 +678,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Booking?> GetBookingAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"booking/{id}", ApiQueries.Booking), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"booking/{id}", BookingQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Booking>(response, ct);
     }
