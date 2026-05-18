@@ -377,6 +377,31 @@ public class EasyVereinApiClientTests
         Assert.Equal("Schmidt", result[0].FamilyName);
     }
 
+    [Fact]
+    public async Task GetContactDetails_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, firstName = "Anna" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListContactDetailsAsync(id: 12345, firstName: "Bob", familyName: "Smith", name: "BSmith");
+        await client.GetContactDetailsAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var path = handler.LastRequestUri!.AbsolutePath;
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/contact-details/999", path);
+        Assert.DoesNotContain("firstName=", query);
+        Assert.DoesNotContain("familyName=", query);
+        Assert.DoesNotContain("name=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Bookings
     // ------------------------------------------------------------------ //

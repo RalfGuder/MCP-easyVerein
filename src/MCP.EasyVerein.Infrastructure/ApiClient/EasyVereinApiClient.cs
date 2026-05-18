@@ -704,7 +704,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<ContactDetails?> GetContactDetailsAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"contact-details/{id}", ApiQueries.ContactDetails), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"contact-details/{id}", ContactDetailsQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         return await HandleResponse<ContactDetails>(response, ct);
@@ -870,12 +870,15 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<IReadOnlyList<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
         string? familyName = null, string? name = null, CancellationToken ct = default)
     {
-        ApiQueries.ContactDetailsQuery.Id = id;
-        ApiQueries.ContactDetailsQuery.FirstName = firstName;
-        ApiQueries.ContactDetailsQuery.FamilyName = familyName;
-        ApiQueries.ContactDetailsQuery.Name = name;
+        var query = new ContactDetailsQuery
+        {
+            Id = id,
+            FirstName = firstName,
+            FamilyName = familyName,
+            Name = name
+        };
         return await HandleListResponseWithPagination<ContactDetails>(
-            BuildListUrl("contact-details", ApiQueries.ContactDetails), ct);
+            BuildListUrl("contact-details", query.ToString()), ct);
     }
 
     /// <summary>
