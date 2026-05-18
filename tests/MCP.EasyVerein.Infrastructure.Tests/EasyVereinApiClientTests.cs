@@ -1015,6 +1015,35 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task GetBillingAccount_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListBillingAccountsAsync(
+            name: "Spendenkonto",
+            idIn: "1,2",
+            skr: "42",
+            deleted: "false",
+            ordering: "number");
+        await client.GetBillingAccountAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/billing-account/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("skr=", query);
+        Assert.DoesNotContain("deleted=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
     public async Task ListBillingAccounts_WithUnauthorized_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");

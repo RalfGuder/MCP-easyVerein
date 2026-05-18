@@ -40,13 +40,13 @@ internal class BillingAccountQuery
     /// <summary>Gets or sets the search terms.</summary>
     internal string[]? Search { get; set; }
 
-    /// <summary>The field selection query requesting all billing-account response fields.</summary>
+    /// <summary>Field selection only, without any filters. Use for single-resource GETs.</summary>
     /// <remarks>
     /// The <c>deleted</c> field is intentionally omitted: easyVerein API v2.0 rejects it
     /// in the <c>query=</c> selector with HTTP 400 ("'deleted' field is not found").
     /// It remains valid as a query filter (<see cref="BillingAccountFields.DeletedFilter"/>).
     /// </remarks>
-    private const string FieldQuery =
+    internal const string FieldQuery =
         "query=" +
         "{" +
             BillingAccountFields.Id + "," +

@@ -243,7 +243,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BillingAccount?> GetBillingAccountAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"billing-account/{id}", ApiQueries.BillingAccount), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"billing-account/{id}", BillingAccountQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<BillingAccount>(response, ct);
     }
@@ -271,20 +271,23 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.BillingAccountQuery.Name = name;
-        ApiQueries.BillingAccountQuery.IdIn = idIn;
-        ApiQueries.BillingAccountQuery.Skr = skr;
-        ApiQueries.BillingAccountQuery.SkrIn = skrIn;
-        ApiQueries.BillingAccountQuery.NumberGte = numberGte;
-        ApiQueries.BillingAccountQuery.NumberLte = numberLte;
-        ApiQueries.BillingAccountQuery.Deleted = deleted;
-        ApiQueries.BillingAccountQuery.AccountingPlanIsNull = accountingPlanIsNull;
-        ApiQueries.BillingAccountQuery.ShowOwnBillingAccounts = showOwnBillingAccounts;
-        ApiQueries.BillingAccountQuery.Ordering = ordering;
-        ApiQueries.BillingAccountQuery.Search = search;
+        var query = new BillingAccountQuery
+        {
+            Name = name,
+            IdIn = idIn,
+            Skr = skr,
+            SkrIn = skrIn,
+            NumberGte = numberGte,
+            NumberLte = numberLte,
+            Deleted = deleted,
+            AccountingPlanIsNull = accountingPlanIsNull,
+            ShowOwnBillingAccounts = showOwnBillingAccounts,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<BillingAccount>(
-            BuildListUrl("billing-account", ApiQueries.BillingAccount), ct);
+            BuildListUrl("billing-account", query.ToString()), ct);
     }
 
     /// <summary>Updates a billing account with PATCH semantics.</summary>
