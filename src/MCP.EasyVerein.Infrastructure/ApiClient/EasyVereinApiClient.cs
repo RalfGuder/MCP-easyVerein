@@ -690,7 +690,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Calendar?> GetCalendarAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"calendar/{id}", ApiQueries.Calendar), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"calendar/{id}", CalendarQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Calendar>(response, ct);
     }
@@ -844,19 +844,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? shortNot = null, string? idIn = null, string? allowedGroups = null,
         string? ordering = null, string[]? search = null, CancellationToken ct = default)
     {
-        ApiQueries.CalendarQuery.Name = name;
-        ApiQueries.CalendarQuery.Color = color;
-        ApiQueries.CalendarQuery.Short = short_;
-        ApiQueries.CalendarQuery.NameNot = nameNot;
-        ApiQueries.CalendarQuery.ColorNot = colorNot;
-        ApiQueries.CalendarQuery.ShortNot = shortNot;
-        ApiQueries.CalendarQuery.IdIn = idIn;
-        ApiQueries.CalendarQuery.AllowedGroups = allowedGroups;
-        ApiQueries.CalendarQuery.Ordering = ordering;
-        ApiQueries.CalendarQuery.Search = search;
-
-        return await HandleListResponseWithPagination<Calendar>(
-            BuildListUrl("calendar", ApiQueries.Calendar), ct);
+        var query = new CalendarQuery
+        {
+            Name = name,
+            Color = color,
+            Short = short_,
+            NameNot = nameNot,
+            ColorNot = colorNot,
+            ShortNot = shortNot,
+            IdIn = idIn,
+            AllowedGroups = allowedGroups,
+            Ordering = ordering,
+            Search = search
+        };
+        return await HandleListResponseWithPagination<Calendar>(BuildListUrl("calendar", query.ToString()), ct);
     }
 
     /// <summary>

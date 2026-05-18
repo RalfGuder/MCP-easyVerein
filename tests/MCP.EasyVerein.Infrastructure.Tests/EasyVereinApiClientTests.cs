@@ -630,6 +630,36 @@ public class EasyVereinApiClientTests
         Assert.Contains("limit=100", handler.LastRequestUri!.Query);
     }
 
+    [Fact]
+    public async Task GetCalendar_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "Cal" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListCalendarsAsync(
+            name: "Vereinskalender",
+            color: "#f00",
+            short_: "VK",
+            idIn: "1,2",
+            ordering: "name",
+            search: new[] { "kal" });
+        await client.GetCalendarAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/calendar/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("color=", query);
+        Assert.DoesNotContain("short=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Announcements
     // ------------------------------------------------------------------ //
