@@ -352,6 +352,42 @@ public class EasyVereinApiClientTests
         Assert.Contains("limit=100", handler.LastRequestUri!.Query);
     }
 
+    [Fact]
+    public async Task GetEvent_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListEventsAsync(
+            name: "Sommerfest",
+            startGte: "2026-01-01",
+            startLte: "2026-12-31",
+            endGte: "2026-01-01",
+            endLte: "2026-12-31",
+            calendar: "5",
+            canceled: "false",
+            isPublic: "true",
+            idIn: "1,2",
+            ordering: "name",
+            search: new[] { "fest" });
+        await client.GetEventAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/event/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("start__gte=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // ContactDetails
     // ------------------------------------------------------------------ //

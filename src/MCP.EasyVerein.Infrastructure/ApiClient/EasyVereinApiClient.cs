@@ -719,7 +719,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Event?> GetEventAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"event/{id}", ApiQueries.Event), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"event/{id}", EventQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Event>(response, ct);
     }
@@ -744,20 +744,21 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? idIn = null, string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.EventQuery.Name = name;
-        ApiQueries.EventQuery.StartGte = startGte;
-        ApiQueries.EventQuery.StartLte = startLte;
-        ApiQueries.EventQuery.EndGte = endGte;
-        ApiQueries.EventQuery.EndLte = endLte;
-        ApiQueries.EventQuery.Calendar = calendar;
-        ApiQueries.EventQuery.Canceled = canceled;
-        ApiQueries.EventQuery.IsPublic = isPublic;
-        ApiQueries.EventQuery.IdIn = idIn;
-        ApiQueries.EventQuery.Ordering = ordering;
-        ApiQueries.EventQuery.Search = search;
-
-        return await HandleListResponseWithPagination<Event>(
-            BuildListUrl("event", ApiQueries.Event), ct);
+        var query = new EventQuery
+        {
+            Name = name,
+            StartGte = startGte,
+            StartLte = startLte,
+            EndGte = endGte,
+            EndLte = endLte,
+            Calendar = calendar,
+            Canceled = canceled,
+            IsPublic = isPublic,
+            IdIn = idIn,
+            Ordering = ordering,
+            Search = search
+        };
+        return await HandleListResponseWithPagination<Event>(BuildListUrl("event", query.ToString()), ct);
     }
 
     /// <summary>
