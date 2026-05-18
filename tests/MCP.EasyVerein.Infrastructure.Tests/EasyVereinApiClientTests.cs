@@ -389,6 +389,25 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task ListBookings_WithIdIn_SendsIdInFilter()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListBookingsAsync(idIn: "12345,67890");
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.Contains("id__in=12345%2C67890", query);
+        Assert.DoesNotContain("&id=", query);
+    }
+
+    [Fact]
     public async Task GetBookings_WithUnauthorized_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");

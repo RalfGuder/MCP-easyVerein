@@ -67,6 +67,9 @@ internal static class BookingFields
     /// </summary>
     internal const string Id = "id";
 
+    /// <summary>API query parameter for filtering by a comma-separated list of IDs.</summary>
+    internal const string IdIn = "id__in";
+
     /// <summary>API query parameter for result ordering.</summary>
     internal const string Ordering = "ordering";
 

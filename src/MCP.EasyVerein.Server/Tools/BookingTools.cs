@@ -15,9 +15,9 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfiguration config)
 {
     /// <summary>
-    /// Lists bookings with an optional ID filter and automatic pagination.
+    /// Lists bookings with an optional comma-separated ID filter and automatic pagination.
     /// </summary>
-    /// <param name="id">Optional booking ID filter.</param>
+    /// <param name="idIn">Optional comma-separated list of booking IDs (maps to API filter '<c>id__in</c>').</param>
     /// <param name="date">The date.</param>
     /// <param name="dateGt">The date gt.</param>
     /// <param name="dateLt">The date lt.</param>
@@ -27,16 +27,16 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
     /// <returns>A JSON string containing matching bookings, or an error message.</returns>
     [McpServerTool(Name = "list_bookings"), Description("List all bookings")]
     public async Task<string> ListBookings(
-        [Description("The ID of a booking")] long? id, 
+        [Description("Comma-separated list of booking IDs (e.g. '12345' or '12345,67890')")] string? idIn,
         [Description("Booking date")] string? date,
         [Description("Booking date greater than")] string? dateGt,
         [Description("Booking date less than")] string? dateLt,
-        [Description("Search terms")] string[]? search, 
+        [Description("Search terms")] string[]? search,
         [Description("Ordering criteria")] string? ordering, CancellationToken ct)
     {
         try
         {
-            var bookings = await client.ListBookingsAsync(id, date, dateGt, dateLt, ordering, search, ct);
+            var bookings = await client.ListBookingsAsync(idIn, date, dateGt, dateLt, ordering, search, ct);
             return JsonSerializer.Serialize(bookings, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception ex)

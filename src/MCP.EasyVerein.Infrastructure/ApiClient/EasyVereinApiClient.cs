@@ -801,7 +801,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     }
 
     /// <summary>Lists bookings with optional filters and automatic pagination.</summary>
-    /// <param name="id">Optional filter by booking identifier.</param>
+    /// <param name="idIn">Optional comma-separated list of booking IDs (maps to API filter '<c>id__in</c>').</param>
     /// <param name="date">Optional exact date filter.</param>
     /// <param name="dateGt">Optional filter for dates greater than the specified value.</param>
     /// <param name="dateLt">Optional filter for dates less than the specified value.</param>
@@ -809,10 +809,10 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="search">Optional search terms to filter bookings.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="Booking"/> records.</returns>
-    public async Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,
+    public async Task<IReadOnlyList<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,
         CancellationToken ct = default)
     {
-        ApiQueries.BookingQuery.Id = id;
+        ApiQueries.BookingQuery.IdIn = idIn;
         ApiQueries.BookingQuery.Search = search;
         ApiQueries.BookingQuery.Date = date;
         ApiQueries.BookingQuery.DateGt = dateGt;
