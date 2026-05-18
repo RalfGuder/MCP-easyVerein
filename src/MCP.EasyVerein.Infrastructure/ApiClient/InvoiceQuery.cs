@@ -23,9 +23,9 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
         public string[]? Search { get; set; }
 
         /// <summary>
-        /// The base field selection query requesting all invoice fields.
+        /// Field selection only, without any filters. Use for single-resource GETs.
         /// </summary>
-        private const string FieldQuery =
+        internal const string FieldQuery =
             "query=" +
             "{" +
                 InvoiceFields.Id + "," +

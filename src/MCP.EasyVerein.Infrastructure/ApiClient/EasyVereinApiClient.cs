@@ -780,7 +780,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Invoice?> GetInvoiceAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"invoice/{id}", ApiQueries.Invoice), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"invoice/{id}", InvoiceQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Invoice>(response, ct);
     }
@@ -793,7 +793,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<IReadOnlyList<Invoice>> GetInvoicesAsync(CancellationToken ct = default)
     {
         return await HandleListResponseWithPagination<Invoice>(
-            BuildListUrl("invoice", ApiQueries.Invoice), ct);
+            BuildListUrl("invoice", InvoiceQuery.FieldQuery), ct);
     }
 
     /// <summary>

@@ -301,6 +301,21 @@ public class EasyVereinApiClientTests
         Assert.Contains("400", ex.Message);
     }
 
+    [Fact]
+    public async Task GetInvoice_UsesInvoiceQueryFieldQuery_NotApiQueriesConst()
+    {
+        var json = JsonSerializer.Serialize(new { id = 999, invNumber = "INV-001" });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.GetInvoiceAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/invoice/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("query=", query);
+        Assert.DoesNotContain("id=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Events
     // ------------------------------------------------------------------ //
