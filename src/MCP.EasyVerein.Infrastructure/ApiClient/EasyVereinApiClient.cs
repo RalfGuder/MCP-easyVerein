@@ -159,7 +159,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BankAccount?> GetBankAccountAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"bank-account/{id}", ApiQueries.BankAccount), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"bank-account/{id}", BankAccountQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<BankAccount>(response, ct);
     }
@@ -181,17 +181,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? idIn = null, string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.BankAccountQuery.Name = name;
-        ApiQueries.BankAccountQuery.Iban = iban;
-        ApiQueries.BankAccountQuery.Bic = bic;
-        ApiQueries.BankAccountQuery.AccountHolder = accountHolder;
-        ApiQueries.BankAccountQuery.BankName = bankName;
-        ApiQueries.BankAccountQuery.IdIn = idIn;
-        ApiQueries.BankAccountQuery.Ordering = ordering;
-        ApiQueries.BankAccountQuery.Search = search;
+        var query = new BankAccountQuery
+        {
+            Name = name,
+            Iban = iban,
+            Bic = bic,
+            AccountHolder = accountHolder,
+            BankName = bankName,
+            IdIn = idIn,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<BankAccount>(
-            BuildListUrl("bank-account", ApiQueries.BankAccount), ct);
+            BuildListUrl("bank-account", query.ToString()), ct);
     }
 
     /// <summary>Updates a bank account with PATCH semantics.</summary>

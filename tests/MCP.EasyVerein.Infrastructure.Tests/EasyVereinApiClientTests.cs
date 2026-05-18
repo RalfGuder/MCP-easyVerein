@@ -781,6 +781,37 @@ public class EasyVereinApiClientTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBankAccountsAsync());
     }
 
+    [Fact]
+    public async Task GetBankAccount_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListBankAccountsAsync(
+            name: "Sparkasse",
+            iban: "DE00",
+            bic: "BIC",
+            accountHolder: "Verein",
+            bankName: "Sparkasse",
+            idIn: "1,2",
+            ordering: "name",
+            search: new[] { "spk" });
+        await client.GetBankAccountAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/bank-account/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("iban=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Billing Accounts
     // ------------------------------------------------------------------ //
