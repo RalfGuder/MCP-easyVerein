@@ -1582,6 +1582,34 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInvoiceItemsAsync());
     }
+
+    [Fact]
+    public async Task GetInvoiceItem_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, title = "Pos" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListInvoiceItemsAsync(
+            idIn: "1,2",
+            relatedInvoice: "42",
+            ordering: "id",
+            search: new[] { "Pos" });
+        await client.GetInvoiceItemAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/invoice-item/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("relatedInvoice=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.DoesNotContain("search=", query);
+        Assert.Contains("query=", query);
+    }
 }
 
 // ------------------------------------------------------------------ //

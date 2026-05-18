@@ -421,7 +421,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<InvoiceItem?> GetInvoiceItemAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"invoice-item/{id}", ApiQueries.InvoiceItem), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"invoice-item/{id}", InvoiceItemQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<InvoiceItem>(response, ct);
     }
@@ -438,13 +438,16 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.InvoiceItemQuery.IdIn = idIn;
-        ApiQueries.InvoiceItemQuery.RelatedInvoice = relatedInvoice;
-        ApiQueries.InvoiceItemQuery.Ordering = ordering;
-        ApiQueries.InvoiceItemQuery.Search = search;
+        var query = new InvoiceItemQuery
+        {
+            IdIn = idIn,
+            RelatedInvoice = relatedInvoice,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<InvoiceItem>(
-            BuildListUrl("invoice-item", ApiQueries.InvoiceItem), ct);
+            BuildListUrl("invoice-item", query.ToString()), ct);
     }
 
     /// <summary>Updates an invoice item with PATCH semantics.</summary>
