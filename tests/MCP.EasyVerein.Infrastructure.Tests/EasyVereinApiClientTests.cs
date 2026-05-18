@@ -705,6 +705,28 @@ public class EasyVereinApiClientTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListAnnouncementsAsync());
     }
 
+    [Fact]
+    public async Task GetAnnouncement_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, title = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListAnnouncementsAsync(ordering: "title", search: new[] { "wartung" });
+        await client.GetAnnouncementAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/announcement/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.DoesNotContain("search=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Bank Accounts
     // ------------------------------------------------------------------ //

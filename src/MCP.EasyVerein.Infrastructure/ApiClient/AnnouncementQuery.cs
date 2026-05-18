@@ -13,8 +13,8 @@ internal class AnnouncementQuery
     /// <summary>Gets or sets the search terms.</summary>
     internal string[]? Search { get; set; }
 
-    /// <summary>The field selection query requesting all announcement fields.</summary>
-    private const string FieldQuery =
+    /// <summary>Field selection only, without any filters. Use for single-resource GETs.</summary>
+    internal const string FieldQuery =
         "query=" +
         "{" +
             AnnouncementFields.Id + "," +

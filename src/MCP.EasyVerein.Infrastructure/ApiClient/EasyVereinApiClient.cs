@@ -90,7 +90,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Announcement?> GetAnnouncementAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"announcement/{id}", ApiQueries.Announcement), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"announcement/{id}", AnnouncementQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Announcement>(response, ct);
     }
@@ -104,11 +104,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.AnnouncementQuery.Ordering = ordering;
-        ApiQueries.AnnouncementQuery.Search = search;
-
+        var query = new AnnouncementQuery
+        {
+            Ordering = ordering,
+            Search = search
+        };
         return await HandleListResponseWithPagination<Announcement>(
-            BuildListUrl("announcement", ApiQueries.Announcement), ct);
+            BuildListUrl("announcement", query.ToString()), ct);
     }
 
     /// <summary>Updates an announcement with PATCH semantics.</summary>
