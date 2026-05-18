@@ -90,7 +90,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Announcement?> GetAnnouncementAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"announcement/{id}", ApiQueries.Announcement), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"announcement/{id}", AnnouncementQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Announcement>(response, ct);
     }
@@ -104,11 +104,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.AnnouncementQuery.Ordering = ordering;
-        ApiQueries.AnnouncementQuery.Search = search;
-
+        var query = new AnnouncementQuery
+        {
+            Ordering = ordering,
+            Search = search
+        };
         return await HandleListResponseWithPagination<Announcement>(
-            BuildListUrl("announcement", ApiQueries.Announcement), ct);
+            BuildListUrl("announcement", query.ToString()), ct);
     }
 
     /// <summary>Updates an announcement with PATCH semantics.</summary>
@@ -157,7 +159,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BankAccount?> GetBankAccountAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"bank-account/{id}", ApiQueries.BankAccount), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"bank-account/{id}", BankAccountQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<BankAccount>(response, ct);
     }
@@ -179,17 +181,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? idIn = null, string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.BankAccountQuery.Name = name;
-        ApiQueries.BankAccountQuery.Iban = iban;
-        ApiQueries.BankAccountQuery.Bic = bic;
-        ApiQueries.BankAccountQuery.AccountHolder = accountHolder;
-        ApiQueries.BankAccountQuery.BankName = bankName;
-        ApiQueries.BankAccountQuery.IdIn = idIn;
-        ApiQueries.BankAccountQuery.Ordering = ordering;
-        ApiQueries.BankAccountQuery.Search = search;
+        var query = new BankAccountQuery
+        {
+            Name = name,
+            Iban = iban,
+            Bic = bic,
+            AccountHolder = accountHolder,
+            BankName = bankName,
+            IdIn = idIn,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<BankAccount>(
-            BuildListUrl("bank-account", ApiQueries.BankAccount), ct);
+            BuildListUrl("bank-account", query.ToString()), ct);
     }
 
     /// <summary>Updates a bank account with PATCH semantics.</summary>
@@ -238,7 +243,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BillingAccount?> GetBillingAccountAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"billing-account/{id}", ApiQueries.BillingAccount), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"billing-account/{id}", BillingAccountQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<BillingAccount>(response, ct);
     }
@@ -266,20 +271,23 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.BillingAccountQuery.Name = name;
-        ApiQueries.BillingAccountQuery.IdIn = idIn;
-        ApiQueries.BillingAccountQuery.Skr = skr;
-        ApiQueries.BillingAccountQuery.SkrIn = skrIn;
-        ApiQueries.BillingAccountQuery.NumberGte = numberGte;
-        ApiQueries.BillingAccountQuery.NumberLte = numberLte;
-        ApiQueries.BillingAccountQuery.Deleted = deleted;
-        ApiQueries.BillingAccountQuery.AccountingPlanIsNull = accountingPlanIsNull;
-        ApiQueries.BillingAccountQuery.ShowOwnBillingAccounts = showOwnBillingAccounts;
-        ApiQueries.BillingAccountQuery.Ordering = ordering;
-        ApiQueries.BillingAccountQuery.Search = search;
+        var query = new BillingAccountQuery
+        {
+            Name = name,
+            IdIn = idIn,
+            Skr = skr,
+            SkrIn = skrIn,
+            NumberGte = numberGte,
+            NumberLte = numberLte,
+            Deleted = deleted,
+            AccountingPlanIsNull = accountingPlanIsNull,
+            ShowOwnBillingAccounts = showOwnBillingAccounts,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<BillingAccount>(
-            BuildListUrl("billing-account", ApiQueries.BillingAccount), ct);
+            BuildListUrl("billing-account", query.ToString()), ct);
     }
 
     /// <summary>Updates a billing account with PATCH semantics.</summary>
@@ -328,7 +336,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BookingProject?> GetBookingProjectAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"booking-project/{id}", ApiQueries.BookingProject), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"booking-project/{id}", BookingProjectQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<BookingProject>(response, ct);
     }
@@ -351,17 +359,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.BookingProjectQuery.Name = name;
-        ApiQueries.BookingProjectQuery.Short = @short;
-        ApiQueries.BookingProjectQuery.Completed = completed;
-        ApiQueries.BookingProjectQuery.IdIn = idIn;
-        ApiQueries.BookingProjectQuery.BudgetGt = budgetGt;
-        ApiQueries.BookingProjectQuery.BudgetLt = budgetLt;
-        ApiQueries.BookingProjectQuery.Ordering = ordering;
-        ApiQueries.BookingProjectQuery.Search = search;
+        var query = new BookingProjectQuery
+        {
+            Name = name,
+            Short = @short,
+            Completed = completed,
+            IdIn = idIn,
+            BudgetGt = budgetGt,
+            BudgetLt = budgetLt,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<BookingProject>(
-            BuildListUrl("booking-project", ApiQueries.BookingProject), ct);
+            BuildListUrl("booking-project", query.ToString()), ct);
     }
 
     /// <summary>Updates a booking project with PATCH semantics.</summary>
@@ -410,7 +421,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<InvoiceItem?> GetInvoiceItemAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"invoice-item/{id}", ApiQueries.InvoiceItem), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"invoice-item/{id}", InvoiceItemQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<InvoiceItem>(response, ct);
     }
@@ -427,13 +438,16 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.InvoiceItemQuery.IdIn = idIn;
-        ApiQueries.InvoiceItemQuery.RelatedInvoice = relatedInvoice;
-        ApiQueries.InvoiceItemQuery.Ordering = ordering;
-        ApiQueries.InvoiceItemQuery.Search = search;
+        var query = new InvoiceItemQuery
+        {
+            IdIn = idIn,
+            RelatedInvoice = relatedInvoice,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<InvoiceItem>(
-            BuildListUrl("invoice-item", ApiQueries.InvoiceItem), ct);
+            BuildListUrl("invoice-item", query.ToString()), ct);
     }
 
     /// <summary>Updates an invoice item with PATCH semantics.</summary>
@@ -482,7 +496,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<ChairmanLevel?> GetChairmanLevelAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"chairman-level/{id}", ApiQueries.ChairmanLevel), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"chairman-level/{id}", ChairmanLevelQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<ChairmanLevel>(response, ct);
     }
@@ -500,14 +514,10 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? idIn = null, string? ordering = null,
         string[]? search = null, CancellationToken ct = default)
     {
-        ApiQueries.ChairmanLevelQuery.Name = name;
-        ApiQueries.ChairmanLevelQuery.Short = @short;
-        ApiQueries.ChairmanLevelQuery.IdIn = idIn;
-        ApiQueries.ChairmanLevelQuery.Ordering = ordering;
-        ApiQueries.ChairmanLevelQuery.Search = search;
+        var query = new ChairmanLevelQuery { Name = name, Short = @short, IdIn = idIn, Ordering = ordering, Search = search };
 
         return await HandleListResponseWithPagination<ChairmanLevel>(
-            BuildListUrl("chairman-level", ApiQueries.ChairmanLevel), ct);
+            BuildListUrl("chairman-level", query.ToString()), ct);
     }
 
     /// <summary>Updates a chairman level with PATCH semantics.</summary>
@@ -690,7 +700,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Calendar?> GetCalendarAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"calendar/{id}", ApiQueries.Calendar), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"calendar/{id}", CalendarQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Calendar>(response, ct);
     }
@@ -704,7 +714,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<ContactDetails?> GetContactDetailsAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"contact-details/{id}", ApiQueries.ContactDetails), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"contact-details/{id}", ContactDetailsQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         return await HandleResponse<ContactDetails>(response, ct);
@@ -719,7 +729,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Event?> GetEventAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"event/{id}", ApiQueries.Event), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"event/{id}", EventQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Event>(response, ct);
     }
@@ -744,20 +754,21 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? idIn = null, string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.EventQuery.Name = name;
-        ApiQueries.EventQuery.StartGte = startGte;
-        ApiQueries.EventQuery.StartLte = startLte;
-        ApiQueries.EventQuery.EndGte = endGte;
-        ApiQueries.EventQuery.EndLte = endLte;
-        ApiQueries.EventQuery.Calendar = calendar;
-        ApiQueries.EventQuery.Canceled = canceled;
-        ApiQueries.EventQuery.IsPublic = isPublic;
-        ApiQueries.EventQuery.IdIn = idIn;
-        ApiQueries.EventQuery.Ordering = ordering;
-        ApiQueries.EventQuery.Search = search;
-
-        return await HandleListResponseWithPagination<Event>(
-            BuildListUrl("event", ApiQueries.Event), ct);
+        var query = new EventQuery
+        {
+            Name = name,
+            StartGte = startGte,
+            StartLte = startLte,
+            EndGte = endGte,
+            EndLte = endLte,
+            Calendar = calendar,
+            Canceled = canceled,
+            IsPublic = isPublic,
+            IdIn = idIn,
+            Ordering = ordering,
+            Search = search
+        };
+        return await HandleListResponseWithPagination<Event>(BuildListUrl("event", query.ToString()), ct);
     }
 
     /// <summary>
@@ -769,7 +780,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Invoice?> GetInvoiceAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"invoice/{id}", ApiQueries.Invoice), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"invoice/{id}", InvoiceQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<Invoice>(response, ct);
     }
@@ -782,7 +793,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<IReadOnlyList<Invoice>> GetInvoicesAsync(CancellationToken ct = default)
     {
         return await HandleListResponseWithPagination<Invoice>(
-            BuildListUrl("invoice", ApiQueries.Invoice), ct);
+            BuildListUrl("invoice", InvoiceQuery.FieldQuery), ct);
     }
 
     /// <summary>
@@ -794,7 +805,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Member?> GetMemberAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"member/{id}", ApiQueries.Member), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"member/{id}", MemberQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         return await HandleResponse<Member>(response, ct);
@@ -812,15 +823,17 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<IReadOnlyList<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,
         CancellationToken ct = default)
     {
-        ApiQueries.BookingQuery.IdIn = idIn;
-        ApiQueries.BookingQuery.Search = search;
-        ApiQueries.BookingQuery.Date = date;
-        ApiQueries.BookingQuery.DateGt = dateGt;
-        ApiQueries.BookingQuery.DateLt = dateLt;
-        ApiQueries.BookingQuery.Ordering = ordering;
-
+        var query = new BookingQuery
+        {
+            IdIn = idIn,
+            Search = search,
+            Date = date,
+            DateGt = dateGt,
+            DateLt = dateLt,
+            Ordering = ordering
+        };
         return await HandleListResponseWithPagination<Booking>(
-            BuildListUrl("booking", ApiQueries.Booking), ct);
+            BuildListUrl("booking", query.ToString()), ct);
     }
 
     /// <summary>Lists calendars with optional filters and automatic pagination.</summary>
@@ -841,19 +854,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? shortNot = null, string? idIn = null, string? allowedGroups = null,
         string? ordering = null, string[]? search = null, CancellationToken ct = default)
     {
-        ApiQueries.CalendarQuery.Name = name;
-        ApiQueries.CalendarQuery.Color = color;
-        ApiQueries.CalendarQuery.Short = short_;
-        ApiQueries.CalendarQuery.NameNot = nameNot;
-        ApiQueries.CalendarQuery.ColorNot = colorNot;
-        ApiQueries.CalendarQuery.ShortNot = shortNot;
-        ApiQueries.CalendarQuery.IdIn = idIn;
-        ApiQueries.CalendarQuery.AllowedGroups = allowedGroups;
-        ApiQueries.CalendarQuery.Ordering = ordering;
-        ApiQueries.CalendarQuery.Search = search;
-
-        return await HandleListResponseWithPagination<Calendar>(
-            BuildListUrl("calendar", ApiQueries.Calendar), ct);
+        var query = new CalendarQuery
+        {
+            Name = name,
+            Color = color,
+            Short = short_,
+            NameNot = nameNot,
+            ColorNot = colorNot,
+            ShortNot = shortNot,
+            IdIn = idIn,
+            AllowedGroups = allowedGroups,
+            Ordering = ordering,
+            Search = search
+        };
+        return await HandleListResponseWithPagination<Calendar>(BuildListUrl("calendar", query.ToString()), ct);
     }
 
     /// <summary>
@@ -868,12 +882,15 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<IReadOnlyList<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
         string? familyName = null, string? name = null, CancellationToken ct = default)
     {
-        ApiQueries.ContactDetailsQuery.Id = id;
-        ApiQueries.ContactDetailsQuery.FirstName = firstName;
-        ApiQueries.ContactDetailsQuery.FamilyName = familyName;
-        ApiQueries.ContactDetailsQuery.Name = name;
+        var query = new ContactDetailsQuery
+        {
+            Id = id,
+            FirstName = firstName,
+            FamilyName = familyName,
+            Name = name
+        };
         return await HandleListResponseWithPagination<ContactDetails>(
-            BuildListUrl("contact-details", ApiQueries.ContactDetails), ct);
+            BuildListUrl("contact-details", query.ToString()), ct);
     }
 
     /// <summary>
@@ -886,12 +903,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <returns>A read-only list of matching <see cref="Member"/> records.</returns>
     public async Task<IReadOnlyList<Member>> ListMembersAsync(long? id = null, string? membershipNumber = null, string[]? search = null, CancellationToken ct = default)
     {
-        ApiQueries.MemberQuery.Id = id;
-        ApiQueries.MemberQuery.MembershipNumber = membershipNumber;
-        ApiQueries.MemberQuery.Search = search;
-
+        var query = new MemberQuery
+        {
+            Id = id,
+            MembershipNumber = membershipNumber,
+            Search = search
+        };
         return await HandleListResponseWithPagination<Member>(
-            BuildListUrl("member", ApiQueries.Member), ct);
+            BuildListUrl("member", query.ToString()), ct);
     }
 
     // --- Bookings (FR-045) ---

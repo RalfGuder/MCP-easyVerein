@@ -22,10 +22,8 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
         /// </summary>
         public string[]? Search { get; set; }
 
-        /// <summary>
-        /// The base field selection query requesting member and nested contact details fields.
-        /// </summary>
-        private const string FieldQuery =
+        /// <summary>Field selection only, without any filters. Use for single-resource GETs.</summary>
+        internal const string FieldQuery =
             "query=" +
             "{" +
                 MemberFields.Id + "," +

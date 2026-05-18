@@ -40,8 +40,8 @@ internal class EventQuery
     /// <summary>Gets or sets optional search terms to filter events.</summary>
     internal string[]? Search { get; set; }
 
-    /// <summary>The base field selection query requesting all event fields.</summary>
-    private const string FieldQuery =
+    /// <summary>Field selection only, without any filters. Use for single-resource GETs.</summary>
+    internal const string FieldQuery =
         "query=" +
         "{" +
             EventFields.Id + "," +

@@ -179,6 +179,31 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task GetMember_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, emailOrUserName = "x@y.de" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListMembersAsync(id: 12345, membershipNumber: "M-42", search: new[] { "Mueller" });
+        await client.GetMemberAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var path = handler.LastRequestUri!.AbsolutePath;
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/member/999", path);
+        Assert.DoesNotContain("id=", query);
+        Assert.DoesNotContain("membershipNumber=", query);
+        Assert.DoesNotContain("search=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
     public async Task DeleteMember_WithForbidden_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Forbidden, "{}");
@@ -276,6 +301,21 @@ public class EasyVereinApiClientTests
         Assert.Contains("400", ex.Message);
     }
 
+    [Fact]
+    public async Task GetInvoice_UsesInvoiceQueryFieldQuery_NotApiQueriesConst()
+    {
+        var json = JsonSerializer.Serialize(new { id = 999, invNumber = "INV-001" });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.GetInvoiceAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/invoice/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("query=", query);
+        Assert.DoesNotContain("id=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Events
     // ------------------------------------------------------------------ //
@@ -327,6 +367,42 @@ public class EasyVereinApiClientTests
         Assert.Contains("limit=100", handler.LastRequestUri!.Query);
     }
 
+    [Fact]
+    public async Task GetEvent_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListEventsAsync(
+            name: "Sommerfest",
+            startGte: "2026-01-01",
+            startLte: "2026-12-31",
+            endGte: "2026-01-01",
+            endLte: "2026-12-31",
+            calendar: "5",
+            canceled: "false",
+            isPublic: "true",
+            idIn: "1,2",
+            ordering: "name",
+            search: new[] { "fest" });
+        await client.GetEventAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/event/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("start__gte=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // ContactDetails
     // ------------------------------------------------------------------ //
@@ -350,6 +426,31 @@ public class EasyVereinApiClientTests
         Assert.Single(result);
         Assert.Equal("Anna", result[0].FirstName);
         Assert.Equal("Schmidt", result[0].FamilyName);
+    }
+
+    [Fact]
+    public async Task GetContactDetails_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, firstName = "Anna" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListContactDetailsAsync(id: 12345, firstName: "Bob", familyName: "Smith", name: "BSmith");
+        await client.GetContactDetailsAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var path = handler.LastRequestUri!.AbsolutePath;
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/contact-details/999", path);
+        Assert.DoesNotContain("firstName=", query);
+        Assert.DoesNotContain("familyName=", query);
+        Assert.DoesNotContain("name=", query);
+        Assert.Contains("query=", query);
     }
 
     // ------------------------------------------------------------------ //
@@ -447,6 +548,32 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task ListBookings_ConcurrentCallsWithDifferentFilters_DoNotLeakBetweenEachOther()
+    {
+        var emptyPage = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+
+        var handlerA = new CapturingFakeHttpHandler(HttpStatusCode.OK, emptyPage);
+        var handlerB = new CapturingFakeHttpHandler(HttpStatusCode.OK, emptyPage);
+        var clientA = CreateClient(handlerA);
+        var clientB = CreateClient(handlerB);
+
+        var taskA = clientA.ListBookingsAsync(idIn: "111,222");
+        var taskB = clientB.ListBookingsAsync(idIn: "999");
+        await Task.WhenAll(taskA, taskB);
+
+        Assert.NotNull(handlerA.LastRequestUri);
+        Assert.NotNull(handlerB.LastRequestUri);
+        Assert.Contains("id__in=111%2C222", handlerA.LastRequestUri!.Query);
+        Assert.DoesNotContain("id__in=999", handlerA.LastRequestUri!.Query);
+        Assert.Contains("id__in=999", handlerB.LastRequestUri!.Query);
+        Assert.DoesNotContain("id__in=111", handlerB.LastRequestUri!.Query);
+    }
+
+    [Fact]
     public async Task GetBookings_WithUnauthorized_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
@@ -518,6 +645,36 @@ public class EasyVereinApiClientTests
         Assert.Contains("limit=100", handler.LastRequestUri!.Query);
     }
 
+    [Fact]
+    public async Task GetCalendar_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "Cal" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListCalendarsAsync(
+            name: "Vereinskalender",
+            color: "#f00",
+            short_: "VK",
+            idIn: "1,2",
+            ordering: "name",
+            search: new[] { "kal" });
+        await client.GetCalendarAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/calendar/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("color=", query);
+        Assert.DoesNotContain("short=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Announcements
     // ------------------------------------------------------------------ //
@@ -561,6 +718,28 @@ public class EasyVereinApiClientTests
         var client = CreateClient(handler);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListAnnouncementsAsync());
+    }
+
+    [Fact]
+    public async Task GetAnnouncement_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, title = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListAnnouncementsAsync(ordering: "title", search: new[] { "wartung" });
+        await client.GetAnnouncementAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/announcement/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.DoesNotContain("search=", query);
+        Assert.Contains("query=", query);
     }
 
     // ------------------------------------------------------------------ //
@@ -615,6 +794,37 @@ public class EasyVereinApiClientTests
         var client = CreateClient(handler);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBankAccountsAsync());
+    }
+
+    [Fact]
+    public async Task GetBankAccount_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListBankAccountsAsync(
+            name: "Sparkasse",
+            iban: "DE00",
+            bic: "BIC",
+            accountHolder: "Verein",
+            bankName: "Sparkasse",
+            idIn: "1,2",
+            ordering: "name",
+            search: new[] { "spk" });
+        await client.GetBankAccountAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/bank-account/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("iban=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
     }
 
     // ------------------------------------------------------------------ //
@@ -820,6 +1030,35 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task GetBillingAccount_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListBillingAccountsAsync(
+            name: "Spendenkonto",
+            idIn: "1,2",
+            skr: "42",
+            deleted: "false",
+            ordering: "number");
+        await client.GetBillingAccountAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/billing-account/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("skr=", query);
+        Assert.DoesNotContain("deleted=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
     public async Task ListBillingAccounts_WithUnauthorized_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
@@ -976,6 +1215,34 @@ public class EasyVereinApiClientTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBookingProjectsAsync());
     }
 
+    [Fact]
+    public async Task GetBookingProject_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListBookingProjectsAsync(
+            name: "Dorffest",
+            @short: "DF",
+            completed: "false",
+            idIn: "1,2",
+            ordering: "name");
+        await client.GetBookingProjectAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/booking-project/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("short=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Chairman Levels
     // ------------------------------------------------------------------ //
@@ -1116,6 +1383,33 @@ public class EasyVereinApiClientTests
         var client = CreateClient(handler);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListChairmanLevelsAsync());
+    }
+
+    [Fact]
+    public async Task GetChairmanLevel_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "Vorstand" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListChairmanLevelsAsync(
+            name: "Vorstand",
+            @short: "VS",
+            idIn: "1,2",
+            ordering: "name");
+        await client.GetChairmanLevelAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/chairman-level/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("short=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
     }
 
     // ------------------------------------------------------------------ //
@@ -1302,6 +1596,34 @@ public class EasyVereinApiClientTests
         var client = CreateClient(handler);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInvoiceItemsAsync());
+    }
+
+    [Fact]
+    public async Task GetInvoiceItem_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, title = "Pos" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListInvoiceItemsAsync(
+            idIn: "1,2",
+            relatedInvoice: "42",
+            ordering: "id",
+            search: new[] { "Pos" });
+        await client.GetInvoiceItemAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/invoice-item/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("relatedInvoice=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.DoesNotContain("search=", query);
+        Assert.Contains("query=", query);
     }
 }
 
