@@ -179,6 +179,31 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task GetMember_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, emailOrUserName = "x@y.de" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListMembersAsync(id: 12345, membershipNumber: "M-42", search: new[] { "Mueller" });
+        await client.GetMemberAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var path = handler.LastRequestUri!.AbsolutePath;
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/member/999", path);
+        Assert.DoesNotContain("id=", query);
+        Assert.DoesNotContain("membershipNumber=", query);
+        Assert.DoesNotContain("search=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
     public async Task DeleteMember_WithForbidden_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Forbidden, "{}");

@@ -794,7 +794,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<Member?> GetMemberAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"member/{id}", ApiQueries.Member), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"member/{id}", MemberQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
         return await HandleResponse<Member>(response, ct);
@@ -888,12 +888,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <returns>A read-only list of matching <see cref="Member"/> records.</returns>
     public async Task<IReadOnlyList<Member>> ListMembersAsync(long? id = null, string? membershipNumber = null, string[]? search = null, CancellationToken ct = default)
     {
-        ApiQueries.MemberQuery.Id = id;
-        ApiQueries.MemberQuery.MembershipNumber = membershipNumber;
-        ApiQueries.MemberQuery.Search = search;
-
+        var query = new MemberQuery
+        {
+            Id = id,
+            MembershipNumber = membershipNumber,
+            Search = search
+        };
         return await HandleListResponseWithPagination<Member>(
-            BuildListUrl("member", ApiQueries.Member), ct);
+            BuildListUrl("member", query.ToString()), ct);
     }
 
     // --- Bookings (FR-045) ---
