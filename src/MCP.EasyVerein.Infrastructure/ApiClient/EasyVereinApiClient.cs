@@ -493,7 +493,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<ChairmanLevel?> GetChairmanLevelAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"chairman-level/{id}", ApiQueries.ChairmanLevel), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"chairman-level/{id}", ChairmanLevelQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<ChairmanLevel>(response, ct);
     }
@@ -511,14 +511,10 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? idIn = null, string? ordering = null,
         string[]? search = null, CancellationToken ct = default)
     {
-        ApiQueries.ChairmanLevelQuery.Name = name;
-        ApiQueries.ChairmanLevelQuery.Short = @short;
-        ApiQueries.ChairmanLevelQuery.IdIn = idIn;
-        ApiQueries.ChairmanLevelQuery.Ordering = ordering;
-        ApiQueries.ChairmanLevelQuery.Search = search;
+        var query = new ChairmanLevelQuery { Name = name, Short = @short, IdIn = idIn, Ordering = ordering, Search = search };
 
         return await HandleListResponseWithPagination<ChairmanLevel>(
-            BuildListUrl("chairman-level", ApiQueries.ChairmanLevel), ct);
+            BuildListUrl("chairman-level", query.ToString()), ct);
     }
 
     /// <summary>Updates a chairman level with PATCH semantics.</summary>
