@@ -7,8 +7,8 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient;
 /// </summary>
 internal class BookingQuery
 {
-    /// <summary>Gets or sets an optional booking identifier filter.</summary>
-    internal long? Id { get; set; }
+    /// <summary>Gets or sets an optional comma-separated list of booking IDs (maps to API filter '<c>id__in</c>').</summary>
+    internal string? IdIn { get; set; }
 
     /// <summary>Gets or sets optional search terms to filter bookings.</summary>
     public string[]? Search { get; set; }
@@ -67,9 +67,9 @@ internal class BookingQuery
     {
         var parts = new List<string> { FieldQuery };
 
-        if (Id != null)
+        if (!string.IsNullOrEmpty(IdIn))
         {
-            parts.Add($"{BookingFields.Id}={Id}");
+            parts.Add($"{BookingFields.IdIn}={Uri.EscapeDataString(IdIn)}");
         }
 
         if (!string.IsNullOrEmpty(Date))

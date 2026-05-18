@@ -357,8 +357,8 @@ public interface IEasyVereinApiClient
     Task<Member?> GetMemberAsync(long id, CancellationToken ct = default);
 
     // Bookings
-    /// <summary>Lists bookings, optionally filtered by ID, date range, ordering, or search terms.</summary>
-    /// <param name="id">Optional booking ID to filter by.</param>
+    /// <summary>Lists bookings, optionally filtered by a comma-separated list of IDs, date range, ordering, or search terms.</summary>
+    /// <param name="idIn">Optional comma-separated list of booking IDs to filter by (maps to API filter '<c>id__in</c>').</param>
     /// <param name="date">Optional exact date filter.</param>
     /// <param name="dateGt">Optional filter for dates greater than the specified value.</param>
     /// <param name="dateLt">Optional filter for dates less than the specified value.</param>
@@ -366,7 +366,7 @@ public interface IEasyVereinApiClient
     /// <param name="search">Optional search terms to filter bookings.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching bookings.</returns>
-    Task<IReadOnlyList<Booking>> ListBookingsAsync(long? id = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default, CancellationToken ct = default);
+    Task<IReadOnlyList<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default, CancellationToken ct = default);
 
     /// <summary>Lists calendars, optionally filtered by name, color, short, ordering, or search terms.</summary>
     /// <param name="name">Optional name filter.</param>
