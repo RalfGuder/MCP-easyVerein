@@ -336,7 +336,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<BookingProject?> GetBookingProjectAsync(long id, CancellationToken ct = default)
     {
         var response = await SendWithErrorHandling(
-            () => _httpClient.GetAsync(BuildGetUrl($"booking-project/{id}", ApiQueries.BookingProject), ct), ct);
+            () => _httpClient.GetAsync(BuildGetUrl($"booking-project/{id}", BookingProjectQuery.FieldQuery), ct), ct);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         return await HandleResponse<BookingProject>(response, ct);
     }
@@ -359,17 +359,20 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         string? ordering = null, string[]? search = null,
         CancellationToken ct = default)
     {
-        ApiQueries.BookingProjectQuery.Name = name;
-        ApiQueries.BookingProjectQuery.Short = @short;
-        ApiQueries.BookingProjectQuery.Completed = completed;
-        ApiQueries.BookingProjectQuery.IdIn = idIn;
-        ApiQueries.BookingProjectQuery.BudgetGt = budgetGt;
-        ApiQueries.BookingProjectQuery.BudgetLt = budgetLt;
-        ApiQueries.BookingProjectQuery.Ordering = ordering;
-        ApiQueries.BookingProjectQuery.Search = search;
+        var query = new BookingProjectQuery
+        {
+            Name = name,
+            Short = @short,
+            Completed = completed,
+            IdIn = idIn,
+            BudgetGt = budgetGt,
+            BudgetLt = budgetLt,
+            Ordering = ordering,
+            Search = search
+        };
 
         return await HandleListResponseWithPagination<BookingProject>(
-            BuildListUrl("booking-project", ApiQueries.BookingProject), ct);
+            BuildListUrl("booking-project", query.ToString()), ct);
     }
 
     /// <summary>Updates a booking project with PATCH semantics.</summary>

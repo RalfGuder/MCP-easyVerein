@@ -1200,6 +1200,34 @@ public class EasyVereinApiClientTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListBookingProjectsAsync());
     }
 
+    [Fact]
+    public async Task GetBookingProject_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListBookingProjectsAsync(
+            name: "Dorffest",
+            @short: "DF",
+            completed: "false",
+            idIn: "1,2",
+            ordering: "name");
+        await client.GetBookingProjectAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/booking-project/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("short=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
+    }
+
     // ------------------------------------------------------------------ //
     // Chairman Levels
     // ------------------------------------------------------------------ //
