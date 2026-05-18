@@ -32,7 +32,7 @@ internal class BookingProjectQuery
     internal string[]? Search { get; set; }
 
     /// <summary>Field selection only, without any filters. Use for single-resource GETs.</summary>
-    internal static string FieldQuery =>
+    internal const string FieldQuery =
         "query=" +
         "{" +
             BookingProjectFields.Id + "," +
