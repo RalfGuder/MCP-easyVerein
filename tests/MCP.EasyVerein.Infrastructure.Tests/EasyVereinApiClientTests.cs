@@ -408,6 +408,45 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task GetBooking_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var getJson = JsonSerializer.Serialize(new { id = 999, amount = 1.23, receiver = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListBookingsAsync(
+            idIn: "12345,67890",
+            date: "2026-05-18",
+            dateGt: "2026-01-01",
+            dateLt: "2026-12-31",
+            ordering: "-date",
+            search: new[] { "Muster" });
+
+        await client.GetBookingAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var path = handler.LastRequestUri!.AbsolutePath;
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/booking/999", path);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("date=", query);
+        Assert.DoesNotContain("date__gt=", query);
+        Assert.DoesNotContain("date__lt=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.DoesNotContain("search=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
     public async Task GetBookings_WithUnauthorized_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
@@ -1302,6 +1341,9 @@ public class MultiPageFakeHttpHandler : HttpMessageHandler
 {
     private readonly Queue<(HttpStatusCode StatusCode, string Content)> _responses;
 
+    /// <summary>Gets the URI of the most recently sent request.</summary>
+    public Uri? LastRequestUri { get; private set; }
+
     public MultiPageFakeHttpHandler(IEnumerable<(HttpStatusCode, string)> responses)
     {
         _responses = new Queue<(HttpStatusCode, string)>(responses);
@@ -1310,6 +1352,7 @@ public class MultiPageFakeHttpHandler : HttpMessageHandler
     protected override Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request, CancellationToken cancellationToken)
     {
+        LastRequestUri = request.RequestUri;
         if (!_responses.TryDequeue(out var entry))
             throw new InvalidOperationException("Keine weiteren Antworten in der Queue.");
 
