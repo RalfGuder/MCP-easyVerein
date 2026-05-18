@@ -812,15 +812,17 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     public async Task<IReadOnlyList<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,
         CancellationToken ct = default)
     {
-        ApiQueries.BookingQuery.IdIn = idIn;
-        ApiQueries.BookingQuery.Search = search;
-        ApiQueries.BookingQuery.Date = date;
-        ApiQueries.BookingQuery.DateGt = dateGt;
-        ApiQueries.BookingQuery.DateLt = dateLt;
-        ApiQueries.BookingQuery.Ordering = ordering;
-
+        var query = new BookingQuery
+        {
+            IdIn = idIn,
+            Search = search,
+            Date = date,
+            DateGt = dateGt,
+            DateLt = dateLt,
+            Ordering = ordering
+        };
         return await HandleListResponseWithPagination<Booking>(
-            BuildListUrl("booking", ApiQueries.Booking), ct);
+            BuildListUrl("booking", query.ToString()), ct);
     }
 
     /// <summary>Lists calendars with optional filters and automatic pagination.</summary>

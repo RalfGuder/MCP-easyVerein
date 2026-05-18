@@ -447,6 +447,32 @@ public class EasyVereinApiClientTests
     }
 
     [Fact]
+    public async Task ListBookings_ConcurrentCallsWithDifferentFilters_DoNotLeakBetweenEachOther()
+    {
+        var emptyPage = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+
+        var handlerA = new CapturingFakeHttpHandler(HttpStatusCode.OK, emptyPage);
+        var handlerB = new CapturingFakeHttpHandler(HttpStatusCode.OK, emptyPage);
+        var clientA = CreateClient(handlerA);
+        var clientB = CreateClient(handlerB);
+
+        var taskA = clientA.ListBookingsAsync(idIn: "111,222");
+        var taskB = clientB.ListBookingsAsync(idIn: "999");
+        await Task.WhenAll(taskA, taskB);
+
+        Assert.NotNull(handlerA.LastRequestUri);
+        Assert.NotNull(handlerB.LastRequestUri);
+        Assert.Contains("id__in=111%2C222", handlerA.LastRequestUri!.Query);
+        Assert.DoesNotContain("id__in=999", handlerA.LastRequestUri!.Query);
+        Assert.Contains("id__in=999", handlerB.LastRequestUri!.Query);
+        Assert.DoesNotContain("id__in=111", handlerB.LastRequestUri!.Query);
+    }
+
+    [Fact]
     public async Task GetBookings_WithUnauthorized_ThrowsUnauthorizedAccessException()
     {
         var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
