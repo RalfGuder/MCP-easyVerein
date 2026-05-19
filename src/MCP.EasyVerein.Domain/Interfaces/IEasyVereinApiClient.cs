@@ -227,6 +227,45 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteChairmanLevelAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists all contact-details groups, optionally filtered.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="color">Optional color filter (exact match).</param>
+    /// <param name="short">Optional short-label filter (exact match).</param>
+    /// <param name="deleted">Optional soft-delete filter.</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms (allowed fields: name, short).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching contact-details groups.</returns>
+    Task<IReadOnlyList<ContactDetailsGroup>> ListContactDetailsGroupsAsync(
+        string? name = null, string? color = null, string? @short = null,
+        bool? deleted = null, string? idIn = null, string? ordering = null,
+        string[]? search = null, CancellationToken ct = default);
+
+    /// <summary>Gets a single contact-details group by ID.</summary>
+    /// <param name="id">The contact-details group ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The contact-details group, or <c>null</c> if not found.</returns>
+    Task<ContactDetailsGroup?> GetContactDetailsGroupAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new contact-details group.</summary>
+    /// <param name="group">The contact-details group to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created contact-details group.</returns>
+    Task<ContactDetailsGroup> CreateContactDetailsGroupAsync(ContactDetailsGroup group, CancellationToken ct = default);
+
+    /// <summary>Partially updates a contact-details group (PATCH semantics).</summary>
+    /// <param name="id">The contact-details group ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated contact-details group.</returns>
+    Task<ContactDetailsGroup> UpdateContactDetailsGroupAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a contact-details group by ID.</summary>
+    /// <param name="id">The contact-details group ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteContactDetailsGroupAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

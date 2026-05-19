@@ -24,14 +24,13 @@
 1. easyVerein API-Dokumentation für den `contact-details-group`-Endpoint analysieren
 2. `ContactDetailsGroupFields.cs` als ValueObject anlegen
 3. `ContactDetailsGroup.cs` Entity mit `ContactDetailsGroupFields`-Konstanten erstellen
-4. `ContactDetailsGroupQuery.cs` für Standard-Filter implementieren
-5. `ApiQueries.cs` um ContactDetailsGroup-Query erweitern
-6. `IEasyVereinApiClient` um ContactDetailsGroup-CRUD-Methoden erweitern
-7. `EasyVereinApiClient` implementieren (inkl. Pagination und PATCH-Dictionary)
-8. `ContactDetailsGroupTools.cs` als MCP-Tool-Klasse erstellen (inkl. Error-Handling)
-9. `Program.cs` um ContactDetailsGroup-Tools-Registrierung erweitern
-10. Unit-Tests schreiben (TDD: Domain, Infrastructure, Tools)
-11. Manuelle Verifikation gegen die easyVerein API
+4. `ContactDetailsGroupQuery.cs` für Standard-Filter implementieren (per-call Instanzen gemäß US-0062)
+5. `IEasyVereinApiClient` um ContactDetailsGroup-CRUD-Methoden erweitern
+6. `EasyVereinApiClient` implementieren (inkl. Pagination und PATCH-Dictionary)
+7. `ContactDetailsGroupTools.cs` als MCP-Tool-Klasse erstellen (inkl. Error-Handling)
+8. `Program.cs` um ContactDetailsGroup-Tools-Registrierung erweitern
+9. Unit-Tests schreiben (TDD: Domain, Infrastructure, Tools)
+10. Manuelle Verifikation gegen die easyVerein API
 
 ## Technische Hinweise
 

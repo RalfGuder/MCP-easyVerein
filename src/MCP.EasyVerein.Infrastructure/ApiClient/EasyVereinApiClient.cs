@@ -534,6 +534,87 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<ChairmanLevel>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Contact-Details Groups
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new contact-details group via the API.</summary>
+    /// <param name="group">The contact-details group to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="ContactDetailsGroup"/> as returned by the API.</returns>
+    public async Task<ContactDetailsGroup> CreateContactDetailsGroupAsync(ContactDetailsGroup group, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("contact-details-group"), BuildJsonContent(group), ct), ct);
+        return await HandleResponse<ContactDetailsGroup>(response, ct);
+    }
+
+    /// <summary>Deletes a contact-details group by ID.</summary>
+    /// <param name="id">The contact-details group ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteContactDetailsGroupAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"contact-details-group/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single contact-details group by ID.</summary>
+    /// <param name="id">The contact-details group ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The contact-details group, or <c>null</c> if not found.</returns>
+    public async Task<ContactDetailsGroup?> GetContactDetailsGroupAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"contact-details-group/{id}", ContactDetailsGroupQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<ContactDetailsGroup>(response, ct);
+    }
+
+    /// <summary>Lists contact-details groups with optional filters and automatic pagination.</summary>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="color">Optional color filter (exact match).</param>
+    /// <param name="short">Optional short label filter (exact match).</param>
+    /// <param name="deleted">Optional soft-delete filter.</param>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms (allowed fields: name, short).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching contact-details groups.</returns>
+    public async Task<IReadOnlyList<ContactDetailsGroup>> ListContactDetailsGroupsAsync(
+        string? name = null, string? color = null, string? @short = null,
+        bool? deleted = null, string? idIn = null, string? ordering = null,
+        string[]? search = null, CancellationToken ct = default)
+    {
+        var query = new ContactDetailsGroupQuery
+        {
+            Name = name,
+            Color = color,
+            Short = @short,
+            Deleted = deleted,
+            IdIn = idIn,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<ContactDetailsGroup>(
+            BuildListUrl("contact-details-group", query.ToString()), ct);
+    }
+
+    /// <summary>Updates a contact-details group with PATCH semantics.</summary>
+    /// <param name="id">The contact-details group ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="ContactDetailsGroup"/> as returned by the API.</returns>
+    public async Task<ContactDetailsGroup> UpdateContactDetailsGroupAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"contact-details-group/{id}"), content, ct), ct);
+        return await HandleResponse<ContactDetailsGroup>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
