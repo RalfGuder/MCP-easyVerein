@@ -10,14 +10,23 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `ContactDetailsGroup`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `ContactDetailsGroupFields`-Konstanten
-- [ ] **ValueObject `ContactDetailsGroupFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `ContactDetailsGroupQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
-- [ ] **API-Client:** `ListContactDetailsGroupsAsync`, `GetContactDetailsGroupAsync`, `CreateContactDetailsGroupAsync`, `UpdateContactDetailsGroupAsync`, `DeleteContactDetailsGroupAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
-- [ ] **MCP-Tools:** `ContactDetailsGroupTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
+- [x] **Entity `ContactDetailsGroup`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `ContactDetailsGroupFields`-Konstanten
+- [x] **ValueObject `ContactDetailsGroupFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `ContactDetailsGroupQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern (per-call Instanzen gemäß US-0062)
+- [x] **API-Client:** `ListContactDetailsGroupsAsync`, `GetContactDetailsGroupAsync`, `CreateContactDetailsGroupAsync`, `UpdateContactDetailsGroupAsync`, `DeleteContactDetailsGroupAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
+- [x] **MCP-Tools:** `ContactDetailsGroupTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests für Entity und API-Client nach TDD (Red-Green-Refactor) — 2 Domain + 9 Infrastructure
+
+## Umsetzung (PR #104)
+
+- Branch: `feature/US-0016-contact-details-group`
+- Commit: `feat(US-0016): Contact-Details-Group-Endpoint implementieren` (76fa725)
+- 11 neue Tests (2 Domain + 9 Infrastructure), Gesamt 196 grün
+- API-Felder: `id`, `name`, `color`, `short`, `orderSequence` (camelCase im API)
+- Filter: `name`, `color`, `short`, `deleted`, `id__in`, `ordering`, `search` (auf `name`, `short` begrenzt)
+- Update ausschließlich PATCH (Endpoint ist PATCH-only, kein PUT API-seitig)
 
 ## Aufgaben
 
