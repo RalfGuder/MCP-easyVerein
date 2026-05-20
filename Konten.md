@@ -42,6 +42,7 @@
 | 64950 | Kleinreparaturen Gebäude (Vorschlag) |
 | 68510 | Grundsteuer und kommunale Abgaben (Vorschlag) |
 | 68610 | Hausverwaltung und Objektbetreuung (Vorschlag) |
+| 68000 | Porto |
 
 ### Zweckbetrieb
 
@@ -66,7 +67,6 @@
 | 66300 | Repräsentationskosten |
 | 66310 | Kosten der Öffentlichkeitsarbeit |
 | 66400 | Bewirtungskosten |
-| 68000 | Porto |
 | 68050 | Telefon |
 | 68100 | Internetkosten |
 | 68150 | Bürobedarf |
