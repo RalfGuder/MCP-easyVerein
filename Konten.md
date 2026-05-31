@@ -109,6 +109,8 @@
 | 1500 | Dartabend – Ideell (Spenden) |
 | 1600 | Obstblütenfest – Ideell (Spenden) |
 | 1700 | Vatertag – Ideell (Spenden) |
+| 1710 | Frauentag – Ideell (Spenden) |
+| 1720 | Kindertag – Ideell (Spenden) |
 | 1800 | Maler – Ideell (Spenden) |
 | 1900 | Kulturverein – Ideell (Spenden, staatliche Zuschüsse) |
 | 1901 | Kulturverein – Mitgliedsbeiträge |
@@ -139,6 +141,8 @@
 | 3500 | Dartabend – Kultur |
 | 3600 | Obstblütenfest – Kultur |
 | 3700 | Vatertag – Kultur |
+| 3710 | Frauentag – Kultur |
+| 3720 | Kindertag – Kultur |
 | 3800 | Maler – Kultur |
 | 3801 | Maler -Einnahmen: Eintrittsgelder |
 | 3802 | Maler – Einnahmen: Verkauf Kalender |
@@ -171,6 +175,7 @@
 | 4405 | Spieleabend - Ausgaben: Musik |
 | 4406 | Spieleabend - Ausgaben: Sonstige Ausgaben |
 | 4500 | Dartabend – Gesellige Veranstaltungen |
+| 4502 | Dartabend - Einnahmen: Erlös Speisen/Getränke |
 | 4600 | Obstblütenfest – Gesellige Veranstaltungen |
 | 4700 | Vatertag – Gesellige Veranstaltungen |
 | 4701 | Vatertag – Einnahmen: Eintrittsgelder |
@@ -186,5 +191,10 @@
 | 4714 | Frauentag - Ausgaben: Wareneinkauf |
 | 4715 | Frauentag - Ausgaben: Musik |
 | 4716 | Frauentag - Ausgaben: Sonstige Ausgaben |
+| 4720 | Kindertag - Gesellige Veranstaltung |
+| 4722 | Kindertag - Einnahmen: Erlös Speisen/Getränke |
+| 4723 | Kindertag - Einnahmen: sonstige Einnahmen |
+| 4724 | Kindertag - Ausgaben: Wareneinkauf |
 | 4800 | Maler – Gesellige Veranstaltungen |
 | 4900 | Kulturverein – Gesellige Veranstaltungen |
+
