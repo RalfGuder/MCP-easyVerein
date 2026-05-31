@@ -1,6 +1,6 @@
 # User Story 014: Calendar-Endpoint implementieren
 
-> **GitHub Issue:** [#21 – US-0014 Calendar-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/21)
+> **GitHub Issue:** [#21 – US-0014 Calendar-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/21) — ✅ geschlossen
 
 ## User Story
 
@@ -10,14 +10,14 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `Calendar`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `CalendarFields`-Konstanten
-- [ ] **ValueObject `CalendarFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `CalendarQuery.cs`:** Filterung nach ID, Datum und weiteren Standard-Feldern
-- [ ] **API-Client:** `ListCalendarsAsync`, `GetCalendarAsync`, `CreateCalendarAsync`, `UpdateCalendarAsync`, `DeleteCalendarAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
-- [ ] **MCP-Tools:** `CalendarTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
+- [x] **Entity `Calendar`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `CalendarFields`-Konstanten
+- [x] **ValueObject `CalendarFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `CalendarQuery.cs`:** Filterung nach ID, Datum und weiteren Standard-Feldern
+- [x] **API-Client:** `ListCalendarsAsync`, `GetCalendarAsync`, `CreateCalendarAsync`, `UpdateCalendarAsync`, `DeleteCalendarAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
+- [x] **MCP-Tools:** `CalendarTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
 
 ## Aufgaben
 
@@ -42,3 +42,5 @@
 - Pagination: `?limit=100`, automatisch `next`-URL folgen
 - Architektur konsistent mit bestehenden Entities
 - Priorität: **Mittel**
+
+**Status:** ✅ Abgeschlossen. Implementiert, in `main` (Calendar in `Program.cs:61`); Issue #21 bereits geschlossen. Doc-Checkboxen am 2026-05-31 nachgezogen (waren versehentlich offen geblieben).
