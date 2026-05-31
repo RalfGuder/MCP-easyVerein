@@ -1,6 +1,6 @@
 # User Story 018: Custom-Field-Endpoint implementieren
 
-> **GitHub Issue:** [#25 – US-0018 Custom-Field-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/25)
+> **GitHub Issue:** [#25 – US-0018 Custom-Field-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/25) — ✅ geschlossen (2026-05-31)
 
 ## User Story
 
