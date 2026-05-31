@@ -266,6 +266,42 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteContactDetailsGroupAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists all contact-details logs, optionally filtered.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="date">Optional exact-date filter.</param>
+    /// <param name="dateGte">Optional date greater-or-equal filter.</param>
+    /// <param name="dateLte">Optional date less-or-equal filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching contact-details logs.</returns>
+    Task<IReadOnlyList<ContactDetailsLog>> ListContactDetailsLogsAsync(
+        string? idIn = null, string? date = null, string? dateGte = null,
+        string? dateLte = null, string? ordering = null, CancellationToken ct = default);
+
+    /// <summary>Gets a single contact-details log by ID.</summary>
+    /// <param name="id">The contact-details log ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The contact-details log, or <c>null</c> if not found.</returns>
+    Task<ContactDetailsLog?> GetContactDetailsLogAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new contact-details log.</summary>
+    /// <param name="log">The contact-details log to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created contact-details log.</returns>
+    Task<ContactDetailsLog> CreateContactDetailsLogAsync(ContactDetailsLog log, CancellationToken ct = default);
+
+    /// <summary>Partially updates a contact-details log (PATCH semantics).</summary>
+    /// <param name="id">The contact-details log ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated contact-details log.</returns>
+    Task<ContactDetailsLog> UpdateContactDetailsLogAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a contact-details log by ID.</summary>
+    /// <param name="id">The contact-details log ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteContactDetailsLogAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

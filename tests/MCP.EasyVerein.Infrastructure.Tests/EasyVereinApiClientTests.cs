@@ -1601,6 +1601,191 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Contact-Details Logs
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListContactDetailsLogs_ReturnsContactDetailsLogs()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new
+                {
+                    id = 1,
+                    kind = "Custom",
+                    description = "Adresse aktualisiert",
+                    date = "2026-05-31T10:00:00",
+                    shared = true
+                }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListContactDetailsLogsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Custom", result[0].Kind);
+        Assert.Equal("Adresse aktualisiert", result[0].Description);
+        Assert.True(result[0].Shared);
+        Assert.Equal(new DateTime(2026, 5, 31, 10, 0, 0), result[0].Date);
+    }
+
+    [Fact]
+    public async Task ListContactDetailsLogs_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListContactDetailsLogsAsync(
+            idIn: "1,2,3",
+            date: "2026-05-31",
+            dateGte: "2026-05-01",
+            dateLte: "2026-05-31",
+            ordering: "date");
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.Contains("id__in=1%2C2%2C3", query);
+        Assert.Contains("date=2026-05-31", query);
+        Assert.Contains("date__gte=2026-05-01", query);
+        Assert.Contains("date__lte=2026-05-31", query);
+        Assert.Contains("ordering=date", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task GetContactDetailsLog_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetContactDetailsLogAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateContactDetailsLog_PostsEntityAndReturnsCreated()
+    {
+        var createdJson = JsonSerializer.Serialize(new
+        {
+            id = 123,
+            kind = "Custom",
+            description = "Neuer Log",
+            relatedAddress = "https://easyverein.com/api/v2.0/contact-details/555"
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateContactDetailsLogAsync(new ContactDetailsLog
+        {
+            Kind = "Custom",
+            Description = "Neuer Log",
+            RelatedAddress = 555
+        });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal("Custom", created.Kind);
+        Assert.Equal(555L, created.RelatedAddress);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/contact-details-log", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task UpdateContactDetailsLog_SendsPatchDictionary()
+    {
+        var updatedJson = JsonSerializer.Serialize(new
+        {
+            id = 5,
+            kind = "Custom",
+            description = "Geaendert"
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object>
+        {
+            ["description"] = "Geaendert"
+        };
+        var updated = await client.UpdateContactDetailsLogAsync(5, patch);
+
+        Assert.Equal("Geaendert", updated.Description);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/contact-details-log/5", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task DeleteContactDetailsLog_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteContactDetailsLogAsync(42);
+
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/contact-details-log/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListContactDetailsLogs_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListContactDetailsLogsAsync());
+    }
+
+    [Fact]
+    public async Task GetContactDetailsLog_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, kind = "Custom" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListContactDetailsLogsAsync(
+            idIn: "1,2",
+            dateGte: "2026-05-01",
+            ordering: "date");
+        await client.GetContactDetailsLogAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/contact-details-log/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("date__gte=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateContactDetailsLog_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"kind\":\"Custom\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateContactDetailsLogAsync(new ContactDetailsLog { Kind = "Custom" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as

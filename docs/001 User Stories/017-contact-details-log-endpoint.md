@@ -10,14 +10,14 @@
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `ContactDetailsLog`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `ContactDetailsLogFields`-Konstanten
-- [ ] **ValueObject `ContactDetailsLogFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `ContactDetailsLogQuery.cs`:** Filterung nach ID, Datum und Kontakt-ID
-- [ ] **API-Client:** `ListContactDetailsLogsAsync`, `GetContactDetailsLogAsync`, `CreateContactDetailsLogAsync`, `UpdateContactDetailsLogAsync`, `DeleteContactDetailsLogAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
-- [ ] **MCP-Tools:** `ContactDetailsLogTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
+- [x] **Entity `ContactDetailsLog`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `ContactDetailsLogFields`-Konstanten
+- [x] **ValueObject `ContactDetailsLogFields.cs`:** Alle API-Feldnamen als Konstanten
+- [x] **Query-Klasse `ContactDetailsLogQuery.cs`:** Filterung nach ID, Datum und Kontakt-ID
+- [x] **API-Client:** `ListContactDetailsLogsAsync`, `GetContactDetailsLogAsync`, `CreateContactDetailsLogAsync`, `UpdateContactDetailsLogAsync`, `DeleteContactDetailsLogAsync` im `IEasyVereinApiClient` und `EasyVereinApiClient`
+- [x] **MCP-Tools:** `ContactDetailsLogTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
+- [x] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
+- [x] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
+- [x] **Tests:** Unit-Tests für Entity, API-Client und Tools nach TDD (Red-Green-Refactor)
 
 ## Aufgaben
 
@@ -42,3 +42,7 @@
 - Pagination: `?limit=100`, automatisch `next`-URL folgen
 - Architektur konsistent mit bestehenden Entities
 - Priorität: **Mittel**
+- FK-Felder `creator`/`relatedAddress`: `long?` mit neuem `FlexibleIdConverter` (liest Number oder URL-String → ID via `UrlReference.ExtractId`, schreibt Integer)
+- `date` nutzt `FlexibleDateTimeConverter`
+
+**Status:** ✅ Implementiert auf Branch `feature/US-0017-contact-details-log` (TDD). +17 Tests (8 Domain inkl. 6 `FlexibleIdConverter`, 9 Infrastructure), gesamt 213 grün.
