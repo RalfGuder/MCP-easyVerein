@@ -39,4 +39,6 @@
 - Architektur konsistent mit bestehenden Entities
 - Priorität: **Mittel**
 
-**Status:** ✅ Implementiert auf Branch `feature/US-0018-custom-field` (TDD). +11 Tests (2 Domain + 9 Infrastructure), gesamt 224 grün. Live-Verifikation ausstehend (Server-Reconnect).
+**Status:** ✅ Implementiert (TDD) + live verifiziert (CRUD vollständig). +11 Tests (2 Domain + 9 Infrastructure), gesamt 224 grün.
+
+**Live-Erkenntnis (yaml ungenau):** `settings_type`/`kind` akzeptieren nur **lowercase**-Codes (`t`, `e` etc.; capitalized → HTTP 400).

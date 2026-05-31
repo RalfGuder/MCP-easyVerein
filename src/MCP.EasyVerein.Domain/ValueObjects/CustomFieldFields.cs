@@ -15,10 +15,10 @@ internal static class CustomFieldFields
     /// <summary>API field name for the short label (max 4 characters; required for groups only, must be unique).</summary>
     internal const string Short = "short";
 
-    /// <summary>API field name for the field type code (max 1 char; e.g. 'T','F','Z','D','C','R','S','A','B','M'; default 'T').</summary>
+    /// <summary>API field name for the field type code (max 1 char, lowercase; e.g. 't','f','z','d','c','r','s','a','b','m'; default 't'; API rejects capitalized values).</summary>
     internal const string SettingsType = "settings_type";
 
-    /// <summary>API field name for the kind code (max 2 chars; for custom fields: 'E'=members, 'H'=events, 'J'=contact-details, 'I'=inventory).</summary>
+    /// <summary>API field name for the kind code (max 2 chars, lowercase; for custom fields: 'e'=members, 'h'=events, 'j'=contact-details, 'i'=inventory; API rejects capitalized values).</summary>
     internal const string Kind = "kind";
 
     /// <summary>API field name for the description (max 124 characters).</summary>
