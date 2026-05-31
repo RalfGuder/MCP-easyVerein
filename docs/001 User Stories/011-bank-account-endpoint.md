@@ -1,6 +1,6 @@
 # User Story 011: Bank-Account-Endpoint implementieren
 
-> **GitHub Issue:** [#18 – US-0011 Bank-Account-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/18)
+> **GitHub Issue:** [#18 – US-0011 Bank-Account-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/18) — ✅ geschlossen (2026-05-31)
 
 ## User Story
 
@@ -43,4 +43,4 @@
 - Architektur konsistent mit bestehenden Entities
 - Priorität: **Mittel**
 
-**Status:** Implementiert am 2026-04-20 auf Branch `feature/US-0011-bank-account-endpoint`.
+**Status:** ✅ Abgeschlossen. Implementiert am 2026-04-20 auf Branch `feature/US-0011-bank-account-endpoint`, in `main` gemergt. Issue #18 am 2026-05-31 geschlossen (Code-verifiziert vollständig).
