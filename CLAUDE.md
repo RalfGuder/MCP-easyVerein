@@ -87,22 +87,23 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 
-### Implementierte Endpoints (12)
+### Implementierte Endpoints (13)
 
-| Endpoint       | User Story | MCP-Tools                                                |
-|----------------|------------|----------------------------------------------------------|
-| Member         | US-0001    | list, get, create, update (PATCH), delete                |
-| ContactDetails | US-0001    | list, get, create, update (PATCH), delete                |
-| Invoice        | US-0001, US-0061 | list, get, create, update (PATCH), delete, create_receipt |
-| Event          | US-0001    | list, get, create, update (PATCH), delete                |
-| Booking        | US-0009    | list, get, create, update (PATCH), delete                |
-| Calendar       | US-0014    | list, get, create, update (PATCH), delete                |
-| Announcement   | US-0010    | list, get, create, update (PATCH), delete                |
-| BankAccount    | US-0011    | list, get, create, update (PATCH), delete                |
-| BillingAccount | US-0012    | list, get, create, update (PATCH), delete                |
-| BookingProject | US-0013    | list, get, create, update (PATCH), delete                |
-| ChairmanLevel  | US-0015    | list, get, create, update (PATCH), delete                |
-| InvoiceItem    | US-0028    | list, get, create, update (PATCH), delete                |
+| Endpoint            | User Story | MCP-Tools                                                |
+|---------------------|------------|----------------------------------------------------------|
+| Member              | US-0001    | list, get, create, update (PATCH), delete                |
+| ContactDetails      | US-0001    | list, get, create, update (PATCH), delete                |
+| Invoice             | US-0001, US-0061 | list, get, create, update (PATCH), delete, create_receipt |
+| Event               | US-0001    | list, get, create, update (PATCH), delete                |
+| Booking             | US-0009    | list, get, create, update (PATCH), delete                |
+| Calendar            | US-0014    | list, get, create, update (PATCH), delete                |
+| Announcement        | US-0010    | list, get, create, update (PATCH), delete                |
+| BankAccount         | US-0011    | list, get, create, update (PATCH), delete                |
+| BillingAccount      | US-0012    | list, get, create, update (PATCH), delete                |
+| BookingProject      | US-0013    | list, get, create, update (PATCH), delete                |
+| ChairmanLevel       | US-0015    | list, get, create, update (PATCH), delete                |
+| ContactDetailsGroup | US-0016    | list, get, create, update (PATCH), delete                |
+| InvoiceItem        | US-0028    | list, get, create, update (PATCH), delete                |
 
 ### HTTP-Methoden in der easyVerein API v1.7
 
@@ -113,16 +114,16 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Nächste anstehende Endpoints
 
-- US-0016: Contact Details Group
 - US-0017: Contact Details Log
+- US-0018: Custom Field
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (65)
+- **Domain.Tests** — Entity- und Value-Object-Tests (85)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (43)
-- **Server.Tests** — noch leer (Platzhalter)
-- **Gesamt: 130 Tests** (US-0015 bringt +9, Regressions-Test `Constructor_SetsAuthorizationHeader` aus dem v2-Support ist rot und wartet auf separaten Fix)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (90)
+- **Server.Tests** — Tool-Tests (8)
+- **Gesamt: 196 Tests** (US-0016 bringt +11: 2 Domain + 9 Infrastructure)
 
 ## Repository
 
