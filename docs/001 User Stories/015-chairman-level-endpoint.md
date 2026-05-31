@@ -1,6 +1,6 @@
 # User Story 015: Chairman-Level-Endpoint implementieren
 
-> **GitHub Issue:** [#22 – US-0015 Chairman-Level-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/22)
+> **GitHub Issue:** [#22 – US-0015 Chairman-Level-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/22) — ✅ geschlossen (2026-05-31)
 
 ## User Story
 
@@ -42,3 +42,5 @@
 - Pagination: `?limit=100`, automatisch `next`-URL folgen
 - Architektur konsistent mit bestehenden Entities
 - Priorität: **Mittel**
+
+**Status:** ✅ Abgeschlossen. Implementiert (PR #78 @ 95007c7), in `main`. Issue #22 am 2026-05-31 geschlossen (Code-verifiziert: Entity/Fields/Query/ApiClient/Tools, `Program.cs:66`).
