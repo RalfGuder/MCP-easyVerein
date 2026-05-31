@@ -1,6 +1,6 @@
 # User Story 017: Contact-Details-Log-Endpoint implementieren
 
-> **GitHub Issue:** [#24 – US-0017 Contact-Details-Log-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/24)
+> **GitHub Issue:** [#24 – US-0017 Contact-Details-Log-Endpoint implementieren](https://github.com/RalfGuder/MCP-easyVerein/issues/24) — ✅ geschlossen (2026-05-31)
 
 ## User Story
 
@@ -45,4 +45,6 @@
 - FK-Felder `creator`/`relatedAddress`: `long?` mit neuem `FlexibleIdConverter` (liest Number oder URL-String → ID via `UrlReference.ExtractId`, schreibt Integer)
 - `date` nutzt `FlexibleDateTimeConverter`
 
-**Status:** ✅ Implementiert auf Branch `feature/US-0017-contact-details-log` (TDD). +17 Tests (8 Domain inkl. 6 `FlexibleIdConverter`, 9 Infrastructure), gesamt 213 grün.
+**Status:** ✅ Abgeschlossen. Implementiert (TDD), live verifiziert, in `main` gemergt (PR #107, `be50fa1`), Issue #24 geschlossen. +17 Tests (8 Domain inkl. 6 `FlexibleIdConverter`, 9 Infrastructure), gesamt 213 grün.
+
+**Live-Erkenntnisse (yaml ungenau):** `kind` akzeptiert nur lowercase-Werte (`custom` etc.; capitalized → HTTP 400). PATCH erlaubt bei bereits erstellten Logs nur das `shared`-Attribut.
