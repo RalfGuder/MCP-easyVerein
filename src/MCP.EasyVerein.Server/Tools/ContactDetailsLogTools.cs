@@ -57,7 +57,7 @@ public sealed class ContactDetailsLogTools(IEasyVereinApiClient client)
     /// <summary>Creates a new contact-details log in easyVerein.</summary>
     [McpServerTool(Name = "create_contact_details_log"), Description("Create a new contact-details log entry")]
     public async Task<string> CreateContactDetailsLog(
-        [Description("Kind of log (e.g. 'Balance', 'Custom', 'Membership', 'Email', 'Dsgvo', 'Articles'; default 'Custom')")] string? kind,
+        [Description("Kind of log, lowercase: 'balance', 'custom', 'membership', 'email', 'dsgvo', 'articles' (default 'custom'). Note: the API rejects capitalized values.")] string? kind,
         [Description("Related address ID (foreign key to contact-details)")] long? relatedAddress,
         [Description("Related file path (max 360 chars)")] string? relatedFile,
         [Description("Date and time of the event (ISO-8601)")] string? date,
@@ -84,8 +84,8 @@ public sealed class ContactDetailsLogTools(IEasyVereinApiClient client)
         }
     }
 
-    /// <summary>Updates an existing contact-details log (PATCH — only provided fields are changed).</summary>
-    [McpServerTool(Name = "update_contact_details_log"), Description("Update a contact-details log (only provided fields are changed)")]
+    /// <summary>Updates an existing contact-details log (PATCH — only provided fields are changed). Note: the API only allows changing the 'shared' attribute on already-created log events; other fields are rejected with HTTP 400.</summary>
+    [McpServerTool(Name = "update_contact_details_log"), Description("Update a contact-details log. Note: easyVerein only permits changing the 'shared' attribute on existing logs — other fields are rejected.")]
     public async Task<string> UpdateContactDetailsLog(
         [Description("The ID of the contact-details log to update")] long id,
         [Description("New kind of log")] string? kind,

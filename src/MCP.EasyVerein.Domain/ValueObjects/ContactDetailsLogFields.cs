@@ -12,7 +12,7 @@ internal static class ContactDetailsLogFields
     /// <summary>API field name for the creator's display name (read-only, max 600 characters).</summary>
     internal const string CreatorName = "creatorName";
 
-    /// <summary>API field name for the kind of log (max 20 chars; e.g. 'Balance', 'Custom', 'Membership', 'Email', 'Dsgvo', 'Articles'; default 'Custom').</summary>
+    /// <summary>API field name for the kind of log (max 20 chars; lowercase values: 'balance', 'custom', 'membership', 'email', 'dsgvo', 'articles'; default 'custom'). The API rejects capitalized values.</summary>
     internal const string Kind = "kind";
 
     /// <summary>API field name for the related address (foreign key to contact-details).</summary>
