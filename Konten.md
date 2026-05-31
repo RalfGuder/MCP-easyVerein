@@ -176,6 +176,7 @@
 | 4406 | Spieleabend - Ausgaben: Sonstige Ausgaben |
 | 4500 | Dartabend – Gesellige Veranstaltungen |
 | 4502 | Dartabend - Einnahmen: Erlös Speisen/Getränke |
+| 4504 | Dartabend - Ausgaben: Wareneinkauf |
 | 4600 | Obstblütenfest – Gesellige Veranstaltungen |
 | 4700 | Vatertag – Gesellige Veranstaltungen |
 | 4701 | Vatertag – Einnahmen: Eintrittsgelder |
