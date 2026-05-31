@@ -615,6 +615,82 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<ContactDetailsGroup>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Contact-Details Logs
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new contact-details log via the API.</summary>
+    /// <param name="log">The contact-details log to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="ContactDetailsLog"/> as returned by the API.</returns>
+    public async Task<ContactDetailsLog> CreateContactDetailsLogAsync(ContactDetailsLog log, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("contact-details-log"), BuildJsonContent(log), ct), ct);
+        return await HandleResponse<ContactDetailsLog>(response, ct);
+    }
+
+    /// <summary>Deletes a contact-details log by ID.</summary>
+    /// <param name="id">The contact-details log ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteContactDetailsLogAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"contact-details-log/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single contact-details log by ID.</summary>
+    /// <param name="id">The contact-details log ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The contact-details log, or <c>null</c> if not found.</returns>
+    public async Task<ContactDetailsLog?> GetContactDetailsLogAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"contact-details-log/{id}", ContactDetailsLogQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<ContactDetailsLog>(response, ct);
+    }
+
+    /// <summary>Lists contact-details logs with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="date">Optional exact-date filter.</param>
+    /// <param name="dateGte">Optional date greater-or-equal filter.</param>
+    /// <param name="dateLte">Optional date less-or-equal filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching contact-details logs.</returns>
+    public async Task<IReadOnlyList<ContactDetailsLog>> ListContactDetailsLogsAsync(
+        string? idIn = null, string? date = null, string? dateGte = null,
+        string? dateLte = null, string? ordering = null, CancellationToken ct = default)
+    {
+        var query = new ContactDetailsLogQuery
+        {
+            IdIn = idIn,
+            Date = date,
+            DateGte = dateGte,
+            DateLte = dateLte,
+            Ordering = ordering
+        };
+
+        return await HandleListResponseWithPagination<ContactDetailsLog>(
+            BuildListUrl("contact-details-log", query.ToString()), ct);
+    }
+
+    /// <summary>Updates a contact-details log with PATCH semantics.</summary>
+    /// <param name="id">The contact-details log ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="ContactDetailsLog"/> as returned by the API.</returns>
+    public async Task<ContactDetailsLog> UpdateContactDetailsLogAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"contact-details-log/{id}"), content, ct), ct);
+        return await HandleResponse<ContactDetailsLog>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
