@@ -1786,6 +1786,195 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Custom Fields
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListCustomFields_ReturnsCustomFields()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Lieblingsfarbe",
+                    settings_type = "T",
+                    kind = "E",
+                    member_show = true,
+                    collection = "https://easyverein.com/api/v2.0/custom-field-collection/777"
+                }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListCustomFieldsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Lieblingsfarbe", result[0].Name);
+        Assert.Equal("T", result[0].SettingsType);
+        Assert.Equal("E", result[0].Kind);
+        Assert.True(result[0].MemberShow);
+        Assert.Equal(777L, result[0].Collection);
+    }
+
+    [Fact]
+    public async Task ListCustomFields_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = Array.Empty<object>(),
+            next = (string?)null
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCustomFieldsAsync(
+            idIn: "1,2,3",
+            name: "Farbe",
+            settingsType: "T",
+            memberShow: true,
+            collection: "777",
+            ordering: "name");
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.Contains("id__in=1%2C2%2C3", query);
+        Assert.Contains("name=Farbe", query);
+        Assert.Contains("settings_type=T", query);
+        Assert.Contains("member_show=true", query);
+        Assert.Contains("collection=777", query);
+        Assert.Contains("ordering=name", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task GetCustomField_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetCustomFieldAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateCustomField_PostsEntityAndReturnsCreated()
+    {
+        var createdJson = JsonSerializer.Serialize(new
+        {
+            id = 123,
+            name = "Lieblingsfarbe",
+            settings_type = "T",
+            kind = "E"
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateCustomFieldAsync(new CustomField
+        {
+            Name = "Lieblingsfarbe",
+            SettingsType = "T",
+            Kind = "E"
+        });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal("Lieblingsfarbe", created.Name);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/custom-field", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task UpdateCustomField_SendsPatchDictionary()
+    {
+        var updatedJson = JsonSerializer.Serialize(new
+        {
+            id = 5,
+            name = "Umbenannt"
+        });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object>
+        {
+            ["name"] = "Umbenannt"
+        };
+        var updated = await client.UpdateCustomFieldAsync(5, patch);
+
+        Assert.Equal("Umbenannt", updated.Name);
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-field/5", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task DeleteCustomField_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteCustomFieldAsync(42);
+
+        Assert.NotNull(handler.LastRequestUri);
+        Assert.EndsWith("/custom-field/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListCustomFields_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListCustomFieldsAsync());
+    }
+
+    [Fact]
+    public async Task GetCustomField_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "Farbe" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListCustomFieldsAsync(
+            name: "Farbe",
+            settingsType: "T",
+            idIn: "1,2",
+            ordering: "name");
+        await client.GetCustomFieldAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/custom-field/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("settings_type=", query);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateCustomField_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"name\":\"Y\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateCustomFieldAsync(new CustomField { Name = "Y" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as

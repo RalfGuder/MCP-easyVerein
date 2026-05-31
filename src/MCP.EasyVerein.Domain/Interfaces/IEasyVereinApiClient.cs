@@ -302,6 +302,53 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteContactDetailsLogAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists all custom fields, optionally filtered.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="color">Optional color filter (exact match).</param>
+    /// <param name="kind">Optional kind-code filter.</param>
+    /// <param name="settingsType">Optional field-type filter.</param>
+    /// <param name="settingsTypeIn">Optional comma-separated list of field types filter.</param>
+    /// <param name="memberEdit">Optional editable-in-member-area filter.</param>
+    /// <param name="memberShow">Optional show-in-member-area filter.</param>
+    /// <param name="deleted">Optional soft-delete filter.</param>
+    /// <param name="collection">Optional collection (tab/group) ID filter.</param>
+    /// <param name="collectionIsnull">Optional no-collection filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms (allowed fields: name, color, short).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching custom fields.</returns>
+    Task<IReadOnlyList<CustomField>> ListCustomFieldsAsync(
+        string? idIn = null, string? name = null, string? color = null, string? kind = null,
+        string? settingsType = null, string? settingsTypeIn = null, bool? memberEdit = null,
+        bool? memberShow = null, bool? deleted = null, string? collection = null,
+        bool? collectionIsnull = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single custom field by ID.</summary>
+    /// <param name="id">The custom-field ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The custom field, or <c>null</c> if not found.</returns>
+    Task<CustomField?> GetCustomFieldAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new custom field.</summary>
+    /// <param name="field">The custom field to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created custom field.</returns>
+    Task<CustomField> CreateCustomFieldAsync(CustomField field, CancellationToken ct = default);
+
+    /// <summary>Partially updates a custom field (PATCH semantics).</summary>
+    /// <param name="id">The custom-field ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated custom field.</returns>
+    Task<CustomField> UpdateCustomFieldAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a custom field by ID.</summary>
+    /// <param name="id">The custom-field ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteCustomFieldAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

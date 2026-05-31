@@ -691,6 +691,101 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<ContactDetailsLog>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Custom Fields
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new custom field via the API.</summary>
+    /// <param name="field">The custom field to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="CustomField"/> as returned by the API.</returns>
+    public async Task<CustomField> CreateCustomFieldAsync(CustomField field, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("custom-field"), BuildJsonContent(field), ct), ct);
+        return await HandleResponse<CustomField>(response, ct);
+    }
+
+    /// <summary>Deletes a custom field by ID.</summary>
+    /// <param name="id">The custom-field ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteCustomFieldAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"custom-field/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single custom field by ID.</summary>
+    /// <param name="id">The custom-field ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The custom field, or <c>null</c> if not found.</returns>
+    public async Task<CustomField?> GetCustomFieldAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"custom-field/{id}", CustomFieldQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<CustomField>(response, ct);
+    }
+
+    /// <summary>Lists custom fields with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="color">Optional color filter (exact match).</param>
+    /// <param name="kind">Optional kind-code filter.</param>
+    /// <param name="settingsType">Optional field-type filter.</param>
+    /// <param name="settingsTypeIn">Optional comma-separated list of field types filter.</param>
+    /// <param name="memberEdit">Optional editable-in-member-area filter.</param>
+    /// <param name="memberShow">Optional show-in-member-area filter.</param>
+    /// <param name="deleted">Optional soft-delete filter.</param>
+    /// <param name="collection">Optional collection (tab/group) ID filter.</param>
+    /// <param name="collectionIsnull">Optional no-collection filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms (allowed fields: name, color, short).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching custom fields.</returns>
+    public async Task<IReadOnlyList<CustomField>> ListCustomFieldsAsync(
+        string? idIn = null, string? name = null, string? color = null, string? kind = null,
+        string? settingsType = null, string? settingsTypeIn = null, bool? memberEdit = null,
+        bool? memberShow = null, bool? deleted = null, string? collection = null,
+        bool? collectionIsnull = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        var query = new CustomFieldQuery
+        {
+            IdIn = idIn,
+            Name = name,
+            Color = color,
+            Kind = kind,
+            SettingsType = settingsType,
+            SettingsTypeIn = settingsTypeIn,
+            MemberEdit = memberEdit,
+            MemberShow = memberShow,
+            Deleted = deleted,
+            Collection = collection,
+            CollectionIsnull = collectionIsnull,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<CustomField>(
+            BuildListUrl("custom-field", query.ToString()), ct);
+    }
+
+    /// <summary>Updates a custom field with PATCH semantics.</summary>
+    /// <param name="id">The custom-field ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="CustomField"/> as returned by the API.</returns>
+    public async Task<CustomField> UpdateCustomFieldAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"custom-field/{id}"), content, ct), ct);
+        return await HandleResponse<CustomField>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
