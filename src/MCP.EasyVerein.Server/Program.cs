@@ -66,6 +66,7 @@ builder.Services
     .WithTools<ChairmanLevelTools>()
     .WithTools<ContactDetailsGroupTools>()
     .WithTools<ContactDetailsLogTools>()
+    .WithTools<CustomFieldTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 
