@@ -136,6 +136,10 @@
 | 3204 | Dorffest – Ausgaben: Bühne |
 | 3205 | Dorffest – Ausgaben: Künstler |
 | 3206 | Dorffest – Ausgaben: Sonstige Ausgaben |
+| 3210 | Stadtfest – Kultur |
+| 3211 | Stadtfest – Einnahmen: Eintrittsgelder |
+| 3212 | Stadtfest – Einnahmen: Sonstige Einnahmen |
+| 3216 | Stadtfest – Ausgaben: Sonstige Ausgaben |
 | 3300 | Helloween – Kultur |
 | 3400 | Spieleabend – Kultur |
 | 3500 | Dartabend – Kultur |
