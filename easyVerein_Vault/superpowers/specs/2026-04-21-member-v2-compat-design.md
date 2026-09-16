@@ -3,7 +3,7 @@
 **Datum:** 2026-04-21
 **Sub-Projekt:** 2 von 10 der v2.0-Migration (SP 1 in PR #70 bereits gemergt)
 **User Story:** US-0057 (anzulegen)
-**Vorgänger-Spec:** `docs/superpowers/specs/2026-04-21-api-v2-support-design.md`
+**Vorgänger-Spec:** `easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md`
 
 ---
 
@@ -79,7 +79,7 @@ Dual-Format durch zwei neue `JsonConverter` + eine Typ-Änderung. Das im Projekt
 | 6 | `tests/MCP.EasyVerein.Domain.Tests/MemberEntityTests.cs` | **Modify**: zwei neue Tests, die die realen Sample-Responses (v1.7 + v2.0) gegen dieselbe `Member`-Klasse parsen. |
 | 7 | `tests/MCP.EasyVerein.Domain.Tests/Fixtures/member/member-v1.7.json` | **Neu** (Fixture aus realem Smoke-Test) |
 | 8 | `tests/MCP.EasyVerein.Domain.Tests/Fixtures/member/member-v2.0.json` | **Neu** (Fixture aus realem Smoke-Test) |
-| 9 | `docs/001 User Stories/057-member-v2-compat.md` | **Neu** |
+| 9 | `easyVerein_Vault/001 User Stories/057-member-v2-compat.md` | **Neu** |
 
 ## Breaking-Change-Analyse
 
@@ -89,8 +89,8 @@ Ausgangspunkt: `Member.ChairmanPermissionGroup` wechselt Typ von `int?` zu `stri
 
 - `src/MCP.EasyVerein.Domain/Entities/Member.cs` (wird in diesem SP geändert)
 - `src/MCP.EasyVerein.Domain/ValueObjects/MemberFields.cs` (Field-Konstante, bleibt)
-- `docs/005 SuperPowers/plans/2026-04-03-api-feldmapping.md` (Doku, nicht Code)
-- `docs/005 SuperPowers/specs/2026-04-03-api-feldmapping-design.md` (Doku, nicht Code)
+- `easyVerein_Vault/005 SuperPowers/plans/2026-04-03-api-feldmapping.md` (Doku, nicht Code)
+- `easyVerein_Vault/005 SuperPowers/specs/2026-04-03-api-feldmapping-design.md` (Doku, nicht Code)
 
 **Keine Tests, keine Server-Tools, kein HTTP-Client** greifen auf das Feld zu. Blast-Radius = null; Typwechsel ist gefahrlos.
 
@@ -114,7 +114,7 @@ Ausgangspunkt: `Member.ChairmanPermissionGroup` wechselt Typ von `int?` zu `stri
 - [ ] Alle bestehenden Tests in Domain/Application/Infrastructure bleiben grün.
 - [ ] Coverage ≥ 70 %.
 - [ ] GitHub-Issue **US-0057** angelegt, verlinkt mit User-Story-Markdown.
-- [ ] User-Story-Markdown `docs/001 User Stories/057-member-v2-compat.md` existiert und verlinkt auf Issue.
+- [ ] User-Story-Markdown `easyVerein_Vault/001 User Stories/057-member-v2-compat.md` existiert und verlinkt auf Issue.
 - [ ] CLAUDE.md-Projektstatus ggf. angepasst (neuer User-Story-Count).
 
 ## Branch / PR

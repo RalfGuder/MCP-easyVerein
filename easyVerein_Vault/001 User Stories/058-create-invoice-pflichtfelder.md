@@ -10,7 +10,7 @@
 
 ## Ausgangslage
 
-Das aktuelle Tool `create_invoice` (`src/MCP.EasyVerein.Server/Tools/InvoiceTools.cs:66`) akzeptiert nur vier Parameter (`invoiceNumber`, `totalPrice`, `description`, `kind`). Laut OpenAPI-Spezifikation (`docs/api/easyverein-v2.0.yaml` Z. 22140–22326) nimmt der Endpunkt `POST /api/v2.0/invoice` jedoch über 30 Felder entgegen. Für typische Workflows fehlen u.a. die Felder für Referenznummer, Zahlungsinformation, Mahnstufe und DATEV-Nummern.
+Das aktuelle Tool `create_invoice` (`src/MCP.EasyVerein.Server/Tools/InvoiceTools.cs:66`) akzeptiert nur vier Parameter (`invoiceNumber`, `totalPrice`, `description`, `kind`). Laut OpenAPI-Spezifikation (`easyVerein_Vault/api/easyverein-v2.0.yaml` Z. 22140–22326) nimmt der Endpunkt `POST /api/v2.0/invoice` jedoch über 30 Felder entgegen. Für typische Workflows fehlen u.a. die Felder für Referenznummer, Zahlungsinformation, Mahnstufe und DATEV-Nummern.
 
 ## Akzeptanzkriterien
 

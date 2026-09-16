@@ -8,7 +8,7 @@
 
 **Tech Stack:** C# / .NET 8, xUnit, System.Text.Json, ModelContextProtocol SDK
 
-**Spec:** `docs/005 SuperPowers/specs/2026-04-04-booking-endpoint-design.md`
+**Spec:** `easyVerein_Vault/005 SuperPowers/specs/2026-04-04-booking-endpoint-design.md`
 
 ---
 

@@ -8,7 +8,7 @@
 
 **Tech Stack:** C# / .NET 8, System.Text.Json, ModelContextProtocol.Server, xUnit
 
-**Spec:** `docs/004 SuperPowers/specs/2026-04-03-api-feldmapping-design.md`
+**Spec:** `easyVerein_Vault/004 SuperPowers/specs/2026-04-03-api-feldmapping-design.md`
 
 ---
 

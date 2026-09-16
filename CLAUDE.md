@@ -20,7 +20,7 @@ Lizenz: MIT.
 
 ## User Stories
 
-- Jede User Story wird als GitHub Issue **und** als Markdown-Dokument unter `docs/user stories/` gepflegt
+- Jede User Story wird als GitHub Issue **und** als Markdown-Dokument unter `easyVerein_Vault/001 User Stories/` gepflegt
 - Dateiname: `XXX-kurzbeschreibung.md` (z.B. `001-easyverein-mcp-server.md`)
 - Issue und Dokument sind **gegenseitig verlinkt**
 - Format:
@@ -134,4 +134,4 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Daily Notes
 
-Projektnotizen werden unter `docs/006 Daily Notes/YYYY-MM-DD.md` abgelegt (Markdown, Obsidian-kompatibel). Beim Tagesabschluss: Status, gemergeter PRs, neue Buchungsregeln, identifizierte Bugs, nächste Schritte zusammenfassen.
+Projektnotizen werden unter `easyVerein_Vault/006 Daily Notes/YYYY-MM-DD.md` abgelegt (Markdown, Obsidian-kompatibel). Beim Tagesabschluss: Status, gemergeter PRs, neue Buchungsregeln, identifizierte Bugs, nächste Schritte zusammenfassen.

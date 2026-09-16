@@ -421,7 +421,7 @@ FodyWeavers.xsd
 .claude/settings.local.json
 
 # Obsidian
-docs/.obsidian/
+easyVerein_Vault/.obsidian/
 
 # Local MCP config (contains secrets)
 .mcp.json

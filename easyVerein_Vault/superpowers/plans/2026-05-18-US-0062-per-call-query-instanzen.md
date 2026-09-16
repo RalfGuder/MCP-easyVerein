@@ -1114,4 +1114,4 @@ Nach Abschluss aller Tasks, vor PR-Merge:
 3. **No leftovers:** `grep -rn "ApiQueries" src/` → leer. `grep -rn "ApiQueries" tests/` → leer (außer evtl. historische Kommentare).
 4. **Konvention CLAUDE.md:** Alle Members (auch private) haben englische XML-Doc-Kommentare. Neue Tests sind im bestehenden flachen Folder (kein neuer Subfolder).
 5. **Branch-Discipline (Memory):** PR enthält ausschließlich US-0062-Refactor. Keine orthogonalen CI/Docs/Skill-Files dabei. Vor jedem `git add`/`git commit` prüfen mit `git status --short`.
-6. **Daily Note 2026-05-18:** PR-Eintrag in `docs/006 Daily Notes/2026-05-18.md` nach Merge ergänzen.
+6. **Daily Note 2026-05-18:** PR-Eintrag in `easyVerein_Vault/006 Daily Notes/2026-05-18.md` nach Merge ergänzen.

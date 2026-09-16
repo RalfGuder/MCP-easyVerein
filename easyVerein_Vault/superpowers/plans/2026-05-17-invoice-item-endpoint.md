@@ -867,7 +867,7 @@ git commit -m "feat(invoice-item): Server — MCP tools (US-0028)"
 
 **Files:**
 - Modify: `CLAUDE.md`
-- Modify: `docs/001 User Stories/028-invoice-item-endpoint.md` (mark closed)
+- Modify: `easyVerein_Vault/001 User Stories/028-invoice-item-endpoint.md` (mark closed)
 
 - [ ] **Step 1: Update CLAUDE.md endpoint table**
 
@@ -881,12 +881,12 @@ In the "Nächste anstehende Endpoints" section, **remove** US-0028 if it appears
 
 - [ ] **Step 2: Mark user story doc as done**
 
-Open `docs/001 User Stories/028-invoice-item-endpoint.md`. Tick all acceptance-criteria checkboxes (`- [ ]` → `- [x]`).
+Open `easyVerein_Vault/001 User Stories/028-invoice-item-endpoint.md`. Tick all acceptance-criteria checkboxes (`- [ ]` → `- [x]`).
 
 - [ ] **Step 3: Commit docs**
 
 ```bash
-git add CLAUDE.md "docs/001 User Stories/028-invoice-item-endpoint.md"
+git add CLAUDE.md "easyVerein_Vault/001 User Stories/028-invoice-item-endpoint.md"
 git commit -m "docs(invoice-item): Status auf 12 Endpoints, US-0028 abgeschlossen"
 ```
 

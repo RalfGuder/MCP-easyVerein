@@ -48,7 +48,7 @@ EasyVereinConfiguration.FromEnvironment / FromConfiguration
 | 1 | `src/MCP.EasyVerein.Domain/ValueObjects/ApiVersion.cs` | `_supportedVersions`-Literal um `"v2.0"` erweitern. `DefaultVersion` bleibt `"v1.7"`. |
 | 2 | `tests/MCP.EasyVerein.Domain.Tests/ApiVersionTests.cs` | Zwei neue Tests: `SupportedVersions_Contains_V20`, `Create_WithV20_Succeeds`. |
 | 3 | `CLAUDE.md` | "Unterstützt: v1.4, v1.5, v1.6, v1.7 (Default: v1.7)" → "Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v1.7)". |
-| 4 | `docs/001 User Stories/056-api-version-v2.md` | Neue User-Story-Markdown im Projektformat. |
+| 4 | `easyVerein_Vault/001 User Stories/056-api-version-v2.md` | Neue User-Story-Markdown im Projektformat. |
 
 Existierende Tests bleiben unverändert: `Default_Is_V17`, `Create_WithSupportedVersion_Succeeds`, `IsSupported_ReturnsTrueForValid`, `GetVersionedBaseUrl_*` etc. assertieren entweder den Default (bleibt v1.7) oder konkret `v1.7`/`v1.6` — das ist korrekt.
 
@@ -72,7 +72,7 @@ Ziel: ≥ 70 % (Projektvorgabe). Da dieser Change rein additiv in einem bereits 
 - [ ] Zwei neue Tests in `ApiVersionTests` erfasst, beide grün.
 - [ ] `CLAUDE.md` dokumentiert v2.0 als unterstützte Version.
 - [ ] GitHub-Issue `US-0056` angelegt, verlinkt auf die User-Story-Markdown.
-- [ ] User-Story-Datei `docs/001 User Stories/056-api-version-v2.md` existiert und verlinkt auf das GitHub-Issue.
+- [ ] User-Story-Datei `easyVerein_Vault/001 User Stories/056-api-version-v2.md` existiert und verlinkt auf das GitHub-Issue.
 
 ## Branch / PR
 

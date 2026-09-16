@@ -8,5 +8,5 @@
 .dockerignore
 Dockerfile
 README.md
-docs/
+easyVerein_Vault/
 .claude/

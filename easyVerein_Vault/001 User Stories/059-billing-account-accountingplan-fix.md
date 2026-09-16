@@ -18,7 +18,7 @@ Tritt bei jedem Aufruf von `list_billing_accounts` und `get_billing_account` auf
 
 ## Root Cause
 
-`src/MCP.EasyVerein.Infrastructure/ApiClient/BillingAccountQuery.cs:44-56` fragt in der `query=`-Feld-Selection das Feld `accountingPlan` an. Laut v2.0-Spec (`docs/api/easyverein-v2.0.yaml` Z. 6566ff.) und v1.7-Spec existiert `accountingPlan` als Response-Feld **nicht** — nur der Filter `accountingPlan__isnull` ist erlaubt. In v2.0 validiert die API Feldnamen strikt und wirft HTTP 400.
+`src/MCP.EasyVerein.Infrastructure/ApiClient/BillingAccountQuery.cs:44-56` fragt in der `query=`-Feld-Selection das Feld `accountingPlan` an. Laut v2.0-Spec (`easyVerein_Vault/api/easyverein-v2.0.yaml` Z. 6566ff.) und v1.7-Spec existiert `accountingPlan` als Response-Feld **nicht** — nur der Filter `accountingPlan__isnull` ist erlaubt. In v2.0 validiert die API Feldnamen strikt und wirft HTTP 400.
 
 ## Akzeptanzkriterien
 

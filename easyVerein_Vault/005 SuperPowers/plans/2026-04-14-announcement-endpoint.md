@@ -722,7 +722,7 @@ git commit -m "feat(server): add AnnouncementTools MCP tools with CRUD operation
 
 **Files:**
 - Modify: `CLAUDE.md`
-- Modify: `docs/001 User Stories/010-announcement-endpoint.md`
+- Modify: `easyVerein_Vault/001 User Stories/010-announcement-endpoint.md`
 
 - [ ] **Step 1: Update CLAUDE.md**
 
@@ -746,6 +746,6 @@ Expected: All tests PASS
 - [ ] **Step 4: Commit**
 
 ```bash
-git add CLAUDE.md docs/001\ User\ Stories/010-announcement-endpoint.md
+git add CLAUDE.md easyVerein_Vault/001\ User\ Stories/010-announcement-endpoint.md
 git commit -m "docs: update CLAUDE.md and user story with Announcement endpoint status"
 ```

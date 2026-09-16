@@ -28,7 +28,7 @@ Führe folgende Schritte aus:
 
 - Aktualisiere das GitHub Issue mit:
   - User Story
-  - Link zum Dokument: `docs/user stories/XXX-kurzbeschreibung.md`
+  - Link zum Dokument: `easyVerein_Vault/001 User Stories/XXX-kurzbeschreibung.md`
   - Akzeptanzkriterien als Checkliste
   - Aufgaben
   - Technische Hinweise
@@ -36,7 +36,7 @@ Führe folgende Schritte aus:
 
 ## 5. Markdown-Dokument anlegen
 
-- Erstelle `docs/user stories/XXX-kurzbeschreibung.md`
+- Erstelle `easyVerein_Vault/001 User Stories/XXX-kurzbeschreibung.md`
 - Nummerierung: nächste freie Nummer (prüfe vorhandene Dateien)
 - Inhalt identisch zum Issue, mit Link zurück zum GitHub Issue
 - Vorlage:
