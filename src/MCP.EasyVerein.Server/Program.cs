@@ -70,6 +70,7 @@ builder.Services
     .WithTools<CustomFieldCollectionTools>()
     .WithTools<CustomFilterTools>()
     .WithTools<CustomTaxRateTools>()
+    .WithTools<DosbSportTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 
