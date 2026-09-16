@@ -67,6 +67,7 @@ builder.Services
     .WithTools<ContactDetailsGroupTools>()
     .WithTools<ContactDetailsLogTools>()
     .WithTools<CustomFieldTools>()
+    .WithTools<CustomFieldCollectionTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 

@@ -2026,6 +2026,202 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Custom Field Collections
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListCustomFieldCollections_ReturnsCollections()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            results = new[]
+            {
+                new { id = 777, name = "Vereinsdaten", orderSequence = 2, position = 5 }
+            },
+            next = (string?)null
+        });
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListCustomFieldCollectionsAsync();
+
+        Assert.Single(result);
+        Assert.Equal(777L, result[0].Id);
+        Assert.Equal("Vereinsdaten", result[0].Name);
+        Assert.Equal(2, result[0].OrderSequence);
+        Assert.Equal(5, result[0].Position);
+    }
+
+    [Fact]
+    public async Task ListCustomFieldCollections_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCustomFieldCollectionsAsync(
+            idIn: "1,2,3",
+            position: 4,
+            ordering: "-position",
+            search: new[] { "Verein" });
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = handler.LastRequestUri!.Query;
+        Assert.Contains("custom-field-collection", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2%2C3", query);
+        Assert.Contains("position=4", query);
+        Assert.Contains("ordering=-position", query);
+        Assert.Contains("search=Verein", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListCustomFieldCollections_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, name = "A" } },
+            next = "https://easyverein.com/api/v2.0/custom-field-collection?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, name = "B" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListCustomFieldCollectionsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("B", result[1].Name);
+    }
+
+    [Fact]
+    public async Task GetCustomFieldCollection_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetCustomFieldCollectionAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateCustomFieldCollection_PostsEntityAndReturnsCreated()
+    {
+        var createdJson = JsonSerializer.Serialize(new { id = 123, name = "Vereinsdaten", position = 1 });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateCustomFieldCollectionAsync(new CustomFieldCollection
+        {
+            Name = "Vereinsdaten",
+            Position = 1
+        });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal("Vereinsdaten", created.Name);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-field-collection", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("\"name\":\"Vereinsdaten\"", handler.LastRequestBody);
+        Assert.DoesNotContain("orderSequence", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task UpdateCustomFieldCollection_SendsPatchDictionary()
+    {
+        var updatedJson = JsonSerializer.Serialize(new { id = 5, name = "Umbenannt" });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, updatedJson);
+        var client = CreateClient(handler);
+
+        var patch = new Dictionary<string, object> { ["name"] = "Umbenannt" };
+        var updated = await client.UpdateCustomFieldCollectionAsync(5, patch);
+
+        Assert.Equal("Umbenannt", updated.Name);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-field-collection/5", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"name\":\"Umbenannt\"}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task DeleteCustomFieldCollection_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteCustomFieldCollectionAsync(42);
+
+        Assert.Equal(HttpMethod.Delete, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-field-collection/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListCustomFieldCollections_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListCustomFieldCollectionsAsync());
+    }
+
+    [Fact]
+    public async Task GetCustomFieldCollection_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListCustomFieldCollectionsAsync(idIn: "1,2", position: 3, ordering: "name");
+        await client.GetCustomFieldCollectionAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/custom-field-collection/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("id__in=", query);
+        Assert.DoesNotContain("position=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CustomFieldCollection_QuerySelector_RequestsOnlyDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCustomFieldCollectionsAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains("query={id,name,orderSequence,position}", query);
+    }
+
+    [Fact]
+    public async Task CreateCustomFieldCollection_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"name\":\"Y\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateCustomFieldCollectionAsync(new CustomFieldCollection { Name = "Y" });
+
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as

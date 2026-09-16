@@ -349,6 +349,41 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteCustomFieldAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists custom field collections with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="position">Optional position filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching custom field collections.</returns>
+    Task<IReadOnlyList<CustomFieldCollection>> ListCustomFieldCollectionsAsync(
+        string? idIn = null, int? position = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single custom field collection by ID.</summary>
+    /// <param name="id">The custom-field-collection ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The custom field collection, or <c>null</c> if not found.</returns>
+    Task<CustomFieldCollection?> GetCustomFieldCollectionAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new custom field collection.</summary>
+    /// <param name="collection">The custom field collection to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created custom field collection.</returns>
+    Task<CustomFieldCollection> CreateCustomFieldCollectionAsync(CustomFieldCollection collection, CancellationToken ct = default);
+
+    /// <summary>Partially updates a custom field collection (PATCH semantics).</summary>
+    /// <param name="id">The custom-field-collection ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated custom field collection.</returns>
+    Task<CustomFieldCollection> UpdateCustomFieldCollectionAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a custom field collection by ID.</summary>
+    /// <param name="id">The custom-field-collection ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteCustomFieldCollectionAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
