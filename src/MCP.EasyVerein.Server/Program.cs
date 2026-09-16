@@ -71,6 +71,7 @@ builder.Services
     .WithTools<CustomFilterTools>()
     .WithTools<CustomTaxRateTools>()
     .WithTools<DosbSportTools>()
+    .WithTools<FeatureRequestTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 
