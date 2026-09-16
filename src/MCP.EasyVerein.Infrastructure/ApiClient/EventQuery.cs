@@ -58,17 +58,14 @@ internal class EventQuery
                 LocationFields.Id + "," +
                 LocationFields.Name +
             "}," +
-            EventFields.Parent + "," +
             EventFields.MinParticipators + "," +
             EventFields.MaxParticipators + "," +
             EventFields.StartParticipation + "," +
             EventFields.EndParticipation + "," +
             EventFields.Access + "," +
-            EventFields.Weekdays + "," +
             EventFields.SendMailCheck + "," +
             EventFields.ShowMemberArea + "," +
             EventFields.IsPublic + "," +
-            EventFields.MassParticipations + "," +
             EventFields.Canceled + "," +
             EventFields.IsReservation + "," +
             EventFields.Creator + "," +

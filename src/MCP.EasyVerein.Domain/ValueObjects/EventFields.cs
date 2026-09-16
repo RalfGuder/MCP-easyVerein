@@ -23,8 +23,6 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string LocationName = "locationName";
         /// <summary>API field name for the location object reference.</summary>
         public const string LocationObject = "locationObject";
-        /// <summary>API field name for the parent event reference.</summary>
-        public const string Parent = "parent";
         /// <summary>API field name for the minimum number of participants.</summary>
         public const string MinParticipators = "minParticipators";
         /// <summary>API field name for the maximum number of participants.</summary>
@@ -35,16 +33,12 @@ namespace MCP.EasyVerein.Domain.ValueObjects
         public const string EndParticipation = "endParticipation";
         /// <summary>API field name for the event access setting.</summary>
         public const string Access = "access";
-        /// <summary>API field name for the weekdays the event occurs on.</summary>
-        public const string Weekdays = "weekdays";
         /// <summary>API field name for the send mail check flag.</summary>
         public const string SendMailCheck = "sendMailCheck";
         /// <summary>API field name for whether the event is shown in the member area.</summary>
         public const string ShowMemberArea = "showMemberarea";
         /// <summary>API field name for whether the event is public.</summary>
         public const string IsPublic = "isPublic";
-        /// <summary>API field name for mass participations.</summary>
-        public const string MassParticipations = "massParticipations";
         /// <summary>API field name for whether the event is canceled.</summary>
         public const string Canceled = "canceled";
         /// <summary>API field name for whether the event is a reservation.</summary>

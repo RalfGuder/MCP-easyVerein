@@ -70,12 +70,6 @@ public class Event : IHasId
     public Location? LocationObject { get; set; }
 
     /// <summary>
-    /// Gets or sets the parent event ID for recurring events. Maps to API field ' <c>parent</c>'.
-    /// </summary>
-    [JsonPropertyName(EventFields.Parent)]
-    public string? Parent { get; set; }
-
-    /// <summary>
     /// Gets or sets the minimum number of participants. Maps to API field ' <c>minParticipators</c>'.
     /// </summary>
     [JsonPropertyName(EventFields.MinParticipators)] 
@@ -106,12 +100,6 @@ public class Event : IHasId
     public int? Access { get; set; }
 
     /// <summary>
-    /// Gets or sets the weekdays for recurring events. Maps to API field ' <c>weekdays</c>'.
-    /// </summary>
-    [JsonPropertyName(EventFields.Weekdays)] 
-    public string? Weekdays { get; set; }
-
-    /// <summary>
     /// Gets or sets whether a mail notification is sent. Maps to API field ' <c>sendMailCheck</c>'.
     /// </summary>
     [JsonPropertyName(EventFields.SendMailCheck)] 
@@ -128,12 +116,6 @@ public class Event : IHasId
     /// </summary>
     [JsonPropertyName(EventFields.IsPublic)] 
     public bool IsPublic { get; set; }
-
-    /// <summary>
-    /// Gets or sets whether mass participations are enabled. Maps to API field ' <c>massParticipations</c>'.
-    /// </summary>
-    [JsonPropertyName(EventFields.MassParticipations)] 
-    public bool MassParticipations { get; set; }
 
     /// <summary>
     /// Gets or sets whether the event is canceled. Maps to API field ' <c>canceled</c>'.
