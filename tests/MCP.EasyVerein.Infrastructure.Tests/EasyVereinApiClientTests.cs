@@ -2222,6 +2222,212 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Custom Filters
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListCustomFilters_ReturnsFiltersWithRules()
+    {
+        var json = """
+            {
+                "results": [
+                    {
+                        "id": 73383,
+                        "name": "2024",
+                        "model": "bookingFilter",
+                        "rules": {"condition": "AND", "rules": [{"field": "date", "operator": "greater_or_equal", "value": "2024-01-01"}], "valid": true},
+                        "created_at": "2026-05-27T06:23:55.206540+02:00",
+                        "updated_at": "2026-05-27T06:23:55.308413+02:00"
+                    }
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListCustomFiltersAsync();
+
+        Assert.Single(result);
+        Assert.Equal(73383L, result[0].Id);
+        Assert.Equal("bookingFilter", result[0].Model);
+        Assert.Equal("AND", result[0].Rules!.Value.GetProperty("condition").GetString());
+        Assert.NotNull(result[0].CreatedAt);
+    }
+
+    [Fact]
+    public async Task ListCustomFilters_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCustomFiltersAsync(
+            idIn: "1,2",
+            name: "2024",
+            model: "bookingFilter",
+            modelIn: "bookingFilter,userFilter",
+            ordering: "-name",
+            search: new[] { "Saldo" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/custom-filter", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2", query);
+        Assert.Contains("name=2024", query);
+        Assert.Contains("model=bookingFilter", query);
+        Assert.Contains("model__in=bookingFilter%2CuserFilter", query);
+        Assert.Contains("ordering=-name", query);
+        Assert.Contains("search=Saldo", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListCustomFilters_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, name = "A" } },
+            next = "https://easyverein.com/api/v2.0/custom-filter?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, name = "B" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListCustomFiltersAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("B", result[1].Name);
+    }
+
+    [Fact]
+    public async Task CustomFilter_QuerySelector_RequestsDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCustomFiltersAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains("query={id,name,model,rules,created_at,updated_at}", query);
+    }
+
+    [Fact]
+    public async Task GetCustomFilter_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetCustomFilterAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetCustomFilter_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListCustomFiltersAsync(name: "X", model: "userFilter", ordering: "name");
+        await client.GetCustomFilterAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/custom-filter/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("model=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateCustomFilter_PostsRulesAsJsonObject_WithoutTimestamps()
+    {
+        var createdJson = """{"id":123,"name":"Test","model":"bookingFilter","rules":{"condition":"AND","rules":[]}}""";
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+        using var rules = JsonDocument.Parse("""{"condition":"AND","rules":[]}""");
+
+        var created = await client.CreateCustomFilterAsync(new CustomFilter
+        {
+            Name = "Test",
+            Model = "bookingFilter",
+            Rules = rules.RootElement.Clone()
+        });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-filter", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("\"rules\":{\"condition\":\"AND\",\"rules\":[]}", handler.LastRequestBody);
+        Assert.Contains("\"model\":\"bookingFilter\"", handler.LastRequestBody);
+        Assert.DoesNotContain("created_at", handler.LastRequestBody);
+        Assert.DoesNotContain("updated_at", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task CreateCustomFilter_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1,\"name\":\"Y\"}");
+        var client = CreateClient(handler);
+
+        await client.CreateCustomFilterAsync(new CustomFilter { Name = "Y", Model = "userFilter" });
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task UpdateCustomFilter_SendsPatchDictionary()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"id":5,"name":"Umbenannt"}""");
+        var client = CreateClient(handler);
+
+        var updated = await client.UpdateCustomFilterAsync(5, new Dictionary<string, object> { ["name"] = "Umbenannt" });
+
+        Assert.Equal("Umbenannt", updated.Name);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-filter/5", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"name\":\"Umbenannt\"}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task DeleteCustomFilter_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteCustomFilterAsync(42);
+
+        Assert.Equal(HttpMethod.Delete, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-filter/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListCustomFilters_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListCustomFiltersAsync());
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as
