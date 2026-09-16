@@ -786,6 +786,80 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<CustomField>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Custom Field Collections
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new custom field collection via the API.</summary>
+    /// <param name="collection">The custom field collection to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="CustomFieldCollection"/> as returned by the API.</returns>
+    public async Task<CustomFieldCollection> CreateCustomFieldCollectionAsync(CustomFieldCollection collection, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("custom-field-collection"), BuildJsonContent(collection), ct), ct);
+        return await HandleResponse<CustomFieldCollection>(response, ct);
+    }
+
+    /// <summary>Deletes a custom field collection by ID.</summary>
+    /// <param name="id">The custom-field-collection ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteCustomFieldCollectionAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"custom-field-collection/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single custom field collection by ID.</summary>
+    /// <param name="id">The custom-field-collection ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The custom field collection, or <c>null</c> if not found.</returns>
+    public async Task<CustomFieldCollection?> GetCustomFieldCollectionAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"custom-field-collection/{id}", CustomFieldCollectionQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<CustomFieldCollection>(response, ct);
+    }
+
+    /// <summary>Lists custom field collections with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="position">Optional position filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching custom field collections.</returns>
+    public async Task<IReadOnlyList<CustomFieldCollection>> ListCustomFieldCollectionsAsync(
+        string? idIn = null, int? position = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        var query = new CustomFieldCollectionQuery
+        {
+            IdIn = idIn,
+            Position = position,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<CustomFieldCollection>(
+            BuildListUrl("custom-field-collection", query.ToString()), ct);
+    }
+
+    /// <summary>Updates a custom field collection with PATCH semantics.</summary>
+    /// <param name="id">The custom-field-collection ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="CustomFieldCollection"/> as returned by the API.</returns>
+    public async Task<CustomFieldCollection> UpdateCustomFieldCollectionAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"custom-field-collection/{id}"), content, ct), ct);
+        return await HandleResponse<CustomFieldCollection>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
