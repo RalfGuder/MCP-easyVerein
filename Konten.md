@@ -136,6 +136,13 @@
 | 3204 | Dorffest – Ausgaben: Bühne |
 | 3205 | Dorffest – Ausgaben: Künstler |
 | 3206 | Dorffest – Ausgaben: Sonstige Ausgaben |
+| 3210 | Stadtfest – Kultur |
+| 3211 | Stadtfest – Einnahmen: Eintrittsgelder |
+| 3212 | Stadtfest – Einnahmen: Sonstige Einnahmen |
+| 3213 | Stadtfest – Ausgaben: Saal- / Raummiete |
+| 3214 | Stadtfest – Ausgaben: Bühne |
+| 3215 | Stadtfest – Ausgaben: Künstler |
+| 3216 | Stadtfest – Ausgaben: Sonstige Ausgaben |
 | 3300 | Helloween – Kultur |
 | 3400 | Spieleabend – Kultur |
 | 3500 | Dartabend – Kultur |
@@ -143,6 +150,7 @@
 | 3700 | Vatertag – Kultur |
 | 3710 | Frauentag – Kultur |
 | 3720 | Kindertag – Kultur |
+| 3726 | Kindertag – Ausgaben: Sonstige Ausgaben |
 | 3800 | Maler – Kultur |
 | 3801 | Maler -Einnahmen: Eintrittsgelder |
 | 3802 | Maler – Einnahmen: Verkauf Kalender |
