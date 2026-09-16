@@ -2768,6 +2768,232 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Feature Requests (easyVerein product idea board)
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListFeatureRequests_ReturnsRequestsWithAuthor()
+    {
+        var json = """
+            {
+                "results": [
+                    {
+                        "id": 7,
+                        "label": "C107/T47",
+                        "title": "eine eigene App",
+                        "author": {"id": 109, "org": {"id": 23, "short": "admin", "name": "easyVerein Verwaltung"}},
+                        "proVotesCount": 301,
+                        "contraVotesCount": 28,
+                        "status": 3,
+                        "category": 1
+                    }
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListFeatureRequestsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("C107/T47", result[0].Label);
+        Assert.Equal(301, result[0].ProVotesCount);
+        Assert.Equal("admin", result[0].Author!.Org!.Short);
+    }
+
+    [Fact]
+    public async Task ListFeatureRequests_WithUnknownAuthor_DoesNotFail()
+    {
+        var json = """
+            {
+                "results": [
+                    {"id": 1, "title": "A", "author": {"id": 109, "org": {"id": 23, "short": "admin", "name": "easyVerein Verwaltung"}}},
+                    {"id": 26, "title": "B", "author": {"id": "Unbekannt", "org": {"id": "", "short": "", "name": "Unbekannt"}}}
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListFeatureRequestsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal(109L, result[0].Author!.Id);
+        Assert.Null(result[1].Author!.Id);
+    }
+
+    [Fact]
+    public async Task ListFeatureRequests_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListFeatureRequestsAsync(
+            idIn: "1,4",
+            status: "3",
+            category: "10",
+            authorIsme: true,
+            ordering: "-proVotesCount",
+            search: new[] { "DATEV" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/feature-request", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C4", query);
+        Assert.Contains("status=3", query);
+        Assert.Contains("category=10", query);
+        Assert.Contains("author__isme=true", query);
+        Assert.Contains("ordering=-proVotesCount", query);
+        Assert.Contains("search=DATEV", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListFeatureRequests_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, title = "A" } },
+            next = "https://easyverein.com/api/v2.0/feature-request?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, title = "B" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListFeatureRequestsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("B", result[1].Title);
+    }
+
+    [Fact]
+    public async Task FeatureRequest_QuerySelector_RequestsDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListFeatureRequestsAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains(
+            "query={id,label,title,description,response,author,proVotesCount,contraVotesCount,hasVoted,status,approved,date,category}",
+            query);
+    }
+
+    [Fact]
+    public async Task GetFeatureRequest_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetFeatureRequestAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetFeatureRequest_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, title = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListFeatureRequestsAsync(status: "3", category: "10", ordering: "title");
+        await client.GetFeatureRequestAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/feature-request/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("status=", query);
+        Assert.DoesNotContain("category=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateFeatureRequest_PostsOnlyWritableFields()
+    {
+        var createdJson = """{"id":6800,"label":"C6900","title":"T","description":"D","status":0,"category":6}""";
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateFeatureRequestAsync(new FeatureRequest
+        {
+            Title = "T",
+            Description = "D",
+            Category = 6
+        });
+
+        Assert.Equal(6800L, created.Id);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/feature-request", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"title\":\"T\",\"description\":\"D\",\"category\":6}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task CreateFeatureRequest_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateFeatureRequestAsync(new FeatureRequest { Title = "T", Description = "D" });
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Theory]
+    [InlineData(true, "/feature-request/7/voteFor")]
+    [InlineData(false, "/feature-request/7/voteAgainst")]
+    public async Task VoteFeatureRequest_SendsGetToVotePath(bool inFavor, string expectedPath)
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, "{\"ok\":true}");
+        var client = CreateClient(handler);
+
+        var result = await client.VoteFeatureRequestAsync(7, inFavor);
+
+        Assert.Equal(HttpMethod.Get, handler.LastRequestMethod);
+        Assert.EndsWith(expectedPath, handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"ok\":true}", result);
+    }
+
+    [Fact]
+    public async Task VoteFeatureRequest_WithServerError_ThrowsHttpRequestException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.BadRequest, "{\"detail\":\"bereits abgestimmt\"}");
+        var client = CreateClient(handler);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.VoteFeatureRequestAsync(7, true));
+        Assert.Contains("bereits abgestimmt", ex.Message);
+    }
+
+    [Fact]
+    public async Task ListFeatureRequests_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListFeatureRequestsAsync());
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as

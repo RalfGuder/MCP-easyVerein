@@ -487,6 +487,45 @@ public interface IEasyVereinApiClient
     /// <returns>The DOSB sport, or <c>null</c> if not found.</returns>
     Task<DosbSport?> GetDosbSportAsync(long id, CancellationToken ct = default);
 
+    /// <summary>
+    /// Lists entries of the public easyVerein product idea board with optional filters and automatic pagination.
+    /// </summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="status">Optional status code filter.</param>
+    /// <param name="category">Optional category code filter.</param>
+    /// <param name="authorIsme">Optional filter returning only requests authored by the current user.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms (allowed fields: title, description).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching feature requests.</returns>
+    Task<IReadOnlyList<FeatureRequest>> ListFeatureRequestsAsync(
+        string? idIn = null, string? status = null, string? category = null, bool? authorIsme = null,
+        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+
+    /// <summary>Gets a single feature request by ID.</summary>
+    /// <param name="id">The feature-request ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The feature request, or <c>null</c> if not found.</returns>
+    Task<FeatureRequest?> GetFeatureRequestAsync(long id, CancellationToken ct = default);
+
+    /// <summary>
+    /// Submits a new feature request to the public easyVerein idea board. The request is visible to the vendor
+    /// and other organizations and cannot be changed or deleted via the API afterwards.
+    /// </summary>
+    /// <param name="request">The feature request to submit (title and description are required).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created feature request.</returns>
+    Task<FeatureRequest> CreateFeatureRequestAsync(FeatureRequest request, CancellationToken ct = default);
+
+    /// <summary>
+    /// Casts a vote for or against a feature request on the public easyVerein idea board.
+    /// </summary>
+    /// <param name="id">The feature-request ID.</param>
+    /// <param name="inFavor"><c>true</c> to vote in favor, <c>false</c> to vote against.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The raw response body of the API.</returns>
+    Task<string> VoteFeatureRequestAsync(long id, bool inFavor, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
