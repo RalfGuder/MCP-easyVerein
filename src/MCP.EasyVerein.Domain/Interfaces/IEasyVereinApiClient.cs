@@ -384,6 +384,43 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteCustomFieldCollectionAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists custom filters with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional name filter (exact match).</param>
+    /// <param name="model">Optional filter-model filter (e.g. 'bookingFilter').</param>
+    /// <param name="modelIn">Optional comma-separated list of filter models.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms (allowed field: name).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching custom filters.</returns>
+    Task<IReadOnlyList<CustomFilter>> ListCustomFiltersAsync(
+        string? idIn = null, string? name = null, string? model = null, string? modelIn = null,
+        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+
+    /// <summary>Gets a single custom filter by ID.</summary>
+    /// <param name="id">The custom-filter ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The custom filter, or <c>null</c> if not found.</returns>
+    Task<CustomFilter?> GetCustomFilterAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new custom filter.</summary>
+    /// <param name="filter">The custom filter to create (name, model and rules are required by the API).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created custom filter.</returns>
+    Task<CustomFilter> CreateCustomFilterAsync(CustomFilter filter, CancellationToken ct = default);
+
+    /// <summary>Partially updates a custom filter (PATCH semantics).</summary>
+    /// <param name="id">The custom-filter ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch. A rules change must include the model.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated custom filter.</returns>
+    Task<CustomFilter> UpdateCustomFilterAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a custom filter by ID (hard delete, no wastebasket).</summary>
+    /// <param name="id">The custom-filter ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteCustomFilterAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

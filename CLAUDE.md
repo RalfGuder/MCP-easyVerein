@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 
-### Implementierte Endpoints (16)
+### Implementierte Endpoints (17)
 
 | Endpoint            | User Story | MCP-Tools                                                |
 |---------------------|------------|----------------------------------------------------------|
@@ -106,6 +106,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | ContactDetailsLog   | US-0017    | list, get, create, update (PATCH), delete                |
 | CustomField         | US-0018    | list, get, create, update (PATCH), delete                |
 | CustomFieldCollection | US-0019  | list, get, create, update (PATCH), delete                |
+| CustomFilter        | US-0020    | list, get, create, update (PATCH), delete                |
 | InvoiceItem        | US-0028    | list, get, create, update (PATCH), delete                |
 
 ### HTTP-Methoden in der easyVerein API v1.7
@@ -117,15 +118,16 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Nächste anstehende Endpoints
 
-- US-0020: Custom Filter
+- US-0021: Custom Tax Rate
+- US-0022: DOSB Sport
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (98)
+- **Domain.Tests** — Entity- und Value-Object-Tests (101)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (128)
-- **Server.Tests** — Tool-Tests (11)
-- **Gesamt: 250 Tests** (US-0019 bringt +16: 2 Domain + 11 Infrastructure + 3 Server)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (139)
+- **Server.Tests** — Tool-Tests (19)
+- **Gesamt: 272 Tests** (US-0020 bringt +22: 3 Domain + 11 Infrastructure + 8 Server)
 
 ## Repository
 
