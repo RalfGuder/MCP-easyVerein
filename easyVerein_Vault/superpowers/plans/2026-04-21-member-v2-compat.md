@@ -8,7 +8,7 @@
 
 **Tech Stack:** .NET 8, C#, xUnit 2.4.2, System.Text.Json, `CopyToOutputDirectory` for test fixtures.
 
-**Design-Spec:** `docs/superpowers/specs/2026-04-21-member-v2-compat-design.md`
+**Design-Spec:** `easyVerein_Vault/superpowers/specs/2026-04-21-member-v2-compat-design.md`
 
 ---
 
@@ -42,7 +42,7 @@ If anything else is modified in the working tree, STOP and ask the maintainer be
 | `tests/MCP.EasyVerein.Domain.Tests/Fixtures/member-v1.7.json` | Create | Real v1.7 response trimmed to the relevant fields. |
 | `tests/MCP.EasyVerein.Domain.Tests/Fixtures/member-v2.0.json` | Create | Real v2.0 response trimmed to the relevant fields. |
 | `tests/MCP.EasyVerein.Domain.Tests/MCP.EasyVerein.Domain.Tests.csproj` | Modify | Add a `<None Update>` entry for the two new fixtures. |
-| `docs/001 User Stories/057-member-v2-compat.md` | Create | User-story markdown per project convention. |
+| `easyVerein_Vault/001 User Stories/057-member-v2-compat.md` | Create | User-story markdown per project convention. |
 | GitHub Issue `US-0057` | Create | External artefact, bidirectionally linked with the markdown. |
 
 ---
@@ -91,8 +91,8 @@ Sub-Projekt 2 von 10 der v2.0-Migration. Strikt YAGNI: keine der 14 neuen v2.0-F
 
 ## Links
 
-- Markdown: [docs/001 User Stories/057-member-v2-compat.md](docs/001%20User%20Stories/057-member-v2-compat.md)
-- Design-Spec: [docs/superpowers/specs/2026-04-21-member-v2-compat-design.md](docs/superpowers/specs/2026-04-21-member-v2-compat-design.md)
+- Markdown: [easyVerein_Vault/001 User Stories/057-member-v2-compat.md](easyVerein_Vault/001%20User%20Stories/057-member-v2-compat.md)
+- Design-Spec: [easyVerein_Vault/superpowers/specs/2026-04-21-member-v2-compat-design.md](easyVerein_Vault/superpowers/specs/2026-04-21-member-v2-compat-design.md)
 - Vorgänger-PR: #70 (SP 1)
 EOF
 )"
@@ -771,11 +771,11 @@ Replace `#NN` with the issue number from Task 2.
 ## Task 6: User-Story-Markdown anlegen
 
 **Files:**
-- Create: `docs/001 User Stories/057-member-v2-compat.md`
+- Create: `easyVerein_Vault/001 User Stories/057-member-v2-compat.md`
 
 - [ ] **Step 1: Create the file**
 
-Create `docs/001 User Stories/057-member-v2-compat.md` with this exact content (replace `NN` with the real issue number from Task 2):
+Create `easyVerein_Vault/001 User Stories/057-member-v2-compat.md` with this exact content (replace `NN` with the real issue number from Task 2):
 
 ```markdown
 # US-0057 Member-Entity für v2.0-Response-Shape kompatibel machen
@@ -807,7 +807,7 @@ Create `docs/001 User Stories/057-member-v2-compat.md` with this exact content (
 - Zwei neue Converter unter `src/MCP.EasyVerein.Domain/Converters/` analog zum bestehenden `FlexibleDateTimeConverter`.
 - Strikt YAGNI: keine der 14 neuen v2.0-Felder (DOSB/LSB, memberGroups, customFields, etc.) kommt in die Entity. Sie werden beim Deserialize stillschweigend ignoriert.
 - `ChairmanPermissionGroup int?→string?` ist Breaking Change mit nachgewiesenem 0-Consumer-Blast-Radius.
-- Siehe Design-Spec: [`docs/superpowers/specs/2026-04-21-member-v2-compat-design.md`](../superpowers/specs/2026-04-21-member-v2-compat-design.md)
+- Siehe Design-Spec: [`easyVerein_Vault/superpowers/specs/2026-04-21-member-v2-compat-design.md`](../superpowers/specs/2026-04-21-member-v2-compat-design.md)
 
 ## Kontext
 
@@ -817,7 +817,7 @@ Sub-Projekt 2 von 10 der v2.0-Migration. Folgende Sub-Projekte (SP 3–9) wenden
 - [ ] **Step 2: Stage and commit**
 
 ```bash
-git add "docs/001 User Stories/057-member-v2-compat.md"
+git add "easyVerein_Vault/001 User Stories/057-member-v2-compat.md"
 git commit -m "$(cat <<'EOF'
 docs(user-story): add US-0057 for Member v2.0 compat
 
@@ -831,13 +831,13 @@ Replace `#NN` with the issue number from Task 2.
 - [ ] **Step 3: Verify the link is real (not literal `NN`)**
 
 ```bash
-grep -n "^\*\*Issue:\*\*" "docs/001 User Stories/057-member-v2-compat.md"
+grep -n "^\*\*Issue:\*\*" "easyVerein_Vault/001 User Stories/057-member-v2-compat.md"
 ```
 
 Expected: the `**Issue:**` line shows the real issue number. If it still shows literal `NN`, fix the file and create a **new** follow-up commit:
 
 ```bash
-git add "docs/001 User Stories/057-member-v2-compat.md"
+git add "easyVerein_Vault/001 User Stories/057-member-v2-compat.md"
 git commit -m "docs(user-story): fix issue link in US-0057"
 ```
 
@@ -878,8 +878,8 @@ Closes #NN.
 
 ## Referenzen
 
-- Design-Spec: [docs/superpowers/specs/2026-04-21-member-v2-compat-design.md](docs/superpowers/specs/2026-04-21-member-v2-compat-design.md)
-- Plan: [docs/superpowers/plans/2026-04-21-member-v2-compat.md](docs/superpowers/plans/2026-04-21-member-v2-compat.md)
+- Design-Spec: [easyVerein_Vault/superpowers/specs/2026-04-21-member-v2-compat-design.md](easyVerein_Vault/superpowers/specs/2026-04-21-member-v2-compat-design.md)
+- Plan: [easyVerein_Vault/superpowers/plans/2026-04-21-member-v2-compat.md](easyVerein_Vault/superpowers/plans/2026-04-21-member-v2-compat.md)
 - Vorgänger: PR #70 (SP 1)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
@@ -908,7 +908,7 @@ Expected: state `OPEN`, isDraft false. Files should be **exactly these eight**:
 - `tests/MCP.EasyVerein.Domain.Tests/MemberEntityTests.cs`
 - `tests/MCP.EasyVerein.Domain.Tests/Fixtures/member-v1.7.json`
 - `tests/MCP.EasyVerein.Domain.Tests/Fixtures/member-v2.0.json`
-- `docs/001 User Stories/057-member-v2-compat.md`
+- `easyVerein_Vault/001 User Stories/057-member-v2-compat.md`
 
 Any other files means something leaked in — STOP and report.
 
@@ -923,5 +923,5 @@ All acceptance criteria from the design spec are satisfied:
 - [ ] Both fixtures round-trip successfully through `Member`.
 - [ ] Full test suite green.
 - [ ] GitHub issue `US-0057` created; linked both ways with the markdown.
-- [ ] User-story markdown `docs/001 User Stories/057-member-v2-compat.md` exists.
+- [ ] User-story markdown `easyVerein_Vault/001 User Stories/057-member-v2-compat.md` exists.
 - [ ] PR open against `main`.

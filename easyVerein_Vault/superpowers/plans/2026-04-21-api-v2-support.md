@@ -8,7 +8,7 @@
 
 **Tech Stack:** .NET 8, C#, xUnit 2.4.2, Moq 4.20.72, Git, GitHub CLI (`gh`).
 
-**Design-Spec:** `docs/superpowers/specs/2026-04-21-api-v2-support-design.md`
+**Design-Spec:** `easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md`
 
 ---
 
@@ -34,7 +34,7 @@ Expected: exactly one file listed with `1 insertion(+), 1 deletion(-)`; the diff
 | `src/MCP.EasyVerein.Domain/ValueObjects/ApiVersion.cs` | Modify | Append `"v2.0"` to `_supportedVersions`. |
 | `tests/MCP.EasyVerein.Domain.Tests/ApiVersionTests.cs` | Modify | Add two new xUnit facts. |
 | `CLAUDE.md` | Modify | Update the "API-Versionen" line. |
-| `docs/001 User Stories/056-api-version-v2.md` | Create | User-story markdown per project convention. |
+| `easyVerein_Vault/001 User Stories/056-api-version-v2.md` | Create | User-story markdown per project convention. |
 | GitHub Issue `US-0056` | Create | External artefact, linked bidirectionally with the markdown. |
 
 ---
@@ -95,8 +95,8 @@ Sub-Projekt 1 von 10 der v2.0-Migration. Entity-Anpassungen folgen in SP 2–9, 
 
 ## Links
 
-- Markdown: [docs/001 User Stories/056-api-version-v2.md](docs/001%20User%20Stories/056-api-version-v2.md)
-- Design-Spec: [docs/superpowers/specs/2026-04-21-api-v2-support-design.md](docs/superpowers/specs/2026-04-21-api-v2-support-design.md)
+- Markdown: [easyVerein_Vault/001 User Stories/056-api-version-v2.md](easyVerein_Vault/001%20User%20Stories/056-api-version-v2.md)
+- Design-Spec: [easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md](easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md)
 EOF
 )"
 ```
@@ -240,11 +240,11 @@ Replace `#NN` with the issue number.
 
 ## Task 5: User-Story-Markdown anlegen
 
-**Files:** `docs/001 User Stories/056-api-version-v2.md` (create)
+**Files:** `easyVerein_Vault/001 User Stories/056-api-version-v2.md` (create)
 
 - [ ] **Step 1: Create the file with the full user-story content**
 
-Create `docs/001 User Stories/056-api-version-v2.md` with this exact content (replace `NN` with the real issue number from Task 2):
+Create `easyVerein_Vault/001 User Stories/056-api-version-v2.md` with this exact content (replace `NN` with the real issue number from Task 2):
 
 ```markdown
 # US-0056 API-Version v2.0 als unterstützte Version hinzufügen
@@ -276,7 +276,7 @@ Create `docs/001 User Stories/056-api-version-v2.md` with this exact content (re
 
 - Einzige Code-Änderung: `_supportedVersions`-Array in `src/MCP.EasyVerein.Domain/ValueObjects/ApiVersion.cs`.
 - `ApiVersion.Default.Version` bleibt bewusst `"v1.7"`; der Wechsel des Defaults passiert in einem späteren Sub-Projekt (SP 10) nach vollständiger Entity-Migration.
-- Siehe Design-Spec: [`docs/superpowers/specs/2026-04-21-api-v2-support-design.md`](../superpowers/specs/2026-04-21-api-v2-support-design.md)
+- Siehe Design-Spec: [`easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md`](../superpowers/specs/2026-04-21-api-v2-support-design.md)
 
 ## Kontext
 
@@ -286,7 +286,7 @@ Teil der v2.0-Migration, Sub-Projekt 1 von 10. Folgende Sub-Projekte (SP 2–9) 
 - [ ] **Step 2: Stage and commit**
 
 ```bash
-git add "docs/001 User Stories/056-api-version-v2.md"
+git add "easyVerein_Vault/001 User Stories/056-api-version-v2.md"
 git commit -m "$(cat <<'EOF'
 docs(user-story): add US-0056 for API v2.0 support
 
@@ -308,19 +308,19 @@ The issue body already points at the markdown path (Task 2). Verify the markdown
 - [ ] **Step 1: Double-check the markdown references the correct issue**
 
 ```bash
-grep -n "^\*\*Issue:\*\*" "docs/001 User Stories/056-api-version-v2.md"
+grep -n "^\*\*Issue:\*\*" "easyVerein_Vault/001 User Stories/056-api-version-v2.md"
 ```
 
 Expected: the `**Issue:**` line shows the real issue number (not the literal `NN`). If it still shows `NN`, fix the file, then create a **new** fix commit (do not `git commit --amend`):
 
 ```bash
-git add "docs/001 User Stories/056-api-version-v2.md"
+git add "easyVerein_Vault/001 User Stories/056-api-version-v2.md"
 git commit -m "docs(user-story): fix issue link in US-0056"
 ```
 
 - [ ] **Step 2: No update required on the issue body**
 
-The issue body from Task 2 already includes a link to `docs/001 User Stories/056-api-version-v2.md`. The file now exists at that path, so the link will resolve once the branch is pushed. No `gh issue edit` is needed.
+The issue body from Task 2 already includes a link to `easyVerein_Vault/001 User Stories/056-api-version-v2.md`. The file now exists at that path, so the link will resolve once the branch is pushed. No `gh issue edit` is needed.
 
 ---
 
@@ -343,7 +343,7 @@ gh pr create --title "US-0056 API-Version v2.0 als unterstützte Version hinzuf�
 - Fügt `v2.0` zu `ApiVersion.SupportedVersions` hinzu (additive Änderung).
 - Default bleibt `v1.7`; der Wechsel des Defaults ist Sub-Projekt 10.
 - Zwei neue xUnit-Tests in `ApiVersionTests`; alle bestehenden Tests grün.
-- `CLAUDE.md` aktualisiert; User Story `docs/001 User Stories/056-api-version-v2.md` angelegt.
+- `CLAUDE.md` aktualisiert; User Story `easyVerein_Vault/001 User Stories/056-api-version-v2.md` angelegt.
 
 Closes #NN.
 
@@ -355,8 +355,8 @@ Closes #NN.
 
 ## Referenzen
 
-- Design-Spec: [docs/superpowers/specs/2026-04-21-api-v2-support-design.md](docs/superpowers/specs/2026-04-21-api-v2-support-design.md)
-- Plan: [docs/superpowers/plans/2026-04-21-api-v2-support.md](docs/superpowers/plans/2026-04-21-api-v2-support.md)
+- Design-Spec: [easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md](easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md)
+- Plan: [easyVerein_Vault/superpowers/plans/2026-04-21-api-v2-support.md](easyVerein_Vault/superpowers/plans/2026-04-21-api-v2-support.md)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
@@ -374,7 +374,7 @@ gh pr view --json title,state,isDraft,files
 dotnet test
 ```
 
-Expected: PR state `OPEN`, `isDraft` false, files list contains exactly the four expected files (`ApiVersion.cs`, `ApiVersionTests.cs`, `CLAUDE.md`, `docs/001 User Stories/056-api-version-v2.md`). Tests still pass.
+Expected: PR state `OPEN`, `isDraft` false, files list contains exactly the four expected files (`ApiVersion.cs`, `ApiVersionTests.cs`, `CLAUDE.md`, `easyVerein_Vault/001 User Stories/056-api-version-v2.md`). Tests still pass.
 
 ---
 
@@ -390,6 +390,6 @@ All items from the design spec's Akzeptanzkriterien are satisfied:
 - [ ] Two new tests in `ApiVersionTests` pass.
 - [ ] `CLAUDE.md` lists v2.0 as supported.
 - [ ] GitHub issue `US-0056` created; linked both ways with the markdown.
-- [ ] User-story markdown `docs/001 User Stories/056-api-version-v2.md` exists.
+- [ ] User-story markdown `easyVerein_Vault/001 User Stories/056-api-version-v2.md` exists.
 
 Uncommitted Bearer-prefix change in `EasyVereinApiClient.cs` remains untouched and un-merged (maintainer's parallel work).

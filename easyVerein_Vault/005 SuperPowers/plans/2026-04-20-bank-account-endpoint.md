@@ -12,7 +12,7 @@
 
 ## API-Felder (easyVerein v1.7 — `/api/v1.7/bank-account`)
 
-Basierend auf `docs/easyverein-api-v1.7.yaml` (Zeilen 3913–4412).
+Basierend auf `easyVerein_Vault/easyverein-api-v1.7.yaml` (Zeilen 3913–4412).
 
 | API-Feld | .NET-Typ | Beschreibung |
 |----------|----------|--------------|
@@ -50,7 +50,7 @@ Basierend auf `docs/easyverein-api-v1.7.yaml` (Zeilen 3913–4412).
 | `tests/MCP.EasyVerein.Domain.Tests/BankAccountEntityTests.cs` | Create | Entity-Deserialisierungs-Tests |
 | `tests/MCP.EasyVerein.Infrastructure.Tests/EasyVereinApiClientTests.cs` | Modify | API-Client-Tests |
 | `CLAUDE.md` | Modify | Endpoint-Tabelle erweitern |
-| `docs/001 User Stories/011-bank-account-endpoint.md` | Modify | Akzeptanzkriterien abhaken |
+| `easyVerein_Vault/001 User Stories/011-bank-account-endpoint.md` | Modify | Akzeptanzkriterien abhaken |
 
 ---
 
@@ -871,7 +871,7 @@ git commit -m "feat(server): add BankAccountTools MCP tools with CRUD operations
 
 **Files:**
 - Modify: `CLAUDE.md`
-- Modify: `docs/001 User Stories/011-bank-account-endpoint.md`
+- Modify: `easyVerein_Vault/001 User Stories/011-bank-account-endpoint.md`
 
 - [ ] **Step 1: Update CLAUDE.md endpoint table**
 
@@ -892,7 +892,7 @@ Update:
 
 - [ ] **Step 3: Check all acceptance criteria in the user story**
 
-In `docs/001 User Stories/011-bank-account-endpoint.md`, replace every `- [ ]` with `- [x]` in the Akzeptanzkriterien list, and add a final status line after the list:
+In `easyVerein_Vault/001 User Stories/011-bank-account-endpoint.md`, replace every `- [ ]` with `- [x]` in the Akzeptanzkriterien list, and add a final status line after the list:
 
 ```
 **Status:** Implementiert mit PR #<NR> am 2026-04-20.
@@ -906,7 +906,7 @@ Expected: All 68 tests PASS
 - [ ] **Step 5: Commit**
 
 ```bash
-git add CLAUDE.md "docs/001 User Stories/011-bank-account-endpoint.md"
+git add CLAUDE.md "easyVerein_Vault/001 User Stories/011-bank-account-endpoint.md"
 git commit -m "docs: update CLAUDE.md and user story with BankAccount endpoint status"
 ```
 

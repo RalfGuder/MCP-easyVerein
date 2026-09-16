@@ -27,7 +27,7 @@
 - Zwei neue Converter unter `src/MCP.EasyVerein.Domain/Converters/` analog zum bestehenden `FlexibleDateTimeConverter`.
 - Strikt YAGNI: keine der 14 neuen v2.0-Felder (DOSB/LSB, memberGroups, customFields, etc.) kommt in die Entity. Sie werden beim Deserialize stillschweigend ignoriert.
 - `ChairmanPermissionGroup int?→string?` ist Breaking Change mit nachgewiesenem 0-Consumer-Blast-Radius.
-- Siehe Design-Spec: [`docs/superpowers/specs/2026-04-21-member-v2-compat-design.md`](../superpowers/specs/2026-04-21-member-v2-compat-design.md)
+- Siehe Design-Spec: [`easyVerein_Vault/superpowers/specs/2026-04-21-member-v2-compat-design.md`](../superpowers/specs/2026-04-21-member-v2-compat-design.md)
 
 ## Kontext
 

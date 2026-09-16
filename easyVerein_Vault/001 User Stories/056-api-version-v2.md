@@ -27,7 +27,7 @@
 
 - Einzige Code-Änderung: `_supportedVersions`-Array in `src/MCP.EasyVerein.Domain/ValueObjects/ApiVersion.cs`.
 - `ApiVersion.Default.Version` bleibt bewusst `"v1.7"`; der Wechsel des Defaults passiert in einem späteren Sub-Projekt (SP 10) nach vollständiger Entity-Migration.
-- Siehe Design-Spec: [`docs/superpowers/specs/2026-04-21-api-v2-support-design.md`](../superpowers/specs/2026-04-21-api-v2-support-design.md)
+- Siehe Design-Spec: [`easyVerein_Vault/superpowers/specs/2026-04-21-api-v2-support-design.md`](../superpowers/specs/2026-04-21-api-v2-support-design.md)
 
 ## Kontext
 
