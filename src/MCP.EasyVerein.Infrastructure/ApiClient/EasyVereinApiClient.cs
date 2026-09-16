@@ -1026,6 +1026,50 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<CustomTaxRate>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // DOSB Sports (read-only)
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Gets a single DOSB sport by ID.</summary>
+    /// <param name="id">The DOSB-sport ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The DOSB sport, or <c>null</c> if not found.</returns>
+    public async Task<DosbSport?> GetDosbSportAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"dosb-sport/{id}", DosbSportQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<DosbSport>(response, ct);
+    }
+
+    /// <summary>Lists DOSB sports with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="title">Optional title filter (exact match).</param>
+    /// <param name="sportNumber">Optional DOSB sport number filter.</param>
+    /// <param name="federationNumber">Optional federation number filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching DOSB sports.</returns>
+    public async Task<IReadOnlyList<DosbSport>> ListDosbSportsAsync(
+        string? idIn = null, string? title = null, string? sportNumber = null,
+        string? federationNumber = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        var query = new DosbSportQuery
+        {
+            IdIn = idIn,
+            Title = title,
+            SportNumber = sportNumber,
+            FederationNumber = federationNumber,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<DosbSport>(
+            BuildListUrl("dosb-sport", query.ToString()), ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

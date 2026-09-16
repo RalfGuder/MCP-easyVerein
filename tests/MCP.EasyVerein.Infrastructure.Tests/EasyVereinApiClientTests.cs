@@ -2633,6 +2633,141 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // DOSB Sports (read-only)
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListDosbSports_ReturnsSports()
+    {
+        var json = """
+            {
+                "results": [
+                    {"id": 55, "title": "Fußball", "sportNumber": "042", "federationNumber": "07"}
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListDosbSportsAsync();
+
+        Assert.Single(result);
+        Assert.Equal(55L, result[0].Id);
+        Assert.Equal("Fußball", result[0].Title);
+        Assert.Equal("042", result[0].SportNumber);
+        Assert.Equal("07", result[0].FederationNumber);
+    }
+
+    [Fact]
+    public async Task ListDosbSports_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListDosbSportsAsync(
+            idIn: "1,2",
+            title: "Fußball",
+            sportNumber: "042",
+            federationNumber: "07",
+            ordering: "-title",
+            search: new[] { "Ball" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/dosb-sport", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2", query);
+        Assert.Contains("title=Fu%C3%9Fball", query);
+        Assert.Contains("sportNumber=042", query);
+        Assert.Contains("federationNumber=07", query);
+        Assert.Contains("ordering=-title", query);
+        Assert.Contains("search=Ball", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListDosbSports_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, title = "A" } },
+            next = "https://easyverein.com/api/v2.0/dosb-sport?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, title = "B" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListDosbSportsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("B", result[1].Title);
+    }
+
+    [Fact]
+    public async Task DosbSport_QuerySelector_RequestsDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListDosbSportsAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains("query={id,title,sportNumber,federationNumber,org,created_at,updated_at}", query);
+    }
+
+    [Fact]
+    public async Task GetDosbSport_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetDosbSportAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetDosbSport_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, title = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListDosbSportsAsync(title: "X", sportNumber: "1", ordering: "title");
+        await client.GetDosbSportAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/dosb-sport/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("title=", query);
+        Assert.DoesNotContain("sportNumber=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task ListDosbSports_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListDosbSportsAsync());
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as

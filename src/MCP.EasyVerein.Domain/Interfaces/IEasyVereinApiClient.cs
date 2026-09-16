@@ -464,6 +464,29 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteCustomTaxRateAsync(long id, CancellationToken ct = default);
 
+    /// <summary>
+    /// Lists DOSB sports with optional filters and automatic pagination.
+    /// The resource is read-only: the API rejects create, update and delete requests.
+    /// </summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="title">Optional title filter (exact match).</param>
+    /// <param name="sportNumber">Optional DOSB sport number filter.</param>
+    /// <param name="federationNumber">Optional federation number filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching DOSB sports.</returns>
+    Task<IReadOnlyList<DosbSport>> ListDosbSportsAsync(
+        string? idIn = null, string? title = null, string? sportNumber = null,
+        string? federationNumber = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single DOSB sport by ID.</summary>
+    /// <param name="id">The DOSB-sport ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The DOSB sport, or <c>null</c> if not found.</returns>
+    Task<DosbSport?> GetDosbSportAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
