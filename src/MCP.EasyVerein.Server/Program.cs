@@ -69,6 +69,7 @@ builder.Services
     .WithTools<CustomFieldTools>()
     .WithTools<CustomFieldCollectionTools>()
     .WithTools<CustomFilterTools>()
+    .WithTools<CustomTaxRateTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 

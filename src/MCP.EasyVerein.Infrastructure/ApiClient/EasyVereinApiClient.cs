@@ -938,6 +938,94 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<CustomFilter>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Custom Tax Rates
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new organization-specific tax rate via the API.</summary>
+    /// <param name="rate">The tax rate to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="CustomTaxRate"/> as returned by the API.</returns>
+    public async Task<CustomTaxRate> CreateCustomTaxRateAsync(CustomTaxRate rate, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("custom-tax-rate"), BuildJsonContent(rate), ct), ct);
+        return await HandleResponse<CustomTaxRate>(response, ct);
+    }
+
+    /// <summary>Deletes an organization-specific tax rate by ID.</summary>
+    /// <param name="id">The tax-rate ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteCustomTaxRateAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"custom-tax-rate/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single tax rate by ID.</summary>
+    /// <param name="id">The tax-rate ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The tax rate, or <c>null</c> if not found.</returns>
+    public async Task<CustomTaxRate?> GetCustomTaxRateAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"custom-tax-rate/{id}", CustomTaxRateQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<CustomTaxRate>(response, ct);
+    }
+
+    /// <summary>Lists tax rates with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="taxName">Optional tax-rate label filter (exact match).</param>
+    /// <param name="taxNameNe">Optional tax-rate label to exclude.</param>
+    /// <param name="customTaxRate">Optional percentage filter.</param>
+    /// <param name="customTaxRateNe">Optional percentage to exclude.</param>
+    /// <param name="orgIsnull">Optional standard-rate filter.</param>
+    /// <param name="deleted">Optional soft-delete filter.</param>
+    /// <param name="showAllowedToUse">Optional filter returning only usable rates.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms (allowed field: taxName).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching tax rates.</returns>
+    public async Task<IReadOnlyList<CustomTaxRate>> ListCustomTaxRatesAsync(
+        string? idIn = null, string? taxName = null, string? taxNameNe = null,
+        string? customTaxRate = null, string? customTaxRateNe = null, bool? orgIsnull = null,
+        bool? deleted = null, bool? showAllowedToUse = null, string? ordering = null,
+        string[]? search = null, CancellationToken ct = default)
+    {
+        var query = new CustomTaxRateQuery
+        {
+            IdIn = idIn,
+            TaxName = taxName,
+            TaxNameNe = taxNameNe,
+            CustomTaxRate = customTaxRate,
+            CustomTaxRateNe = customTaxRateNe,
+            OrgIsnull = orgIsnull,
+            Deleted = deleted,
+            ShowAllowedToUse = showAllowedToUse,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<CustomTaxRate>(
+            BuildListUrl("custom-tax-rate", query.ToString()), ct);
+    }
+
+    /// <summary>Updates an organization-specific tax rate with PATCH semantics.</summary>
+    /// <param name="id">The tax-rate ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="CustomTaxRate"/> as returned by the API.</returns>
+    public async Task<CustomTaxRate> UpdateCustomTaxRateAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"custom-tax-rate/{id}"), content, ct), ct);
+        return await HandleResponse<CustomTaxRate>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

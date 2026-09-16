@@ -2428,6 +2428,211 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Custom Tax Rates
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListCustomTaxRates_ReturnsRates()
+    {
+        var json = """
+            {
+                "results": [
+                    {"id": 1272, "taxName": "", "customTaxRate": "19.00", "countryCode": "DE", "org": null},
+                    {"id": 1962, "taxName": "Eigener Satz", "customTaxRate": "2.25", "countryCode": "", "org": "https://easyverein.com/api/v2.0/organization/30189"}
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListCustomTaxRatesAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal(19.00m, result[0].CustomTaxRateValue);
+        Assert.Equal("DE", result[0].CountryCode);
+        Assert.Null(result[0].Org);
+        Assert.Equal("Eigener Satz", result[1].TaxName);
+        Assert.NotNull(result[1].Org);
+    }
+
+    [Fact]
+    public async Task ListCustomTaxRates_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCustomTaxRatesAsync(
+            idIn: "1,2",
+            taxName: "Ermäßigt",
+            taxNameNe: "X",
+            customTaxRate: "19",
+            customTaxRateNe: "0",
+            orgIsnull: false,
+            deleted: true,
+            showAllowedToUse: true,
+            ordering: "-customTaxRate",
+            search: new[] { "Satz" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/custom-tax-rate", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2", query);
+        Assert.Contains("taxName=Erm%C3%A4%C3%9Figt", query);
+        Assert.Contains("taxName__ne=X", query);
+        Assert.Contains("customTaxRate=19", query);
+        Assert.Contains("customTaxRate__ne=0", query);
+        Assert.Contains("org__isnull=false", query);
+        Assert.Contains("deleted=true", query);
+        Assert.Contains("showAllowedToUse=true", query);
+        Assert.Contains("ordering=-customTaxRate", query);
+        Assert.Contains("search=Satz", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListCustomTaxRates_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, customTaxRate = "7.00" } },
+            next = "https://easyverein.com/api/v2.0/custom-tax-rate?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, customTaxRate = "19.00" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListCustomTaxRatesAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal(19.00m, result[1].CustomTaxRateValue);
+    }
+
+    [Fact]
+    public async Task CustomTaxRate_QuerySelector_RequestsDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListCustomTaxRatesAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains("query={id,taxName,customTaxRate,countryCode,org,created_at,updated_at}", query);
+    }
+
+    [Fact]
+    public async Task GetCustomTaxRate_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetCustomTaxRateAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetCustomTaxRate_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, customTaxRate = "7.00" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListCustomTaxRatesAsync(customTaxRate: "7", showAllowedToUse: true, ordering: "taxName");
+        await client.GetCustomTaxRateAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/custom-tax-rate/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("customTaxRate=", query);
+        Assert.DoesNotContain("showAllowedToUse=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateCustomTaxRate_PostsRateAsNumber_WithoutReadOnlyFields()
+    {
+        var createdJson = """{"id":123,"taxName":"Test","customTaxRate":"1.50","countryCode":"","org":"https://easyverein.com/api/v2.0/organization/1"}""";
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateCustomTaxRateAsync(new CustomTaxRate { TaxName = "Test", CustomTaxRateValue = 1.5m });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal(1.50m, created.CustomTaxRateValue);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-tax-rate", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("\"customTaxRate\":1.5", handler.LastRequestBody);
+        Assert.Contains("\"taxName\":\"Test\"", handler.LastRequestBody);
+        Assert.DoesNotContain("org", handler.LastRequestBody);
+        Assert.DoesNotContain("countryCode", handler.LastRequestBody);
+        Assert.DoesNotContain("created_at", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task CreateCustomTaxRate_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateCustomTaxRateAsync(new CustomTaxRate { TaxName = "Y", CustomTaxRateValue = 1m });
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task UpdateCustomTaxRate_SendsPatchDictionary()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"id":5,"customTaxRate":"2.25"}""");
+        var client = CreateClient(handler);
+
+        var updated = await client.UpdateCustomTaxRateAsync(5, new Dictionary<string, object> { ["customTaxRate"] = 2.25m });
+
+        Assert.Equal(2.25m, updated.CustomTaxRateValue);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-tax-rate/5", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"customTaxRate\":2.25}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task DeleteCustomTaxRate_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteCustomTaxRateAsync(42);
+
+        Assert.Equal(HttpMethod.Delete, handler.LastRequestMethod);
+        Assert.EndsWith("/custom-tax-rate/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListCustomTaxRates_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListCustomTaxRatesAsync());
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as
