@@ -20,17 +20,14 @@ public class EventEntityTests
                 "allDay": false,
                 "locationName": "Vereinsheim",
                 "locationObject": {"id": 7},
-                "parent": "3",
                 "minParticipators": 5,
                 "maxParticipators": 50,
                 "startParticipation": "2026-04-01T00:00:00",
                 "endParticipation": "2026-04-28T23:59:59",
                 "access": 1,
-                "weekdays": "MO,DI",
                 "sendMailCheck": true,
                 "showMemberarea": true,
                 "isPublic": false,
-                "massParticipations": false,
                 "canceled": false,
                 "isReservation": true,
                 "creator": 42,
@@ -53,17 +50,14 @@ public class EventEntityTests
         Assert.Equal("Vereinsheim", ev.LocationName);
         Assert.NotNull(ev.LocationObject);
         Assert.Equal(7, ev.LocationObject.Id);
-        Assert.Equal("3", ev.Parent);
         Assert.Equal(5, ev.MinParticipants);
         Assert.Equal(50, ev.MaxParticipants);
         Assert.Equal(new DateTime(2026, 4, 1, 0, 0, 0), ev.StartParticipation);
         Assert.Equal(new DateTime(2026, 4, 28, 23, 59, 59), ev.EndParticipation);
         Assert.Equal(1, ev.Access);
-        Assert.Equal("MO,DI", ev.Weekdays);
         Assert.True(ev.SendMailCheck);
         Assert.True(ev.ShowMemberArea);
         Assert.False(ev.IsPublic);
-        Assert.False(ev.MassParticipations);
         Assert.False(ev.Canceled);
         Assert.True(ev.IsReservation);
         Assert.Equal(42L, ev.Creator);
@@ -98,5 +92,28 @@ public class EventEntityTests
         Assert.Equal("Mitgliederversammlung", ev.Name);
         Assert.NotNull(ev.Calendar);
         Assert.Equal(335702286L, ev.Calendar.Id);
+    }
+
+    [Fact]
+    public void Deserialize_IgnoresFieldsRemovedInApiV2()
+    {
+        var json = """
+            {
+                "id": 1,
+                "name": "Sommerfest",
+                "parent": "3",
+                "weekdays": "MO,DI",
+                "massParticipations": true
+            }
+            """;
+
+        var ev = JsonSerializer.Deserialize<Event>(json);
+
+        Assert.NotNull(ev);
+        Assert.Equal(1, ev.Id);
+        var roundTrip = JsonSerializer.Serialize(ev);
+        Assert.DoesNotContain("\"parent\"", roundTrip);
+        Assert.DoesNotContain("\"weekdays\"", roundTrip);
+        Assert.DoesNotContain("\"massParticipations\"", roundTrip);
     }
 }

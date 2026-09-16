@@ -121,11 +121,11 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (95)
+- **Domain.Tests** — Entity- und Value-Object-Tests (96)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (108)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (117)
 - **Server.Tests** — Tool-Tests (8)
-- **Gesamt: 224 Tests** (US-0018 bringt +11: 2 Domain + 9 Infrastructure)
+- **Gesamt: 234 Tests** (Event-v2-Fix bringt +10: 1 Domain + 9 Infrastructure)
 
 ## Repository
 

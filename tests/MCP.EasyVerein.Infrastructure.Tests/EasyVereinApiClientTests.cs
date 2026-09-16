@@ -403,6 +403,57 @@ public class EasyVereinApiClientTests
         Assert.Contains("query=", query);
     }
 
+    [Theory]
+    [InlineData("parent")]
+    [InlineData("weekdays")]
+    [InlineData("massParticipations")]
+    public async Task ListEvents_DoesNotRequestFieldRemovedInV2_InQuerySelector(string field)
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListEventsAsync();
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        // easyVerein v2.0 answers HTTP 400 "'<field>' field is not found" for these fields.
+        Assert.DoesNotMatch($"[{{,]{field}[,}}]", query);
+    }
+
+    [Theory]
+    [InlineData("parent")]
+    [InlineData("weekdays")]
+    [InlineData("massParticipations")]
+    public async Task GetEvent_DoesNotRequestFieldRemovedInV2_InQuerySelector(string field)
+    {
+        var json = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.GetEventAsync(999);
+
+        Assert.NotNull(handler.LastRequestUri);
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.DoesNotMatch($"[{{,]{field}[,}}]", query);
+    }
+
+    [Theory]
+    [InlineData("parent")]
+    [InlineData("weekdays")]
+    [InlineData("massParticipations")]
+    public async Task CreateEvent_DoesNotSendFieldRemovedInV2_InRequestBody(string field)
+    {
+        var json = JsonSerializer.Serialize(new { id = 1, name = "Sommerfest" });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, json);
+        var client = CreateClient(handler);
+
+        await client.CreateEventAsync(new Event { Name = "Sommerfest" });
+
+        Assert.NotNull(handler.LastRequestBody);
+        Assert.DoesNotContain($"\"{field}\"", handler.LastRequestBody);
+    }
+
     // ------------------------------------------------------------------ //
     // ContactDetails
     // ------------------------------------------------------------------ //
