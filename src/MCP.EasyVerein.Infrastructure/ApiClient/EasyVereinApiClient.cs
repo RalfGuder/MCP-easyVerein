@@ -1260,6 +1260,102 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<GetTokenResult>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Inventory Objects
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new inventory object via the API.</summary>
+    /// <param name="inventoryObject">The inventory object to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="InventoryObject"/> as returned by the API.</returns>
+    public async Task<InventoryObject> CreateInventoryObjectAsync(
+        InventoryObject inventoryObject, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("inventory-object"), BuildJsonContent(inventoryObject), ct), ct);
+        return await HandleResponse<InventoryObject>(response, ct);
+    }
+
+    /// <summary>Deletes an inventory object by ID (moves it to the wastebasket).</summary>
+    /// <param name="id">The inventory object ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteInventoryObjectAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"inventory-object/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single inventory object by ID.</summary>
+    /// <param name="id">The inventory object ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The inventory object, or <c>null</c> if not found.</returns>
+    public async Task<InventoryObject?> GetInventoryObjectAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"inventory-object/{id}", InventoryObjectQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<InventoryObject>(response, ct);
+    }
+
+    /// <summary>Lists inventory objects with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional object name filter.</param>
+    /// <param name="identifier">Optional article number filter.</param>
+    /// <param name="lendingAvailable">Optional filter for objects that can be lent.</param>
+    /// <param name="deleted">Optional soft-deleted filter.</param>
+    /// <param name="locationObject">Optional location ID filter.</param>
+    /// <param name="locationObjectNot">Optional location ID to exclude.</param>
+    /// <param name="inventoryObjectGroups">Optional comma-separated list of group IDs filter.</param>
+    /// <param name="inventoryObjectGroupsNot">Optional comma-separated list of group IDs to exclude.</param>
+    /// <param name="lendingState">Optional lending state filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching inventory objects.</returns>
+    public async Task<IReadOnlyList<InventoryObject>> ListInventoryObjectsAsync(
+        string? idIn = null, string? name = null, string? identifier = null,
+        bool? lendingAvailable = null, bool? deleted = null,
+        long? locationObject = null, long? locationObjectNot = null,
+        string? inventoryObjectGroups = null, string? inventoryObjectGroupsNot = null,
+        string? lendingState = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        var query = new InventoryObjectQuery
+        {
+            IdIn = idIn,
+            Name = name,
+            Identifier = identifier,
+            LendingAvailable = lendingAvailable,
+            Deleted = deleted,
+            LocationObject = locationObject,
+            LocationObjectNot = locationObjectNot,
+            InventoryObjectGroups = inventoryObjectGroups,
+            InventoryObjectGroupsNot = inventoryObjectGroupsNot,
+            LendingState = lendingState,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<InventoryObject>(
+            BuildListUrl("inventory-object", query.ToString()), ct);
+    }
+
+    /// <summary>Updates an inventory object with PATCH semantics.</summary>
+    /// <param name="id">The inventory object ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="InventoryObject"/> as returned by the API.</returns>
+    public async Task<InventoryObject> UpdateInventoryObjectAsync(
+        long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"inventory-object/{id}"), content, ct), ct);
+        return await HandleResponse<InventoryObject>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

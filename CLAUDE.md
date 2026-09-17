@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 
-### Implementierte Endpoints (22)
+### Implementierte Endpoints (23)
 
 | Endpoint            | User Story | MCP-Tools                                                |
 |---------------------|------------|----------------------------------------------------------|
@@ -113,6 +113,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | Forum               | US-0024    | list, get, create, update (PATCH), delete (endgültig, kein Papierkorb) |
 | GetToken            | US-0025    | get_token (Login mit Zugangsdaten; Token nur maskiert, SENSITIVE) |
 | InvoiceItem        | US-0028    | list, get, create, update (PATCH), delete                |
+| InventoryObject     | US-0026    | list, get, create (pieces Pflicht), update (PATCH), delete (Papierkorb) |
 
 ### HTTP-Methoden in der easyVerein API v1.7
 
@@ -123,16 +124,16 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Nächste anstehende Endpoints
 
-- US-0026: Inventory Object
 - US-0027: Inventory Object Group
+- US-0029: Lending
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (114)
+- **Domain.Tests** — Entity- und Value-Object-Tests (117)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (186)
-- **Server.Tests** — Tool-Tests (54)
-- **Gesamt: 367 Tests** (US-0025 bringt +16: 2 Domain + 5 Infrastructure + 9 Server)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (197)
+- **Server.Tests** — Tool-Tests (68)
+- **Gesamt: 395 Tests** (US-0026 bringt +28: 3 Domain + 11 Infrastructure + 14 Server)
 
 ## Repository
 
