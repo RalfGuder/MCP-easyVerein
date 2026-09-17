@@ -628,6 +628,45 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteInventoryObjectAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists the organization's inventory object groups with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional group name filter.</param>
+    /// <param name="color">Optional hex color filter.</param>
+    /// <param name="short">Optional short-label filter.</param>
+    /// <param name="deleted">Optional soft-deleted filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching groups.</returns>
+    Task<IReadOnlyList<InventoryObjectGroup>> ListInventoryObjectGroupsAsync(
+        string? idIn = null, string? name = null, string? color = null, string? @short = null,
+        bool? deleted = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single inventory object group by ID.</summary>
+    /// <param name="id">The group ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The group, or <c>null</c> if not found.</returns>
+    Task<InventoryObjectGroup?> GetInventoryObjectGroupAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new inventory object group.</summary>
+    /// <param name="group">The group to create (name, color and short are required by the API).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created group.</returns>
+    Task<InventoryObjectGroup> CreateInventoryObjectGroupAsync(InventoryObjectGroup group, CancellationToken ct = default);
+
+    /// <summary>Partially updates an inventory object group (PATCH semantics).</summary>
+    /// <param name="id">The group ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated group.</returns>
+    Task<InventoryObjectGroup> UpdateInventoryObjectGroupAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes an inventory object group by ID (moves it to the wastebasket).</summary>
+    /// <param name="id">The group ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteInventoryObjectGroupAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

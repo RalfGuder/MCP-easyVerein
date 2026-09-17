@@ -3702,6 +3702,208 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInventoryObjectsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // Inventory Object Groups
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListInventoryObjectGroups_ReturnsGroups()
+    {
+        var json = """
+            {
+                "results": [
+                    {"id": 1, "name": "Zelte", "color": "#ff8800", "short": "ZLT", "linkedItems": []},
+                    {"id": 2, "name": "Technik", "color": "#0000ff", "short": "TEC"}
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListInventoryObjectGroupsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("Zelte", result[0].Name);
+        Assert.Equal("#ff8800", result[0].Color);
+        Assert.Equal("TEC", result[1].Short);
+    }
+
+    [Fact]
+    public async Task ListInventoryObjectGroups_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListInventoryObjectGroupsAsync(
+            idIn: "1,2",
+            name: "Zelte & Planen",
+            color: "#ff8800",
+            @short: "ZLT",
+            deleted: false,
+            ordering: "-name",
+            search: new[] { "Zelt" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/inventory-object-group", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2", query);
+        Assert.Contains("name=Zelte%20%26%20Planen", query);
+        Assert.Contains("color=%23ff8800", query);
+        Assert.Contains("short=ZLT", query);
+        Assert.Contains("deleted=false", query);
+        Assert.Contains("ordering=-name", query);
+        Assert.Contains("search=Zelt", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListInventoryObjectGroups_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, name = "A" } },
+            next = "https://easyverein.com/api/v2.0/inventory-object-group?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, name = "B" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListInventoryObjectGroupsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("B", result[1].Name);
+    }
+
+    [Fact]
+    public async Task InventoryObjectGroup_QuerySelector_RequestsDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListInventoryObjectGroupsAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains(
+            "query={id,org,_deleteAfterDate,_deletedBy,created_at,updated_at,name,color,short,linkedItems}",
+            query);
+    }
+
+    [Fact]
+    public async Task GetInventoryObjectGroup_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetInventoryObjectGroupAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetInventoryObjectGroup_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListInventoryObjectGroupsAsync(name: "X", @short: "Y", ordering: "name");
+        var group = await client.GetInventoryObjectGroupAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.Equal(999L, group!.Id);
+        Assert.EndsWith("/inventory-object-group/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("short=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateInventoryObjectGroup_PostsWritableFields_WithoutReadOnlyFields()
+    {
+        var createdJson = """{"id":123,"name":"Zelte","color":"#ff8800","short":"ZLT","org":"https://easyverein.com/api/v2.0/organization/1","linkedItems":[]}""";
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateInventoryObjectGroupAsync(
+            new InventoryObjectGroup { Name = "Zelte", Color = "#ff8800", Short = "ZLT" });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/inventory-object-group", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("\"name\":\"Zelte\"", handler.LastRequestBody);
+        Assert.Contains("\"short\":\"ZLT\"", handler.LastRequestBody);
+        Assert.Contains("\"color\":", handler.LastRequestBody);
+        Assert.DoesNotContain("org", handler.LastRequestBody);
+        Assert.DoesNotContain("linkedItems", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task CreateInventoryObjectGroup_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateInventoryObjectGroupAsync(new InventoryObjectGroup { Name = "Y", Color = "#000000", Short = "Y" });
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task UpdateInventoryObjectGroup_SendsPatchDictionary()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"id":5,"name":"Neu","short":"NEU"}""");
+        var client = CreateClient(handler);
+
+        var updated = await client.UpdateInventoryObjectGroupAsync(5,
+            new Dictionary<string, object> { ["name"] = "Neu", ["short"] = "NEU" });
+
+        Assert.Equal("Neu", updated.Name);
+        Assert.Equal("NEU", updated.Short);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/inventory-object-group/5", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"name\":\"Neu\",\"short\":\"NEU\"}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task DeleteInventoryObjectGroup_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteInventoryObjectGroupAsync(42);
+
+        Assert.Equal(HttpMethod.Delete, handler.LastRequestMethod);
+        Assert.EndsWith("/inventory-object-group/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListInventoryObjectGroups_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInventoryObjectGroupsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //
