@@ -526,6 +526,52 @@ public interface IEasyVereinApiClient
     /// <returns>The raw response body of the API.</returns>
     Task<string> VoteFeatureRequestAsync(long id, bool inFavor, CancellationToken ct = default);
 
+    /// <summary>Lists the organization's forums with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional forum name filter (exact match).</param>
+    /// <param name="nameNot">Optional forum name to exclude.</param>
+    /// <param name="slug">Optional slug filter (exact match).</param>
+    /// <param name="slugNot">Optional slug to exclude.</param>
+    /// <param name="type">Optional forum kind filter (0 = regular forum).</param>
+    /// <param name="createdGt">Optional filter: created after this date.</param>
+    /// <param name="createdLt">Optional filter: created before this date.</param>
+    /// <param name="updatedGt">Optional filter: updated after this date.</param>
+    /// <param name="updatedLt">Optional filter: updated before this date.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching forums.</returns>
+    Task<IReadOnlyList<Forum>> ListForumsAsync(
+        string? idIn = null, string? name = null, string? nameNot = null,
+        string? slug = null, string? slugNot = null, int? type = null,
+        string? createdGt = null, string? createdLt = null,
+        string? updatedGt = null, string? updatedLt = null,
+        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+
+    /// <summary>Gets a single forum by ID.</summary>
+    /// <param name="id">The forum ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The forum, or <c>null</c> if not found.</returns>
+    Task<Forum?> GetForumAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new forum.</summary>
+    /// <param name="forum">The forum to create (the name is required by the API).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created forum.</returns>
+    Task<Forum> CreateForumAsync(Forum forum, CancellationToken ct = default);
+
+    /// <summary>Partially updates a forum (PATCH semantics).</summary>
+    /// <param name="id">The forum ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated forum.</returns>
+    Task<Forum> UpdateForumAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a forum by ID.</summary>
+    /// <param name="id">The forum ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteForumAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

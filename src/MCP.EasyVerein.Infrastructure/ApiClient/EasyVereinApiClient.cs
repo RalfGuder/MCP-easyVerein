@@ -1141,6 +1141,99 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await response.Content.ReadAsStringAsync(ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Forums
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new forum via the API.</summary>
+    /// <param name="forum">The forum to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="Forum"/> as returned by the API.</returns>
+    public async Task<Forum> CreateForumAsync(Forum forum, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("forum"), BuildJsonContent(forum), ct), ct);
+        return await HandleResponse<Forum>(response, ct);
+    }
+
+    /// <summary>Deletes a forum by ID.</summary>
+    /// <param name="id">The forum ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteForumAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"forum/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single forum by ID.</summary>
+    /// <param name="id">The forum ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The forum, or <c>null</c> if not found.</returns>
+    public async Task<Forum?> GetForumAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"forum/{id}", ForumQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<Forum>(response, ct);
+    }
+
+    /// <summary>Lists forums with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional forum name filter (exact match).</param>
+    /// <param name="nameNot">Optional forum name to exclude.</param>
+    /// <param name="slug">Optional slug filter (exact match).</param>
+    /// <param name="slugNot">Optional slug to exclude.</param>
+    /// <param name="type">Optional forum kind filter.</param>
+    /// <param name="createdGt">Optional filter: created after this date.</param>
+    /// <param name="createdLt">Optional filter: created before this date.</param>
+    /// <param name="updatedGt">Optional filter: updated after this date.</param>
+    /// <param name="updatedLt">Optional filter: updated before this date.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching forums.</returns>
+    public async Task<IReadOnlyList<Forum>> ListForumsAsync(
+        string? idIn = null, string? name = null, string? nameNot = null,
+        string? slug = null, string? slugNot = null, int? type = null,
+        string? createdGt = null, string? createdLt = null,
+        string? updatedGt = null, string? updatedLt = null,
+        string? ordering = null, string[]? search = null, CancellationToken ct = default)
+    {
+        var query = new ForumQuery
+        {
+            IdIn = idIn,
+            Name = name,
+            NameNot = nameNot,
+            Slug = slug,
+            SlugNot = slugNot,
+            Type = type,
+            CreatedGt = createdGt,
+            CreatedLt = createdLt,
+            UpdatedGt = updatedGt,
+            UpdatedLt = updatedLt,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<Forum>(
+            BuildListUrl("forum", query.ToString()), ct);
+    }
+
+    /// <summary>Updates a forum with PATCH semantics.</summary>
+    /// <param name="id">The forum ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="Forum"/> as returned by the API.</returns>
+    public async Task<Forum> UpdateForumAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"forum/{id}"), content, ct), ct);
+        return await HandleResponse<Forum>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
