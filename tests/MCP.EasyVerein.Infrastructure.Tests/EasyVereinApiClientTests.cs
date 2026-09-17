@@ -2994,6 +2994,219 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Forums
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListForums_ReturnsForums()
+    {
+        var json = """
+            {
+                "results": [
+                    {"id": 31875, "name": "Kulturverein Milower Land e.V.", "slug": "kulturverein-milower-land-ev", "type": 0, "last_post": null, "display_sub_forum_list": true},
+                    {"id": 31876, "name": "Vorstand", "slug": "vorstand", "type": 0, "direct_topics_count": 3}
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListForumsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("Kulturverein Milower Land e.V.", result[0].Name);
+        Assert.True(result[0].DisplaySubForumList);
+        Assert.Equal("vorstand", result[1].Slug);
+        Assert.Equal(3, result[1].DirectTopicsCount);
+    }
+
+    [Fact]
+    public async Task ListForums_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListForumsAsync(
+            idIn: "1,2",
+            name: "Vorstand & Beirat",
+            nameNot: "Alt",
+            slug: "vorstand",
+            slugNot: "alt",
+            type: 0,
+            createdGt: "2025-01-01",
+            createdLt: "2026-01-01",
+            updatedGt: "2025-02-01",
+            updatedLt: "2026-02-01",
+            ordering: "-order",
+            search: new[] { "Verein" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/forum", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2", query);
+        Assert.Contains("name=Vorstand%20%26%20Beirat", query);
+        Assert.Contains("name__not=Alt", query);
+        Assert.Contains("slug=vorstand", query);
+        Assert.Contains("slug__not=alt", query);
+        Assert.Contains("type=0", query);
+        Assert.Contains("created__gt=2025-01-01", query);
+        Assert.Contains("created__lt=2026-01-01", query);
+        Assert.Contains("updated__gt=2025-02-01", query);
+        Assert.Contains("updated__lt=2026-02-01", query);
+        Assert.Contains("ordering=-order", query);
+        Assert.Contains("search=Verein", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListForums_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, name = "A" } },
+            next = "https://easyverein.com/api/v2.0/forum?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, name = "B" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListForumsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("B", result[1].Name);
+    }
+
+    [Fact]
+    public async Task Forum_QuerySelector_RequestsDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListForumsAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains(
+            "query={id,org,last_post,created,updated,name,slug,description,image,link,link_redirects,type," +
+            "direct_posts_count,direct_topics_count,link_redirects_count,order,last_post_on,display_sub_forum_list}",
+            query);
+    }
+
+    [Fact]
+    public async Task GetForum_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetForumAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetForum_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListForumsAsync(name: "X", type: 0, ordering: "name");
+        var forum = await client.GetForumAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.Equal(999L, forum!.Id);
+        Assert.EndsWith("/forum/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("type=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateForum_PostsWritableFields_WithoutReadOnlyFields()
+    {
+        var createdJson = """{"id":123,"name":"Vorstand","slug":"vorstand","org":"https://easyverein.com/api/v2.0/organization/1","type":0}""";
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateForumAsync(new Forum { Name = "Vorstand", Order = 2, DisplaySubForumList = false });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal("vorstand", created.Slug);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/forum", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("\"name\":\"Vorstand\"", handler.LastRequestBody);
+        Assert.Contains("\"order\":2", handler.LastRequestBody);
+        Assert.Contains("\"display_sub_forum_list\":false", handler.LastRequestBody);
+        Assert.DoesNotContain("org", handler.LastRequestBody);
+        Assert.DoesNotContain("slug", handler.LastRequestBody);
+        Assert.DoesNotContain("\"type\"", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task CreateForum_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateForumAsync(new Forum { Name = "Y" });
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task UpdateForum_SendsPatchDictionary()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"id":5,"name":"Neu"}""");
+        var client = CreateClient(handler);
+
+        var updated = await client.UpdateForumAsync(5, new Dictionary<string, object> { ["name"] = "Neu" });
+
+        Assert.Equal("Neu", updated.Name);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/forum/5", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"name\":\"Neu\"}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task DeleteForum_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteForumAsync(42);
+
+        Assert.Equal(HttpMethod.Delete, handler.LastRequestMethod);
+        Assert.EndsWith("/forum/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListForums_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListForumsAsync());
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as

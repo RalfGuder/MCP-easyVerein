@@ -72,6 +72,7 @@ builder.Services
     .WithTools<CustomTaxRateTools>()
     .WithTools<DosbSportTools>()
     .WithTools<FeatureRequestTools>()
+    .WithTools<ForumTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 
