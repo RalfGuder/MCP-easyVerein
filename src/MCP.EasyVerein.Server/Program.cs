@@ -73,6 +73,7 @@ builder.Services
     .WithTools<DosbSportTools>()
     .WithTools<FeatureRequestTools>()
     .WithTools<ForumTools>()
+    .WithTools<GetTokenTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 

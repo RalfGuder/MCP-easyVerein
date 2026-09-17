@@ -1234,6 +1234,32 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<Forum>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Get Token (login with user credentials)
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Logs in with user credentials and obtains an API token.</summary>
+    /// <param name="username">The login name, built as <c>$orgShort_$emailOrUsername</c>.</param>
+    /// <param name="password">The user's password.</param>
+    /// <param name="twoFactorCode">Optional two-factor code (only for users with 2FA enabled).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The issued token or a two-factor challenge.</returns>
+    public async Task<GetTokenResult> GetTokenAsync(
+        string username, string password, string? twoFactorCode = null, CancellationToken ct = default)
+    {
+        var body = new Dictionary<string, string>
+        {
+            [GetTokenFields.Username] = username,
+            [GetTokenFields.Password] = password
+        };
+        if (!string.IsNullOrEmpty(twoFactorCode))
+            body[GetTokenFields.TwoFactor] = twoFactorCode;
+
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("get-token"), BuildJsonContent(body), ct), ct);
+        return await HandleResponse<GetTokenResult>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

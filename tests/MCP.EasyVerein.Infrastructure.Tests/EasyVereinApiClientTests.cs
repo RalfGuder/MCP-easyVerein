@@ -3207,6 +3207,72 @@ public class EasyVereinApiClientTests
     }
 
     // ------------------------------------------------------------------ //
+    // Get Token (login with user credentials)
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task GetToken_PostsCredentials_AndReturnsToken()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"token":"abc123def456"}""");
+        var client = CreateClient(handler);
+
+        var result = await client.GetTokenAsync("kv_user@example.org", "s3cret");
+
+        Assert.Equal("abc123def456", result.Token);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/get-token", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("""{"username":"kv_user@example.org","password":"s3cret"}""", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task GetToken_WithTwoFactorCode_SendsTwoFactorField()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"token":"t"}""");
+        var client = CreateClient(handler);
+
+        await client.GetTokenAsync("kv_user", "pw", "123456");
+
+        Assert.Contains("\"2FA\":\"123456\"", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task GetToken_WithTwoFactorChallenge_ReturnsNeeds2FA()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, """{"needs2FA":true}""");
+        var client = CreateClient(handler);
+
+        var result = await client.GetTokenAsync("kv_user", "pw");
+
+        Assert.True(result.Needs2FA);
+        Assert.Null(result.Token);
+    }
+
+    [Fact]
+    public async Task GetToken_WithInvalidCredentials_ThrowsHttpRequestException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.BadRequest,
+            """{"non_field_errors":["Die angegebenen Zugangsdaten stimmen nicht."]}""");
+        var client = CreateClient(handler);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetTokenAsync("kv_user", "pw"));
+
+        Assert.Contains("Zugangsdaten", ex.Message);
+    }
+
+    [Fact]
+    public async Task GetToken_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"token":"t"}""");
+        var client = CreateClient(handler);
+
+        await client.GetTokenAsync("kv_user", "pw");
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+    }
+
+    // ------------------------------------------------------------------ //
     // HTTP Transport — POST regression coverage for issue:
     // easyVerein's reverse proxy rejects chunked POST bodies with HTTP 411
     // (Length Required). All Create*Async methods must send the body as

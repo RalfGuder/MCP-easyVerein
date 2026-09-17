@@ -572,6 +572,15 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteForumAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Logs in with user credentials and obtains an API token (<c>POST get-token</c>).</summary>
+    /// <param name="username">The login name, built as <c>$orgShort_$emailOrUsername</c>.</param>
+    /// <param name="password">The user's password.</param>
+    /// <param name="twoFactorCode">Optional two-factor code (only for users with 2FA enabled).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The issued token or a two-factor challenge.</returns>
+    Task<GetTokenResult> GetTokenAsync(
+        string username, string password, string? twoFactorCode = null, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
