@@ -113,7 +113,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | Forum               | US-0024    | list, get, create, update (PATCH), delete (endgültig, kein Papierkorb) |
 | GetToken            | US-0025    | get_token (Login mit Zugangsdaten; Token nur maskiert, SENSITIVE) |
 | InvoiceItem        | US-0028    | list, get, create, update (PATCH), delete                |
-| InventoryObject     | US-0026    | list, get, create, update (PATCH), delete (Papierkorb)   |
+| InventoryObject     | US-0026    | list, get, create (pieces Pflicht), update (PATCH), delete (Papierkorb) |
 
 ### HTTP-Methoden in der easyVerein API v1.7
 
@@ -132,8 +132,8 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 - **Domain.Tests** — Entity- und Value-Object-Tests (117)
 - **Application.Tests** — Konfigurationsauflösung (13)
 - **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (197)
-- **Server.Tests** — Tool-Tests (67)
-- **Gesamt: 394 Tests** (US-0026 bringt +27: 3 Domain + 11 Infrastructure + 13 Server)
+- **Server.Tests** — Tool-Tests (68)
+- **Gesamt: 395 Tests** (US-0026 bringt +28: 3 Domain + 11 Infrastructure + 14 Server)
 
 ## Repository
 

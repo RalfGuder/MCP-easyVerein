@@ -72,16 +72,18 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
         [Description("The object name (max 500 chars)")] string? name,
         [Description("Article number (max 500 chars)")] string? identifier,
         [Description("Description")] string? description,
-        [Description("Number of pieces")] int? pieces,
+        [Description("Number of pieces (required by the API)")] int? pieces,
         [Description("Purchase price")] decimal? price,
         [Description("Purchase date (YYYY-MM-DD or ISO 8601)")] string? purchaseDate,
         [Description("Free-text location name (max 500 chars)")] string? locationName,
         [Description("Whether the object can be lent")] bool? lendingAvailable,
-        [Description("Member ID of the person responsible for lending")] long? lendingResponsible,
+        [Description("Member ID of the person responsible for lending (defaults to the API user)")] long? lendingResponsible,
         CancellationToken ct)
     {
         try
         {
+            if (!pieces.HasValue)
+                return "ERROR: The number of pieces (pieces) is required.";
             var error = ValidateText(name, identifier, locationName);
             if (error != null) return error;
 

@@ -74,7 +74,7 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         await tools.CreateInventoryObject(
-            "Beamer", "null", "null", null, null, "null", "null", null, null, CancellationToken.None);
+            "Beamer", "null", "null", 1, null, "null", "null", null, null, CancellationToken.None);
 
         Assert.Null(captured!.Identifier);
         Assert.Null(captured.Description);
@@ -98,11 +98,28 @@ public class InventoryObjectToolsTests
         var result = await tools.CreateInventoryObject(
             field == 0 ? tooLong : "Beamer",
             field == 1 ? tooLong : null,
-            null, null, null, null,
+            null, 1, null, null,
             field == 2 ? tooLong : null,
             null, null, CancellationToken.None);
 
         Assert.StartsWith("ERROR:", result);
+        Assert.Contains("500", result);
+    }
+
+    /// <summary>
+    /// Verifies that a missing piece count (required by the API, despite OPTIONS) is rejected before calling the API.
+    /// </summary>
+    [Fact]
+    public async Task CreateInventoryObject_WithoutPieces_ReturnsErrorWithoutCallingClient()
+    {
+        var mock = new Mock<IEasyVereinApiClient>(MockBehavior.Strict);
+        var tools = new InventoryObjectTools(mock.Object);
+
+        var result = await tools.CreateInventoryObject(
+            "Beamer", null, null, null, null, null, null, null, null, CancellationToken.None);
+
+        Assert.StartsWith("ERROR:", result);
+        Assert.Contains("pieces", result);
     }
 
     /// <summary>
@@ -115,9 +132,10 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         var result = await tools.CreateInventoryObject(
-            "Beamer", null, null, null, null, "gestern", null, null, null, CancellationToken.None);
+            "Beamer", null, null, 1, null, "gestern", null, null, null, CancellationToken.None);
 
         Assert.StartsWith("ERROR:", result);
+        Assert.Contains("purchase date", result);
     }
 
     /// <summary>

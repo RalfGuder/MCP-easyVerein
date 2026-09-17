@@ -27,17 +27,17 @@
 4. [x] `IEasyVereinApiClient` und `EasyVereinApiClient` um CRUD-Methoden erweitern
 5. [x] `InventoryObjectTools.cs` als MCP-Tool-Klasse erstellen
 6. [x] `Program.cs` um Registrierung erweitern
-7. [x] Unit-Tests schreiben (+27: 3 Domain, 11 Infrastructure, 13 Server → 394 gesamt)
-8. [ ] Manuelle Verifikation gegen die easyVerein API – lesend erledigt, schreibend offen
+7. [x] Unit-Tests schreiben (+28: 3 Domain, 11 Infrastructure, 14 Server → 395 gesamt)
+8. [x] Manuelle Verifikation gegen die easyVerein API (lesend und schreibend)
 
 ## Technische Hinweise
 
 - easyVerein API-Doku: https://easyverein.com/api/documentation/
 - Endpoint: `/inventory-object` (`GET`, `POST`) und `/inventory-object/{pk}` (`GET`, `PUT`, `PATCH`, `DELETE`); die Tools nutzen nur `PATCH`
 - `DELETE` verschiebt das Objekt in den Papierkorb (`wastebasket/inventory-object/{pk}`), endgültiges Löschen dort per `DELETE`
-- Laut `OPTIONS` gibt es **keine Pflichtfelder**
+- **`pieces` ist beim Anlegen Pflicht** (HTTP 400 „Feld: pieces“), obwohl `OPTIONS` kein Pflichtfeld meldet → das Tool prüft `pieces` vorab
 - Schreibbare Felder: `name`, `identifier`, `locationName` (je max. 500 Zeichen, vorab geprüft), `description`, `pieces`, `price`, `purchaseDate`, `lendingAvailable`, `lendingResponsible`
-- `lendingResponsible` ist laut Spec schreibbar (integer), laut `OPTIONS` read-only → live zu klären
+- `lendingResponsible` ist **schreibbar** (live per PATCH bestätigt), obwohl `OPTIONS` read-only meldet. Ohne Angabe setzt die API beim Anlegen einen Standardverwalter (im Test Mitglied 8252487, vermutlich der API-Nutzer)
 - Nur lesend gemappt: `org`, `picture` (Upload bräuchte Multipart), `currentlyLend`, `lendings`, `customFields`, `inventoryObjectGroups`, `locationObject`, `lastLendDate`, `lastReturnDate`, `created_at`, `updated_at`, `_deleteAfterDate`, `_deletedBy`
 - Die API liefert Fremdschlüssel als URL (`lendingResponsible`, `locationObject`) → `FlexibleIdConverter`; `price` als String → `FlexibleDecimalConverter`; `lastLendDate`/`lastReturnDate` nur als Datum → `FlexibleDateTimeConverter`
 - `purchaseDate` wird im Tool geprüft (`YYYY-MM-DD` oder ISO 8601)
@@ -49,4 +49,7 @@
 - Lesend über die gebauten DLLs: `list` liefert 1 Objekt („Zelt“, 335646309). Der Feld-Selektor wird mit vorhandenem Datensatz akzeptiert (alle 23 Felder gültig).
 - Filter `name` + `lendingAvailable` + `deleted=false` → 1, `search=Zelt` → 1, `deleted=true` → 0.
 - `get` 335646309: URL-Fremdschlüssel und Preis-String korrekt umgewandelt; `get` 1 → „not found“.
-- Schreibend (Anlegen, PATCH, `lendingResponsible`, Löschen mit Papierkorb): **offen**.
+- Schreibend (Testobjekt 574478274): Anlegen mit allen Feldern ✅, PATCH von name/pieces/price/purchaseDate/lendingAvailable ✅ (übrige Felder unverändert), PATCH `lendingResponsible` ✅.
+- Anlegen ohne `pieces` → HTTP 400, es wurde nichts angelegt.
+- `delete` → Objekt im Papierkorb (200), `get` → not found; `DELETE wastebasket/inventory-object/{pk}` → 204, danach 404.
+- Keine Nebenwirkungen: „Zelt“ unverändert, keine Testobjekte übrig.
