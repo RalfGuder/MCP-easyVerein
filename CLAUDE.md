@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 
-### Implementierte Endpoints (21)
+### Implementierte Endpoints (22)
 
 | Endpoint            | User Story | MCP-Tools                                                |
 |---------------------|------------|----------------------------------------------------------|
@@ -111,6 +111,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | DosbSport           | US-0022    | list, get (nur lesend – API erlaubt kein Schreiben)      |
 | FeatureRequest      | US-0023    | list, get, create, vote (öffentliches Ideen-Board; kein Update/Delete) |
 | Forum               | US-0024    | list, get, create, update (PATCH), delete (endgültig, kein Papierkorb) |
+| GetToken            | US-0025    | get_token (Login mit Zugangsdaten; Token nur maskiert, SENSITIVE) |
 | InvoiceItem        | US-0028    | list, get, create, update (PATCH), delete                |
 
 ### HTTP-Methoden in der easyVerein API v1.7
@@ -122,15 +123,16 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Nächste anstehende Endpoints
 
-- US-0025: Get Token
+- US-0026: Inventory Object
+- US-0027: Inventory Object Group
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (112)
+- **Domain.Tests** — Entity- und Value-Object-Tests (114)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (181)
-- **Server.Tests** — Tool-Tests (45)
-- **Gesamt: 351 Tests** (US-0024 bringt +23: 3 Domain + 11 Infrastructure + 9 Server)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (186)
+- **Server.Tests** — Tool-Tests (54)
+- **Gesamt: 367 Tests** (US-0025 bringt +16: 2 Domain + 5 Infrastructure + 9 Server)
 
 ## Repository
 
