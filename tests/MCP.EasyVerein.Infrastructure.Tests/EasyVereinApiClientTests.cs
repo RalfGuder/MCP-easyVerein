@@ -3485,6 +3485,223 @@ public class EasyVereinApiClientTests
         Assert.DoesNotContain("search=", query);
         Assert.Contains("query=", query);
     }
+
+    // ------------------------------------------------------------------ //
+    // Inventory Objects
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListInventoryObjects_ReturnsInventoryObjects()
+    {
+        var json = """
+            {
+                "results": [
+                    {"id": 335646309, "name": "Zelt", "pieces": 2, "price": "99.99", "lendingResponsible": "https://easyverein.com/api/v2.0/member/4424352"},
+                    {"id": 2, "name": "Beamer", "lendingAvailable": false, "locationObject": null}
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListInventoryObjectsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("Zelt", result[0].Name);
+        Assert.Equal(99.99m, result[0].Price);
+        Assert.Equal(4424352L, result[0].LendingResponsibleId);
+        Assert.False(result[1].LendingAvailable);
+    }
+
+    [Fact]
+    public async Task ListInventoryObjects_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListInventoryObjectsAsync(
+            idIn: "1,2",
+            name: "Zelt & Plane",
+            identifier: "59409381",
+            lendingAvailable: true,
+            deleted: false,
+            locationObject: 335646294,
+            locationObjectNot: 7,
+            inventoryObjectGroups: "11,12",
+            inventoryObjectGroupsNot: "13",
+            lendingState: "lent",
+            ordering: "-name",
+            search: new[] { "Zelt" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/inventory-object", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2", query);
+        Assert.Contains("name=Zelt%20%26%20Plane", query);
+        Assert.Contains("identifier=59409381", query);
+        Assert.Contains("lendingAvailable=true", query);
+        Assert.Contains("deleted=false", query);
+        Assert.Contains("locationObject=335646294", query);
+        Assert.Contains("locationObject__not=7", query);
+        Assert.Contains("inventoryObjectGroups=11%2C12", query);
+        Assert.Contains("inventoryObjectGroups__not=13", query);
+        Assert.Contains("lending__state=lent", query);
+        Assert.Contains("ordering=-name", query);
+        Assert.Contains("search=Zelt", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListInventoryObjects_FollowsPagination()
+    {
+        var page1 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 1, name = "A" } },
+            next = "https://easyverein.com/api/v2.0/inventory-object?page=2"
+        });
+        var page2 = JsonSerializer.Serialize(new
+        {
+            results = new[] { new { id = 2, name = "B" } },
+            next = (string?)null
+        });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, page1),
+            (HttpStatusCode.OK, page2)
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListInventoryObjectsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("B", result[1].Name);
+    }
+
+    [Fact]
+    public async Task InventoryObject_QuerySelector_RequestsDocumentedFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListInventoryObjectsAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains(
+            "query={id,org,lendingResponsible,inventoryObjectGroups,picture,currentlyLend,lendings,customFields," +
+            "locationObject,lastLendDate,lastReturnDate,created_at,updated_at,_deleteAfterDate,_deletedBy," +
+            "name,identifier,description,pieces,price,purchaseDate,locationName,lendingAvailable}",
+            query);
+    }
+
+    [Fact]
+    public async Task GetInventoryObject_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetInventoryObjectAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetInventoryObject_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, name = "X" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListInventoryObjectsAsync(name: "X", lendingAvailable: true, ordering: "name");
+        var item = await client.GetInventoryObjectAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.Equal(999L, item!.Id);
+        Assert.EndsWith("/inventory-object/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("name=", query);
+        Assert.DoesNotContain("lendingAvailable=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateInventoryObject_PostsWritableFields_WithoutReadOnlyFields()
+    {
+        var createdJson = """{"id":123,"name":"Beamer","org":"https://easyverein.com/api/v2.0/organization/1","picture":"https://easyverein.com/app/image/defaultInventory.png","currentlyLend":0}""";
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateInventoryObjectAsync(
+            new InventoryObject { Name = "Beamer", Pieces = 1, LendingAvailable = true });
+
+        Assert.Equal(123L, created.Id);
+        Assert.Equal(0, created.CurrentlyLend);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/inventory-object", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("\"name\":\"Beamer\"", handler.LastRequestBody);
+        Assert.Contains("\"pieces\":1", handler.LastRequestBody);
+        Assert.Contains("\"lendingAvailable\":true", handler.LastRequestBody);
+        Assert.DoesNotContain("org", handler.LastRequestBody);
+        Assert.DoesNotContain("picture", handler.LastRequestBody);
+        Assert.DoesNotContain("currentlyLend", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task CreateInventoryObject_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateInventoryObjectAsync(new InventoryObject { Name = "Y" });
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task UpdateInventoryObject_SendsPatchDictionary()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"id":5,"name":"Neu","pieces":3}""");
+        var client = CreateClient(handler);
+
+        var updated = await client.UpdateInventoryObjectAsync(5,
+            new Dictionary<string, object> { ["name"] = "Neu", ["pieces"] = 3 });
+
+        Assert.Equal("Neu", updated.Name);
+        Assert.Equal(3, updated.Pieces);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/inventory-object/5", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"name\":\"Neu\",\"pieces\":3}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task DeleteInventoryObject_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteInventoryObjectAsync(42);
+
+        Assert.Equal(HttpMethod.Delete, handler.LastRequestMethod);
+        Assert.EndsWith("/inventory-object/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListInventoryObjects_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInventoryObjectsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //

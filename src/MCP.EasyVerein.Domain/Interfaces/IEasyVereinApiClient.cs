@@ -581,6 +581,53 @@ public interface IEasyVereinApiClient
     Task<GetTokenResult> GetTokenAsync(
         string username, string password, string? twoFactorCode = null, CancellationToken ct = default);
 
+    /// <summary>Lists the organization's inventory objects with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional object name filter.</param>
+    /// <param name="identifier">Optional article number filter.</param>
+    /// <param name="lendingAvailable">Optional filter for objects that can be lent.</param>
+    /// <param name="deleted">Optional soft-deleted filter.</param>
+    /// <param name="locationObject">Optional location ID filter.</param>
+    /// <param name="locationObjectNot">Optional location ID to exclude.</param>
+    /// <param name="inventoryObjectGroups">Optional comma-separated list of group IDs filter.</param>
+    /// <param name="inventoryObjectGroupsNot">Optional comma-separated list of group IDs to exclude.</param>
+    /// <param name="lendingState">Optional lending state filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching inventory objects.</returns>
+    Task<IReadOnlyList<InventoryObject>> ListInventoryObjectsAsync(
+        string? idIn = null, string? name = null, string? identifier = null,
+        bool? lendingAvailable = null, bool? deleted = null,
+        long? locationObject = null, long? locationObjectNot = null,
+        string? inventoryObjectGroups = null, string? inventoryObjectGroupsNot = null,
+        string? lendingState = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single inventory object by ID.</summary>
+    /// <param name="id">The inventory object ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The inventory object, or <c>null</c> if not found.</returns>
+    Task<InventoryObject?> GetInventoryObjectAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new inventory object.</summary>
+    /// <param name="inventoryObject">The inventory object to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created inventory object.</returns>
+    Task<InventoryObject> CreateInventoryObjectAsync(InventoryObject inventoryObject, CancellationToken ct = default);
+
+    /// <summary>Partially updates an inventory object (PATCH semantics).</summary>
+    /// <param name="id">The inventory object ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated inventory object.</returns>
+    Task<InventoryObject> UpdateInventoryObjectAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes an inventory object by ID (moves it to the wastebasket).</summary>
+    /// <param name="id">The inventory object ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteInventoryObjectAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>
