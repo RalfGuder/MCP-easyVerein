@@ -1,10 +1,17 @@
 name: Build & Test
 
 on:
+  # Feature/fix branches are built via their pull request only; building them
+  # on push as well ran every job twice per commit.
   push:
-    branches: [ main, "feature/**", "fix/**" ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   VERSION_PREFIX: "1.0.0"
