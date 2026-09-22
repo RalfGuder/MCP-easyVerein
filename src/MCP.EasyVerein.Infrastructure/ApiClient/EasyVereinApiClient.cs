@@ -1356,6 +1356,90 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<InventoryObject>(response, ct);
     }
 
+    // ------------------------------------------------------------------ //
+    // Inventory Object Groups
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Creates a new inventory object group via the API.</summary>
+    /// <param name="group">The group to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="InventoryObjectGroup"/> as returned by the API.</returns>
+    public async Task<InventoryObjectGroup> CreateInventoryObjectGroupAsync(
+        InventoryObjectGroup group, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("inventory-object-group"), BuildJsonContent(group), ct), ct);
+        return await HandleResponse<InventoryObjectGroup>(response, ct);
+    }
+
+    /// <summary>Deletes an inventory object group by ID (moves it to the wastebasket).</summary>
+    /// <param name="id">The group ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteInventoryObjectGroupAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"inventory-object-group/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single inventory object group by ID.</summary>
+    /// <param name="id">The group ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The group, or <c>null</c> if not found.</returns>
+    public async Task<InventoryObjectGroup?> GetInventoryObjectGroupAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(
+                BuildGetUrl($"inventory-object-group/{id}", InventoryObjectGroupQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<InventoryObjectGroup>(response, ct);
+    }
+
+    /// <summary>Lists inventory object groups with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="name">Optional group name filter.</param>
+    /// <param name="color">Optional hex color filter.</param>
+    /// <param name="short">Optional short-label filter.</param>
+    /// <param name="deleted">Optional soft-deleted filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching groups.</returns>
+    public async Task<IReadOnlyList<InventoryObjectGroup>> ListInventoryObjectGroupsAsync(
+        string? idIn = null, string? name = null, string? color = null, string? @short = null,
+        bool? deleted = null, string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        var query = new InventoryObjectGroupQuery
+        {
+            IdIn = idIn,
+            Name = name,
+            Color = color,
+            Short = @short,
+            Deleted = deleted,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<InventoryObjectGroup>(
+            BuildListUrl("inventory-object-group", query.ToString()), ct);
+    }
+
+    /// <summary>Updates an inventory object group with PATCH semantics.</summary>
+    /// <param name="id">The group ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="InventoryObjectGroup"/> as returned by the API.</returns>
+    public async Task<InventoryObjectGroup> UpdateInventoryObjectGroupAsync(
+        long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"inventory-object-group/{id}"), content, ct), ct);
+        return await HandleResponse<InventoryObjectGroup>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

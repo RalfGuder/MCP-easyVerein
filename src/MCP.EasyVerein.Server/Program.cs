@@ -75,6 +75,7 @@ builder.Services
     .WithTools<ForumTools>()
     .WithTools<GetTokenTools>()
     .WithTools<InventoryObjectTools>()
+    .WithTools<InventoryObjectGroupTools>()
     .WithTools<InvoiceItemTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 
