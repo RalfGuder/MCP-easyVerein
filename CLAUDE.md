@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 
-### Implementierte Endpoints (24)
+### Implementierte Endpoints (25)
 
 | Endpoint            | User Story | MCP-Tools                                                |
 |---------------------|------------|----------------------------------------------------------|
@@ -115,6 +115,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | InvoiceItem        | US-0028    | list, get, create, update (PATCH), delete                |
 | InventoryObject     | US-0026    | list, get, create (pieces Pflicht), update (PATCH), delete (Papierkorb) |
 | InventoryObjectGroup | US-0027   | list, get, create, update (PATCH), delete (Papierkorb)   |
+| Lending             | US-0029    | list, get, create, update (PATCH), delete (Papierkorb)   |
 
 ### HTTP-Methoden in der easyVerein API v1.7
 
@@ -125,16 +126,20 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Nächste anstehende Endpoints
 
-- US-0029: Lending
-- US-0028 ff.: siehe offene Issues
+- US-0063: Gruppenzuordnung für Inventarobjekte (inkl. `lendingResponsible`-Analyse)
+- Weitere: siehe offene Issues
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (120)
+- **Domain.Tests** — Entity- und Value-Object-Tests (129)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (208)
-- **Server.Tests** — Tool-Tests (83)
-- **Gesamt: 424 Tests** (US-0027 bringt +29: 3 Domain + 11 Infrastructure + 15 Server)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (218)
+- **Server.Tests** — Tool-Tests (101)
+- **Gesamt: 461 Tests** (US-0029 bringt +36: 8 Domain + 10 Infrastructure + 18 Server)
+
+### Laufender MCP-Server blockiert den Build
+
+Der über `.mcp.json` gestartete Server sperrt `src/*/bin` — `dotnet test` bricht dann **nur** für `Server.Tests` mit `MSB3027`/`MSB3021` ab. Abhilfe ohne Prozess-Kill: `dotnet test --artifacts-path <temp-verzeichnis>`.
 
 ## Repository
 
