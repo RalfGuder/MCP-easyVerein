@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -54,8 +53,8 @@ public class InventoryObjectGroup : IHasId
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Short { get; set; }
 
-    /// <summary>Gets or sets the items linked to the group as raw JSON (read-only). Maps to API field '<c>linkedItems</c>'.</summary>
+    /// <summary>Gets or sets the count of inventory objects linked to the group (read-only). Maps to API field '<c>linkedItems</c>'.</summary>
     [JsonPropertyName(InventoryObjectGroupFields.LinkedItems)]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public JsonElement? LinkedItems { get; set; }
+    public int? LinkedItems { get; set; }
 }

@@ -3713,7 +3713,7 @@ public class EasyVereinApiClientTests
         var json = """
             {
                 "results": [
-                    {"id": 1, "name": "Zelte", "color": "#ff8800", "short": "ZLT", "linkedItems": []},
+                    {"id": 1, "name": "Zelte", "color": "#ff8800", "short": "ZLT", "linkedItems": 0},
                     {"id": 2, "name": "Technik", "color": "#0000ff", "short": "TEC"}
                 ],
                 "next": null
@@ -3837,7 +3837,7 @@ public class EasyVereinApiClientTests
     [Fact]
     public async Task CreateInventoryObjectGroup_PostsWritableFields_WithoutReadOnlyFields()
     {
-        var createdJson = """{"id":123,"name":"Zelte","color":"#ff8800","short":"ZLT","org":"https://easyverein.com/api/v2.0/organization/1","linkedItems":[]}""";
+        var createdJson = """{"id":123,"name":"Zelte","color":"#ff8800","short":"ZLT","org":"https://easyverein.com/api/v2.0/organization/1","linkedItems":0}""";
         var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
         var client = CreateClient(handler);
 

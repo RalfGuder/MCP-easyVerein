@@ -19,7 +19,7 @@ public class InventoryObjectGroupEntityTests
                 "name": "Zelte",
                 "color": "#ff8800",
                 "short": "ZLT",
-                "linkedItems": ["https://easyverein.com/api/v2.0/inventory-object/335646309"]
+                "linkedItems": 3
             }
             """;
 
@@ -36,9 +36,7 @@ public class InventoryObjectGroupEntityTests
         Assert.Equal("Zelte", group.Name);
         Assert.Equal("#ff8800", group.Color);
         Assert.Equal("ZLT", group.Short);
-        Assert.NotNull(group.LinkedItems);
-        Assert.Equal(JsonValueKind.Array, group.LinkedItems!.Value.ValueKind);
-        Assert.Equal(1, group.LinkedItems.Value.GetArrayLength());
+        Assert.Equal(3, group.LinkedItems);
     }
 
     [Fact]
@@ -60,6 +58,25 @@ public class InventoryObjectGroupEntityTests
         Assert.Null(group.DeleteAfterDate);
         Assert.Null(group.LinkedItems);
         Assert.Null(group.CreatedAt);
+    }
+
+    [Fact]
+    public void LinkedItems_WithoutLinkedObjects_IsZeroNotNull()
+    {
+        var json = """
+            {
+                "id": 577034346,
+                "name": "MCP-Test linkedItems",
+                "color": "#123456",
+                "short": "MTLI",
+                "linkedItems": 0
+            }
+            """;
+
+        var group = JsonSerializer.Deserialize<InventoryObjectGroup>(json);
+
+        Assert.NotNull(group);
+        Assert.Equal(0, group.LinkedItems);
     }
 
     [Fact]

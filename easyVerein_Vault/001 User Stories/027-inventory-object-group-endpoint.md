@@ -27,8 +27,8 @@
 4. [x] `IEasyVereinApiClient` und `EasyVereinApiClient` um CRUD-Methoden erweitern
 5. [x] `InventoryObjectGroupTools.cs` als MCP-Tool-Klasse erstellen
 6. [x] `Program.cs` um Registrierung erweitern
-7. [x] Unit-Tests schreiben (+29: 3 Domain, 11 Infrastructure, 15 Server → 424 gesamt)
-8. [ ] Manuelle Verifikation gegen die easyVerein API – lesend erledigt, Schreibtest offen
+7. [x] Unit-Tests schreiben (+30: 4 Domain, 11 Infrastructure, 15 Server → 425 gesamt)
+8. [x] Manuelle Verifikation gegen die easyVerein API – lesend und schreibend erledigt
 
 ## Technische Hinweise
 
@@ -36,13 +36,21 @@
 - Endpoint: `/inventory-object-group` (`GET`, `POST`) und `/{pk}` (`GET`, `PUT`, `PATCH`, `DELETE`); die Tools nutzen nur `PATCH`
 - `DELETE` verschiebt in den Papierkorb (`wastebasket/inventory-object-group/{pk}`), endgültiges Löschen dort per `DELETE`
 - Schreibbare Felder: `name` (max 200), `color` (Hex, max 7), `short` (max 4) – laut Spec alle drei für Gruppen erforderlich, im Tool vorab geprüft
-- Nur lesend: `id`, `org`, `created_at`, `updated_at`, `_deleteAfterDate`, `_deletedBy`, `linkedItems` (Struktur unbekannt → `JsonElement?`)
+- Nur lesend: `id`, `org`, `created_at`, `updated_at`, `_deleteAfterDate`, `_deletedBy`, `linkedItems` (Anzahl verknüpfter Inventarobjekte → `int?`, live belegt)
 - Filter: `id__in`, `name`, `color`, `short`, `deleted`, `ordering`, `search` (name, short, color)
 - Nicht im Umfang: `bulk-create`/`bulk-update`
 - Architektur konsistent mit bestehenden Entities
 - Priorität: **Mittel**
 
-## Live-Verifikation (2026-09-17)
+## Live-Verifikation (2026-09-17 lesend / 2026-09-22 schreibend)
 
 - Lesend über die gebauten DLLs: `list` leer (Verein hat 0 Gruppen), `deleted=true` leer, `get 1` → „not found“.
-- **Schreibtest offen:** Skript liegt bereit (`scratchpad/grp_live_write.ps1`); der Auto-Mode blockiert Schreibzugriffe, der PO startet es per `!`. Zu klären: tatsächliche Pflichtfelder und Struktur von `linkedItems`.
+- **Pflichtfelder bestätigt:** `POST {}` → 400 „Folgende Felder müssen angegeben werden: name, short, color“; `POST {"name": …}` → 400 für `short` und `color`. Die Vorabprüfung im Tool deckt sich exakt mit der API.
+- **Anlegen, `get`, `list`, PATCH, alle Filter** (`name`, `color`, `short`, `search`, Nicht-Treffer) live geprüft – alle erwartungsgemäß.
+- **Löschen:** `DELETE` → Papierkorb (`wastebasket/inventory-object-group/{pk}` → 200), `get` danach „not found“, Hard-Delete → 204, danach 404.
+- **`linkedItems` ist eine Anzahl, kein Array:** Mit einem verknüpften Inventarobjekt springt der Wert von `0` auf `1` (auch ohne Feld-Selektor). Entity deshalb von `JsonElement?` auf `int?` umgestellt – konsistent mit `Calendar.LinkedItems`.
+- **Keine Nebenwirkungen:** Inventarobjekt „Zelt“ (335646309) unverändert, danach 0 Gruppen und 0 Einträge im Papierkorb.
+
+### Befund für eine Folge-Story
+
+`inventory-object.inventoryObjectGroups` ist laut `OPTIONS` read-only, lässt sich aber per `PATCH` setzen (200, Verknüpfung wirksam). Derselbe Fehler in den Metadaten wie bei `lendingResponsible` in [[026-inventory-object-endpoint]]. Beim Test hat der PATCH zusätzlich das beim Anlegen automatisch gesetzte `lendingResponsible` auf `null` zurückgesetzt. Gehört in eine eigene Story, nicht in diesen PR.
