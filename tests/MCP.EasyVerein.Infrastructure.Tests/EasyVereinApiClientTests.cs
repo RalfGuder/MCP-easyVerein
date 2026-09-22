@@ -3904,6 +3904,236 @@ public class EasyVereinApiClientTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListInventoryObjectGroupsAsync());
     }
+
+    // ------------------------------------------------------------------ //
+    // Lendings
+    // ------------------------------------------------------------------ //
+
+    [Fact]
+    public async Task ListLendings_ReturnsLendings()
+    {
+        var json = """
+            {
+                "results": [
+                    {
+                        "id": 37839,
+                        "parentInventoryObject": "https://easyverein.com/api/v2.0/inventory-object/335646309",
+                        "borrowAddress": "https://easyverein.com/api/v2.0/contact-details/335646225",
+                        "name": "Ausleihe von Ralf Guder",
+                        "borrowingDate": "2025-10-27",
+                        "returnDate": null,
+                        "quantity": 1,
+                        "state": "lent"
+                    },
+                    {"id": 37840, "quantity": 3, "state": "returned"}
+                ],
+                "next": null
+            }
+            """;
+        var handler = new FakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        var result = await client.ListLendingsAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal(335646309L, result[0].ParentInventoryObjectId);
+        Assert.Equal(335646225L, result[0].BorrowAddressId);
+        Assert.Equal("Ausleihe von Ralf Guder", result[0].Name);
+        Assert.Equal(new DateTime(2025, 10, 27), result[0].BorrowingDate);
+        Assert.Null(result[0].ReturnDate);
+        Assert.Equal("returned", result[1].State);
+        Assert.Equal(3, result[1].Quantity);
+    }
+
+    [Fact]
+    public async Task ListLendings_SendsFilterParameters()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListLendingsAsync(
+            idIn: "1,2",
+            parentInventoryObject: 335646309,
+            parentInventoryObjectNot: 11,
+            borrowMember: 4424352,
+            borrowMemberNot: 12,
+            borrowAddress: 335646225,
+            borrowAddressNot: 13,
+            state: "lent",
+            stateNot: "returned",
+            borrowingDate: "2025-10-27",
+            borrowingDateGte: "2025-10-01",
+            borrowingDateLte: "2025-10-31",
+            returnDate: "2025-11-03",
+            returnDateGte: "2025-11-01",
+            returnDateLte: "2025-11-30",
+            quantity: 1,
+            quantityGt: 0,
+            quantityLt: 5,
+            futureReturnDate: true,
+            deleted: false,
+            ordering: "-borrowingDate",
+            search: new[] { "Zelt" });
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.EndsWith("/lending", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("id__in=1%2C2", query);
+        Assert.Contains("parentInventoryObject=335646309", query);
+        Assert.Contains("parentInventoryObject__not=11", query);
+        Assert.Contains("borrowMember=4424352", query);
+        Assert.Contains("borrowMember__not=12", query);
+        Assert.Contains("borrowAddress=335646225", query);
+        Assert.Contains("borrowAddress__not=13", query);
+        Assert.Contains("state=lent", query);
+        Assert.Contains("state__ne=returned", query);
+        Assert.Contains("borrowingDate=2025-10-27", query);
+        Assert.Contains("borrowingDate__gte=2025-10-01", query);
+        Assert.Contains("borrowingDate__lte=2025-10-31", query);
+        Assert.Contains("returnDate=2025-11-03", query);
+        Assert.Contains("returnDate__gte=2025-11-01", query);
+        Assert.Contains("returnDate__lte=2025-11-30", query);
+        Assert.Contains("quantity=1", query);
+        Assert.Contains("quantity__gt=0", query);
+        Assert.Contains("quantity__lt=5", query);
+        Assert.Contains("futureReturnDate=true", query);
+        Assert.Contains("deleted=false", query);
+        Assert.Contains("ordering=-borrowingDate", query);
+        Assert.Contains("search=Zelt", query);
+        Assert.Contains("limit=100", query);
+    }
+
+    [Fact]
+    public async Task ListLendings_RequestsAllFields()
+    {
+        var json = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, json);
+        var client = CreateClient(handler);
+
+        await client.ListLendingsAsync();
+
+        var query = Uri.UnescapeDataString(handler.LastRequestUri!.Query);
+        Assert.Contains(
+            "query={id,org,parentInventoryObject,borrowAddress,name,created_at,updated_at,"
+            + "_deleteAfterDate,_deletedBy,borrowingDate,returnDate,quantity,borrowTime,returnTime,state}",
+            query);
+    }
+
+    [Fact]
+    public async Task GetLending_WithNotFound_ReturnsNull()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.NotFound, "{}");
+        var client = CreateClient(handler);
+
+        var result = await client.GetLendingAsync(999);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetLending_AfterListWithFilters_DoesNotLeakFiltersIntoUrl()
+    {
+        var listJson = JsonSerializer.Serialize(new { results = Array.Empty<object>(), next = (string?)null });
+        var getJson = JsonSerializer.Serialize(new { id = 999, state = "lent" });
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, listJson),
+            (HttpStatusCode.OK, getJson)
+        });
+        var client = CreateClient(handler);
+
+        await client.ListLendingsAsync(state: "lent", ordering: "quantity", futureReturnDate: true);
+        var lending = await client.GetLendingAsync(999);
+
+        var query = handler.LastRequestUri!.Query;
+        Assert.Equal(999L, lending!.Id);
+        Assert.EndsWith("/lending/999", handler.LastRequestUri!.AbsolutePath);
+        Assert.DoesNotContain("state=", query);
+        Assert.DoesNotContain("ordering=", query);
+        Assert.DoesNotContain("futureReturnDate=", query);
+        Assert.Contains("query=", query);
+    }
+
+    [Fact]
+    public async Task CreateLending_PostsWritableFields_WithoutReadOnlyFields()
+    {
+        var createdJson = """
+            {"id":555,"parentInventoryObject":"https://easyverein.com/api/v2.0/inventory-object/335646309",
+             "name":"Ausleihe von Test","org":"https://easyverein.com/api/v2.0/organization/1","quantity":1,"state":"lent"}
+            """;
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, createdJson);
+        var client = CreateClient(handler);
+
+        var created = await client.CreateLendingAsync(new Lending
+        {
+            ParentInventoryObjectId = 335646309,
+            BorrowAddressId = 335646225,
+            Quantity = 1,
+            State = "lent"
+        });
+
+        Assert.Equal(555L, created.Id);
+        Assert.Equal(HttpMethod.Post, handler.LastRequestMethod);
+        Assert.EndsWith("/lending", handler.LastRequestUri!.AbsolutePath);
+        Assert.Contains("\"parentInventoryObject\":335646309", handler.LastRequestBody);
+        Assert.Contains("\"borrowAddress\":335646225", handler.LastRequestBody);
+        Assert.Contains("\"quantity\":1", handler.LastRequestBody);
+        Assert.Contains("\"state\":\"lent\"", handler.LastRequestBody);
+        Assert.DoesNotContain("org", handler.LastRequestBody);
+        Assert.DoesNotContain("\"name\"", handler.LastRequestBody);
+        Assert.DoesNotContain("created_at", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task CreateLending_SendsFixedLengthBody_NotChunked()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateLendingAsync(new Lending { ParentInventoryObjectId = 1, Quantity = 1 });
+
+        Assert.False(handler.LastRequestUsedChunkedEncoding,
+            "POST must not use Transfer-Encoding: chunked — easyVerein rejects chunked bodies with HTTP 411.");
+        Assert.NotNull(handler.LastRequestContentLength);
+        Assert.True(handler.LastRequestContentLength > 0);
+    }
+
+    [Fact]
+    public async Task UpdateLending_SendsPatchDictionary()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"id":5,"state":"returned","quantity":2}""");
+        var client = CreateClient(handler);
+
+        var updated = await client.UpdateLendingAsync(5,
+            new Dictionary<string, object> { ["state"] = "returned", ["quantity"] = 2 });
+
+        Assert.Equal("returned", updated.State);
+        Assert.Equal(2, updated.Quantity);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/lending/5", handler.LastRequestUri!.AbsolutePath);
+        Assert.Equal("{\"state\":\"returned\",\"quantity\":2}", handler.LastRequestBody);
+    }
+
+    [Fact]
+    public async Task DeleteLending_SendsDeleteToExpectedPath()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(handler);
+
+        await client.DeleteLendingAsync(42);
+
+        Assert.Equal(HttpMethod.Delete, handler.LastRequestMethod);
+        Assert.EndsWith("/lending/42", handler.LastRequestUri!.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task ListLendings_WithUnauthorized_ThrowsUnauthorizedAccessException()
+    {
+        var handler = new FakeHttpHandler(HttpStatusCode.Unauthorized, "{}");
+        var client = CreateClient(handler);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ListLendingsAsync());
+    }
 }
 
 // ------------------------------------------------------------------ //

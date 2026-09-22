@@ -1440,6 +1440,121 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         return await HandleResponse<InventoryObjectGroup>(response, ct);
     }
 
+    /// <summary>Creates a new lending via the API.</summary>
+    /// <param name="lending">The lending to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created <see cref="Lending"/> as returned by the API.</returns>
+    public async Task<Lending> CreateLendingAsync(Lending lending, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PostAsync(BuildUrl("lending"), BuildJsonContent(lending), ct), ct);
+        return await HandleResponse<Lending>(response, ct);
+    }
+
+    /// <summary>Deletes a lending by its unique identifier (moves it to the wastebasket).</summary>
+    /// <param name="id">The lending ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    public async Task DeleteLendingAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.DeleteAsync(BuildUrl($"lending/{id}"), ct), ct);
+        await EnsureSuccessOrThrowAsync(response, ct);
+    }
+
+    /// <summary>Gets a single lending by its unique identifier.</summary>
+    /// <param name="id">The lending ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The <see cref="Lending"/>, or <c>null</c> if the API returns 404.</returns>
+    public async Task<Lending?> GetLendingAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"lending/{id}", LendingQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        return await HandleResponse<Lending>(response, ct);
+    }
+
+    /// <summary>Lists the organization's lendings with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="parentInventoryObject">Optional inventory object filter.</param>
+    /// <param name="parentInventoryObjectNot">Optional inventory object to exclude.</param>
+    /// <param name="borrowMember">Optional borrowing member filter.</param>
+    /// <param name="borrowMemberNot">Optional borrowing member to exclude.</param>
+    /// <param name="borrowAddress">Optional borrower contact details filter.</param>
+    /// <param name="borrowAddressNot">Optional borrower contact details to exclude.</param>
+    /// <param name="state">Optional lending state filter.</param>
+    /// <param name="stateNot">Optional lending state to exclude.</param>
+    /// <param name="borrowingDate">Optional exact borrowing date filter.</param>
+    /// <param name="borrowingDateGte">Optional minimum borrowing date filter.</param>
+    /// <param name="borrowingDateLte">Optional maximum borrowing date filter.</param>
+    /// <param name="returnDate">Optional exact return date filter.</param>
+    /// <param name="returnDateGte">Optional minimum return date filter.</param>
+    /// <param name="returnDateLte">Optional maximum return date filter.</param>
+    /// <param name="quantity">Optional exact quantity filter.</param>
+    /// <param name="quantityGt">Optional minimum quantity filter (exclusive).</param>
+    /// <param name="quantityLt">Optional maximum quantity filter (exclusive).</param>
+    /// <param name="futureReturnDate">Optional filter limiting the result to lendings returned in the future.</param>
+    /// <param name="deleted">Optional soft-deleted filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching lendings.</returns>
+    public async Task<IReadOnlyList<Lending>> ListLendingsAsync(
+        string? idIn = null, long? parentInventoryObject = null, long? parentInventoryObjectNot = null,
+        long? borrowMember = null, long? borrowMemberNot = null,
+        long? borrowAddress = null, long? borrowAddressNot = null,
+        string? state = null, string? stateNot = null,
+        string? borrowingDate = null, string? borrowingDateGte = null, string? borrowingDateLte = null,
+        string? returnDate = null, string? returnDateGte = null, string? returnDateLte = null,
+        int? quantity = null, int? quantityGt = null, int? quantityLt = null,
+        bool? futureReturnDate = null, bool? deleted = null,
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default)
+    {
+        var query = new LendingQuery
+        {
+            IdIn = idIn,
+            ParentInventoryObject = parentInventoryObject,
+            ParentInventoryObjectNot = parentInventoryObjectNot,
+            BorrowMember = borrowMember,
+            BorrowMemberNot = borrowMemberNot,
+            BorrowAddress = borrowAddress,
+            BorrowAddressNot = borrowAddressNot,
+            State = state,
+            StateNot = stateNot,
+            BorrowingDate = borrowingDate,
+            BorrowingDateGte = borrowingDateGte,
+            BorrowingDateLte = borrowingDateLte,
+            ReturnDate = returnDate,
+            ReturnDateGte = returnDateGte,
+            ReturnDateLte = returnDateLte,
+            Quantity = quantity,
+            QuantityGt = quantityGt,
+            QuantityLt = quantityLt,
+            FutureReturnDate = futureReturnDate,
+            Deleted = deleted,
+            Ordering = ordering,
+            Search = search
+        };
+
+        return await HandleListResponseWithPagination<Lending>(
+            BuildListUrl("lending", query.ToString()), ct);
+    }
+
+    /// <summary>Updates a lending with PATCH semantics.</summary>
+    /// <param name="id">The lending ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated <see cref="Lending"/> as returned by the API.</returns>
+    public async Task<Lending> UpdateLendingAsync(
+        long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"lending/{id}"), content, ct), ct);
+        return await HandleResponse<Lending>(response, ct);
+    }
+
     /// <summary>Creates a new booking via the API.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

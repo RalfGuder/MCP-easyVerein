@@ -667,6 +667,67 @@ public interface IEasyVereinApiClient
     /// <param name="ct">Cancellation token.</param>
     Task DeleteInventoryObjectGroupAsync(long id, CancellationToken ct = default);
 
+    /// <summary>Lists the organization's lendings with optional filters and automatic pagination.</summary>
+    /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
+    /// <param name="parentInventoryObject">Optional inventory object filter.</param>
+    /// <param name="parentInventoryObjectNot">Optional inventory object to exclude.</param>
+    /// <param name="borrowMember">Optional borrowing member filter.</param>
+    /// <param name="borrowMemberNot">Optional borrowing member to exclude.</param>
+    /// <param name="borrowAddress">Optional borrower contact details filter.</param>
+    /// <param name="borrowAddressNot">Optional borrower contact details to exclude.</param>
+    /// <param name="state">Optional lending state filter.</param>
+    /// <param name="stateNot">Optional lending state to exclude.</param>
+    /// <param name="borrowingDate">Optional exact borrowing date filter.</param>
+    /// <param name="borrowingDateGte">Optional minimum borrowing date filter.</param>
+    /// <param name="borrowingDateLte">Optional maximum borrowing date filter.</param>
+    /// <param name="returnDate">Optional exact return date filter.</param>
+    /// <param name="returnDateGte">Optional minimum return date filter.</param>
+    /// <param name="returnDateLte">Optional maximum return date filter.</param>
+    /// <param name="quantity">Optional exact quantity filter.</param>
+    /// <param name="quantityGt">Optional minimum quantity filter (exclusive).</param>
+    /// <param name="quantityLt">Optional maximum quantity filter (exclusive).</param>
+    /// <param name="futureReturnDate">Optional filter limiting the result to lendings returned in the future.</param>
+    /// <param name="deleted">Optional soft-deleted filter.</param>
+    /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="search">Optional search terms.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A read-only list of matching lendings.</returns>
+    Task<IReadOnlyList<Lending>> ListLendingsAsync(
+        string? idIn = null, long? parentInventoryObject = null, long? parentInventoryObjectNot = null,
+        long? borrowMember = null, long? borrowMemberNot = null,
+        long? borrowAddress = null, long? borrowAddressNot = null,
+        string? state = null, string? stateNot = null,
+        string? borrowingDate = null, string? borrowingDateGte = null, string? borrowingDateLte = null,
+        string? returnDate = null, string? returnDateGte = null, string? returnDateLte = null,
+        int? quantity = null, int? quantityGt = null, int? quantityLt = null,
+        bool? futureReturnDate = null, bool? deleted = null,
+        string? ordering = null, string[]? search = null,
+        CancellationToken ct = default);
+
+    /// <summary>Gets a single lending by ID.</summary>
+    /// <param name="id">The lending ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The lending, or <c>null</c> if not found.</returns>
+    Task<Lending?> GetLendingAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Creates a new lending.</summary>
+    /// <param name="lending">The lending to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created lending.</returns>
+    Task<Lending> CreateLendingAsync(Lending lending, CancellationToken ct = default);
+
+    /// <summary>Partially updates a lending (PATCH semantics).</summary>
+    /// <param name="id">The lending ID to update.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated lending.</returns>
+    Task<Lending> UpdateLendingAsync(long id, object patchData, CancellationToken ct = default);
+
+    /// <summary>Deletes a lending by ID (moves it to the wastebasket).</summary>
+    /// <param name="id">The lending ID to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteLendingAsync(long id, CancellationToken ct = default);
+
     /// <summary>Creates a new booking.</summary>
     /// <param name="booking">The booking to create.</param>
     /// <param name="ct">Cancellation token.</param>

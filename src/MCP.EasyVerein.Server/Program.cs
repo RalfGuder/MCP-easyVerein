@@ -77,6 +77,7 @@ builder.Services
     .WithTools<InventoryObjectTools>()
     .WithTools<InventoryObjectGroupTools>()
     .WithTools<InvoiceItemTools>()
+    .WithTools<LendingTools>()
     .WithPrompts<PortoBuchungenPrompt>();
 
 var app = builder.Build();
