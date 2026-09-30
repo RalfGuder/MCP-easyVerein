@@ -47,28 +47,50 @@ Live-Testskript mit fünf Fällen, jeweils gegen ein frisch angelegtes Testobjek
 
 **Maßnahme (PO-Entscheid 2026-09-30):** `create_inventory_object` liest das Objekt nach dem `POST` per `GET` neu und gibt den tatsächlich gespeicherten Zustand zurück (+1 Request). Die Parameterbeschreibung wird korrigiert: Ohne Angabe wird kein Verleih-Verantwortlicher gespeichert.
 
+## Umsetzung (2026-09-30)
+
+- **Domain:** Neuer `FlexibleIdListConverter` (liest Zahlen, numerische Strings und URL-Referenzen, schreibt ein Integer-Array). `InventoryObject.InventoryObjectGroups` (`List<string>?`, URLs) → `InventoryObjectGroupIds` (`List<long>?`).
+- **Infrastructure:** Keine Code-Änderung nötig; Regressionstests für POST mit IDs, GET mit URL→ID und PATCH mit `[]`.
+- **Server:** `create_inventory_object` und `update_inventory_object` haben den Parameter `inventoryObjectGroups` (`long[]?`). Bei `update` ersetzt die Liste die Zuordnung, `[]` leert sie. Vor dem Senden wird jede ID per `GET inventory-object-group/{id}` geprüft; unbekannte IDs → `ERROR: Inventory object group(s) not found: …`.
+- **Re-Read nach Create:** `create_inventory_object` gibt den per `GET` gelesenen, gespeicherten Zustand zurück (Fallback: POST-Response). Beschreibung von `lendingResponsible` korrigiert.
+- **Tests:** +16 (Domain 7, Infrastructure 3, Server 6) → **477 grün**.
+
+### Live-Verifikation (gebaute Tools, ohne MCP-Neustart)
+
+| # | Schritt | Ergebnis |
+|---|---|---|
+| 1 | Anlegen mit Gruppe, ohne Verantwortlichen | Gruppe gespeichert, kein Phantom-Wert `8252487` in der Tool-Ausgabe |
+| 2 | Anlegen mit `lendingResponsible` 4424352 + zwei Gruppen | beides gespeichert |
+| 3 | Anlegen mit unbekannter Gruppe (ID 1) | verständliche Fehlermeldung, nichts angelegt |
+| 4 | Zuordnung auf andere Gruppe ändern | ersetzt, Verantwortlicher unverändert |
+| 5 | Nur `name` ändern | Gruppen und Verantwortlicher unverändert |
+| 6 | Zuordnung mit `[]` leeren | geleert |
+| 7 | Update mit unbekannter Gruppe | Fehlermeldung, Objekt unverändert |
+
+Alle Testobjekte und -gruppen per Papierkorb + Hard-Delete entfernt; Bestandsobjekt „Zelt" unverändert.
+
 ## Akzeptanzkriterien
 
 - [x] **Live-Analyse `lendingResponsible`:** Geklärt und dokumentiert, ob *jeder* `PATCH` auf `inventory-object` das Feld auf `null` setzt oder nur ein `PATCH`, der `inventoryObjectGroups` enthält. Testmatrix: PATCH nur `name`, PATCH nur `inventoryObjectGroups`, PATCH mit beiden, jeweils gegen ein Testobjekt mit gesetztem `lendingResponsible`.
 - [x] **Maßnahme abgeleitet:** Auf Basis der Analyse ist entschieden und im Dokument festgehalten, wie die Tools damit umgehen (Wert bewahren, explizit fordern oder nur dokumentieren). Bei bestätigtem Datenverlust in `update_inventory_object` wird das als Bug mitbehoben.
-- [ ] **`create_inventory_object`:** Neuer optionaler Parameter für die Gruppenzuordnung (Liste von Gruppen-IDs).
-- [ ] **`update_inventory_object`:** Neuer optionaler Parameter für die Gruppenzuordnung; PATCH-Semantik bleibt erhalten (nur übergebene Felder werden gesendet).
-- [ ] **Entity/Serialisierung:** `inventoryObjectGroups` ist lesend (URL-Referenzen → IDs) und schreibend (IDs) korrekt abgebildet.
-- [ ] **Validierung:** Nicht existierende Gruppen-IDs führen zu einer verständlichen Fehlermeldung statt zu einem rohen API-Fehler.
-- [ ] **Tests:** Unit-Tests nach TDD (Red-Green-Refactor), Coverage bleibt ≥ 70 %.
-- [ ] **Live-Verifikation:** Anlegen mit Gruppe, Zuordnung ändern, Zuordnung leeren, Bestandsdaten vorher/nachher vergleichen, alle Testdaten wieder entfernt.
-- [ ] **Dokumentation:** Der `OPTIONS`-Befund (`read_only` falsch) und das `lendingResponsible`-Verhalten sind im Story-Dokument festgehalten.
+- [x] **`create_inventory_object`:** Neuer optionaler Parameter für die Gruppenzuordnung (Liste von Gruppen-IDs).
+- [x] **`update_inventory_object`:** Neuer optionaler Parameter für die Gruppenzuordnung; PATCH-Semantik bleibt erhalten (nur übergebene Felder werden gesendet).
+- [x] **Entity/Serialisierung:** `inventoryObjectGroups` ist lesend (URL-Referenzen → IDs) und schreibend (IDs) korrekt abgebildet.
+- [x] **Validierung:** Nicht existierende Gruppen-IDs führen zu einer verständlichen Fehlermeldung statt zu einem rohen API-Fehler.
+- [x] **Tests:** Unit-Tests nach TDD (Red-Green-Refactor), Coverage bleibt ≥ 70 %.
+- [x] **Live-Verifikation:** Anlegen mit Gruppe, Zuordnung ändern, Zuordnung leeren, Bestandsdaten vorher/nachher vergleichen, alle Testdaten wieder entfernt.
+- [x] **Dokumentation:** Der `OPTIONS`-Befund (`read_only` falsch) und das `lendingResponsible`-Verhalten sind im Story-Dokument festgehalten.
 
 ## Aufgaben
 
 1. [x] Live-Testskript für die `lendingResponsible`-Testmatrix schreiben und ausführen
 2. [x] Ergebnis auswerten, Maßnahme festlegen, Akzeptanzkriterien ggf. schärfen
-3. [ ] `InventoryObjectFields` / `InventoryObject` für schreibbares `inventoryObjectGroups` anpassen
-4. [ ] `EasyVereinApiClient`: Gruppenzuordnung in Create- und Update-Pfad unterstützen
-5. [ ] `InventoryObjectTools`: Parameter in `CreateInventoryObject` und `UpdateInventoryObject` ergänzen, inkl. Validierung
-6. [ ] Unit-Tests nach TDD (Domain, Infrastructure, Server)
-7. [ ] Live-Verifikation gegen die easyVerein API
-8. [ ] Story-Dokument und `CLAUDE.md` nachziehen
+3. [x] `InventoryObjectFields` / `InventoryObject` für schreibbares `inventoryObjectGroups` anpassen
+4. [x] `EasyVereinApiClient`: Gruppenzuordnung in Create- und Update-Pfad unterstützen
+5. [x] `InventoryObjectTools`: Parameter in `CreateInventoryObject` und `UpdateInventoryObject` ergänzen, inkl. Validierung
+6. [x] Unit-Tests nach TDD (Domain, Infrastructure, Server)
+7. [x] Live-Verifikation gegen die easyVerein API
+8. [x] Story-Dokument und `CLAUDE.md` nachziehen
 
 ## Technische Hinweise
 

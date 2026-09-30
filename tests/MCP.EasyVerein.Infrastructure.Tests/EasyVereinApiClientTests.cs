@@ -3682,6 +3682,44 @@ public class EasyVereinApiClientTests
         Assert.Equal("{\"name\":\"Neu\",\"pieces\":3}", handler.LastRequestBody);
     }
 
+    /// <summary>Verifies that group assignments are posted as integer IDs, not URLs (US-0063).</summary>
+    [Fact]
+    public async Task CreateInventoryObject_WithGroupIds_PostsIntegerIds()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.Created, "{\"id\":1}");
+        var client = CreateClient(handler);
+
+        await client.CreateInventoryObjectAsync(
+            new InventoryObject { Name = "Beamer", Pieces = 1, InventoryObjectGroupIds = new List<long> { 11, 12 } });
+
+        Assert.Contains("\"inventoryObjectGroups\":[11,12]", handler.LastRequestBody);
+    }
+
+    /// <summary>Verifies that group URL references in a response are mapped to IDs (US-0063).</summary>
+    [Fact]
+    public async Task GetInventoryObject_MapsGroupUrlsToIds()
+    {
+        var json = """{"id":5,"inventoryObjectGroups":["https://easyverein.com/api/v2.0/inventory-object-group/11"]}""";
+        var client = CreateClient(new FakeHttpHandler(HttpStatusCode.OK, json));
+
+        var result = await client.GetInventoryObjectAsync(5);
+
+        Assert.Equal(new List<long> { 11 }, result!.InventoryObjectGroupIds);
+    }
+
+    /// <summary>Verifies that an empty group list is sent as <c>[]</c> so the API clears the assignment (US-0063).</summary>
+    [Fact]
+    public async Task UpdateInventoryObject_WithEmptyGroupList_SendsEmptyArray()
+    {
+        var handler = new CapturingFakeHttpHandler(HttpStatusCode.OK, """{"id":5,"inventoryObjectGroups":[]}""");
+        var client = CreateClient(handler);
+
+        await client.UpdateInventoryObjectAsync(5,
+            new Dictionary<string, object> { ["inventoryObjectGroups"] = Array.Empty<long>() });
+
+        Assert.Equal("{\"inventoryObjectGroups\":[]}", handler.LastRequestBody);
+    }
+
     [Fact]
     public async Task DeleteInventoryObject_SendsDeleteToExpectedPath()
     {
