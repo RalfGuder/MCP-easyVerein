@@ -17,10 +17,40 @@ Bei der Live-Verifikation von US-0027 ([PR #126](https://github.com/RalfGuder/MC
 
 Punkt 2 ist möglicherweise kein Sonderfall der Gruppenzuordnung, sondern betrifft jeden `PATCH` auf `inventory-object` — dann würde bereits das bestehende `update_inventory_object` bei jedem Aufruf stillschweigend den Verleih-Verantwortlichen löschen. Das ist vor der Umsetzung zu klären.
 
+## Analyse `lendingResponsible` (2026-09-30)
+
+Live-Testskript mit fünf Fällen, jeweils gegen ein frisch angelegtes Testobjekt. Alle Testdaten wurden danach per Papierkorb + Hard-Delete entfernt, das Bestandsobjekt „Zelt" (335646309) blieb unverändert.
+
+**Ergebnis: Kein `PATCH` setzt `lendingResponsible` zurück.** Der Befund aus US-0027 war ein Scheinbefund.
+
+| Fall | PATCH-Body | `lendingResponsible` danach | Gruppen danach |
+|---|---|---|---|
+| A | nur `name` | unverändert (`member/4424352`) | – |
+| B | nur `inventoryObjectGroups` | unverändert | gesetzt |
+| C | `name` + `inventoryObjectGroups` | unverändert | gesetzt |
+| D | `inventoryObjectGroups` + `lendingResponsible` explizit | unverändert | gesetzt |
+| E | `inventoryObjectGroups: []` (nach vorheriger Zuordnung) | unverändert | geleert |
+
+**Eigentliche Ursache — Phantom-Default beim Anlegen:**
+
+- `POST /inventory-object` **ohne** `lendingResponsible` liefert in der Response `lendingResponsible: member/8252487`.
+- Dieser Wert wird **nicht gespeichert**: Ein direkt folgendes `GET` (mit und ohne Feld-Selektor) liefert `null`.
+- `8252487` ist auch **keine gültige Referenz**: `POST` mit `"lendingResponsible": 8252487` → 400 „Folgende Referenz ist ungültig oder darf nicht verwendet werden: 8252487, Feld: lendingResponsible".
+- In US-0026/US-0027 wurde der Response-Wert als gespeicherter Default gedeutet; der spätere `null`-Wert nach dem PATCH war schlicht der tatsächliche Zustand.
+
+**Folgerungen:**
+
+- `update_inventory_object` verliert **keine** Daten; die Priorität der Story bleibt mittel.
+- `inventoryObjectGroups` ist per `PATCH` setzbar und mit `[]` leerbar, trotz `read_only` in `OPTIONS`.
+- Mit einem gültigen Mitglied (`4424352`) wird `lendingResponsible` beim Anlegen korrekt gespeichert.
+- `create_inventory_object` gibt bisher die POST-Response zurück und zeigt dadurch den Phantom-Wert `8252487` an; die Parameterbeschreibung „defaults to the API user" ist falsch.
+
+**Maßnahme (PO-Entscheid 2026-09-30):** `create_inventory_object` liest das Objekt nach dem `POST` per `GET` neu und gibt den tatsächlich gespeicherten Zustand zurück (+1 Request). Die Parameterbeschreibung wird korrigiert: Ohne Angabe wird kein Verleih-Verantwortlicher gespeichert.
+
 ## Akzeptanzkriterien
 
-- [ ] **Live-Analyse `lendingResponsible`:** Geklärt und dokumentiert, ob *jeder* `PATCH` auf `inventory-object` das Feld auf `null` setzt oder nur ein `PATCH`, der `inventoryObjectGroups` enthält. Testmatrix: PATCH nur `name`, PATCH nur `inventoryObjectGroups`, PATCH mit beiden, jeweils gegen ein Testobjekt mit gesetztem `lendingResponsible`.
-- [ ] **Maßnahme abgeleitet:** Auf Basis der Analyse ist entschieden und im Dokument festgehalten, wie die Tools damit umgehen (Wert bewahren, explizit fordern oder nur dokumentieren). Bei bestätigtem Datenverlust in `update_inventory_object` wird das als Bug mitbehoben.
+- [x] **Live-Analyse `lendingResponsible`:** Geklärt und dokumentiert, ob *jeder* `PATCH` auf `inventory-object` das Feld auf `null` setzt oder nur ein `PATCH`, der `inventoryObjectGroups` enthält. Testmatrix: PATCH nur `name`, PATCH nur `inventoryObjectGroups`, PATCH mit beiden, jeweils gegen ein Testobjekt mit gesetztem `lendingResponsible`.
+- [x] **Maßnahme abgeleitet:** Auf Basis der Analyse ist entschieden und im Dokument festgehalten, wie die Tools damit umgehen (Wert bewahren, explizit fordern oder nur dokumentieren). Bei bestätigtem Datenverlust in `update_inventory_object` wird das als Bug mitbehoben.
 - [ ] **`create_inventory_object`:** Neuer optionaler Parameter für die Gruppenzuordnung (Liste von Gruppen-IDs).
 - [ ] **`update_inventory_object`:** Neuer optionaler Parameter für die Gruppenzuordnung; PATCH-Semantik bleibt erhalten (nur übergebene Felder werden gesendet).
 - [ ] **Entity/Serialisierung:** `inventoryObjectGroups` ist lesend (URL-Referenzen → IDs) und schreibend (IDs) korrekt abgebildet.
@@ -31,8 +61,8 @@ Punkt 2 ist möglicherweise kein Sonderfall der Gruppenzuordnung, sondern betrif
 
 ## Aufgaben
 
-1. [ ] Live-Testskript für die `lendingResponsible`-Testmatrix schreiben und ausführen
-2. [ ] Ergebnis auswerten, Maßnahme festlegen, Akzeptanzkriterien ggf. schärfen
+1. [x] Live-Testskript für die `lendingResponsible`-Testmatrix schreiben und ausführen
+2. [x] Ergebnis auswerten, Maßnahme festlegen, Akzeptanzkriterien ggf. schärfen
 3. [ ] `InventoryObjectFields` / `InventoryObject` für schreibbares `inventoryObjectGroups` anpassen
 4. [ ] `EasyVereinApiClient`: Gruppenzuordnung in Create- und Update-Pfad unterstützen
 5. [ ] `InventoryObjectTools`: Parameter in `CreateInventoryObject` und `UpdateInventoryObject` ergänzen, inkl. Validierung
