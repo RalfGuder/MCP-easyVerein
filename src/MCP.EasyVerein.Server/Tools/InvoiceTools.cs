@@ -145,7 +145,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
     /// <param name="isDraft">New isDraft flag (set to <c>false</c> to finalize a draft).</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the updated invoice, or an error message.</returns>
-    [McpServerTool(Name = "update_invoice"), Description("Update an invoice (only provided fields are changed). Use this to finalize drafts (isDraft=false) or link to bookings (relatedBookingIds).")]
+    [McpServerTool(Name = "update_invoice"), Description("Update an invoice (only provided fields are changed). Use this to finalize drafts (isDraft=false) or link to bookings (relatedBookingIds). Note: linking bookings to an already finalized invoice does not settle the payment in easyVerein; the response then ends with a WARNING line and the payment must be assigned in the easyVerein web interface. Linking while finalizing a draft (as create_receipt does) settles it.")]
     public async Task<string> UpdateInvoice(
         [Description("The ID of the invoice to update")] long id,
         [Description("New description")] string? description,
@@ -177,7 +177,16 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
             if (isDraft.HasValue) patch[InvoiceFields.IsDraft] = isDraft.Value;
 
             var updated = await client.UpdateInvoiceAsync(id, patch, ct);
-            return ToolJson.Serialize(updated);
+            var json = ToolJson.Serialize(updated);
+            if (relatedBookingIds is not { Length: > 0 } || updated.IsDraft == true)
+                return json;
+
+            var reread = await client.GetInvoiceAsync(id, ct);
+            var openAmount = reread?.PaymentDifference ?? 0m;
+            return openAmount == 0m
+                ? json
+                : $"{json}\nWARNING: Bookings linked, but the payment is not settled (paymentDifference {openAmount.ToString(CultureInfo.InvariantCulture)}). " +
+                  "easyVerein does not settle bookings linked to a finalized invoice via the API; assign the payment in the easyVerein web interface.";
         }
         catch (Exception ex)
         {
