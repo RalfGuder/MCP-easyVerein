@@ -1,4 +1,5 @@
 using MCP.EasyVerein.Domain.Entities;
+using MCP.EasyVerein.Domain.ValueObjects;
 
 namespace MCP.EasyVerein.Domain.Interfaces;
 
@@ -6,9 +7,9 @@ namespace MCP.EasyVerein.Domain.Interfaces;
 public interface IEasyVereinApiClient
 {
     /// <summary>Lists all announcements, optionally filtered.</summary>
-    Task<IReadOnlyList<Announcement>> ListAnnouncementsAsync(
+    Task<PagedResult<Announcement>> ListAnnouncementsAsync(
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single announcement by ID.</summary>
     Task<Announcement?> GetAnnouncementAsync(long id, CancellationToken ct = default);
@@ -31,12 +32,13 @@ public interface IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
-    Task<IReadOnlyList<BankAccount>> ListBankAccountsAsync(
+    Task<PagedResult<BankAccount>> ListBankAccountsAsync(
         string? name = null, string? iban = null, string? bic = null,
         string? accountHolder = null, string? bankName = null,
         string? idIn = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single bank account by ID.</summary>
     /// <param name="id">The bank account ID.</param>
@@ -74,15 +76,16 @@ public interface IEasyVereinApiClient
     /// <param name="showOwnBillingAccounts">Optional filter to show only own billing accounts ("true"/"false").</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
-    Task<IReadOnlyList<BillingAccount>> ListBillingAccountsAsync(
+    Task<PagedResult<BillingAccount>> ListBillingAccountsAsync(
         string? name = null, string? idIn = null,
         string? skr = null, string? skrIn = null,
         string? numberGte = null, string? numberLte = null,
         string? deleted = null, string? accountingPlanIsNull = null,
         string? showOwnBillingAccounts = null,
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single billing account by ID.</summary>
     /// <param name="id">The billing account ID.</param>
@@ -117,13 +120,14 @@ public interface IEasyVereinApiClient
     /// <param name="budgetLt">Optional budget less-than filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
-    Task<IReadOnlyList<BookingProject>> ListBookingProjectsAsync(
+    Task<PagedResult<BookingProject>> ListBookingProjectsAsync(
         string? name = null, string? @short = null,
         string? completed = null, string? idIn = null,
         string? budgetGt = null, string? budgetLt = null,
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single booking project by ID.</summary>
     /// <param name="id">The booking project ID.</param>
@@ -158,14 +162,15 @@ public interface IEasyVereinApiClient
     /// <param name="relatedInvoice">Optional parent-invoice-ID filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching invoice items.</returns>
-    Task<IReadOnlyList<InvoiceItem>> ListInvoiceItemsAsync(
+    Task<PagedResult<InvoiceItem>> ListInvoiceItemsAsync(
         string? idIn = null,
         string? relatedInvoice = null,
         string? ordering = null,
         string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single invoice item by ID.</summary>
     /// <param name="id">The invoice item ID.</param>
@@ -197,11 +202,12 @@ public interface IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
-    Task<IReadOnlyList<ChairmanLevel>> ListChairmanLevelsAsync(
+    Task<PagedResult<ChairmanLevel>> ListChairmanLevelsAsync(
         string? name = null, string? @short = null,
         string? idIn = null, string? ordering = null,
-        string[]? search = null, CancellationToken ct = default);
+        string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single chairman level by ID.</summary>
     /// <param name="id">The chairman level ID.</param>
@@ -235,12 +241,13 @@ public interface IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed fields: name, short).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching contact-details groups.</returns>
-    Task<IReadOnlyList<ContactDetailsGroup>> ListContactDetailsGroupsAsync(
+    Task<PagedResult<ContactDetailsGroup>> ListContactDetailsGroupsAsync(
         string? name = null, string? color = null, string? @short = null,
         bool? deleted = null, string? idIn = null, string? ordering = null,
-        string[]? search = null, CancellationToken ct = default);
+        string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single contact-details group by ID.</summary>
     /// <param name="id">The contact-details group ID.</param>
@@ -272,11 +279,12 @@ public interface IEasyVereinApiClient
     /// <param name="dateGte">Optional date greater-or-equal filter.</param>
     /// <param name="dateLte">Optional date less-or-equal filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching contact-details logs.</returns>
-    Task<IReadOnlyList<ContactDetailsLog>> ListContactDetailsLogsAsync(
+    Task<PagedResult<ContactDetailsLog>> ListContactDetailsLogsAsync(
         string? idIn = null, string? date = null, string? dateGte = null,
-        string? dateLte = null, string? ordering = null, CancellationToken ct = default);
+        string? dateLte = null, string? ordering = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single contact-details log by ID.</summary>
     /// <param name="id">The contact-details log ID.</param>
@@ -316,14 +324,15 @@ public interface IEasyVereinApiClient
     /// <param name="collectionIsnull">Optional no-collection filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed fields: name, color, short).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching custom fields.</returns>
-    Task<IReadOnlyList<CustomField>> ListCustomFieldsAsync(
+    Task<PagedResult<CustomField>> ListCustomFieldsAsync(
         string? idIn = null, string? name = null, string? color = null, string? kind = null,
         string? settingsType = null, string? settingsTypeIn = null, bool? memberEdit = null,
         bool? memberShow = null, bool? deleted = null, string? collection = null,
         bool? collectionIsnull = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single custom field by ID.</summary>
     /// <param name="id">The custom-field ID.</param>
@@ -354,11 +363,12 @@ public interface IEasyVereinApiClient
     /// <param name="position">Optional position filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching custom field collections.</returns>
-    Task<IReadOnlyList<CustomFieldCollection>> ListCustomFieldCollectionsAsync(
+    Task<PagedResult<CustomFieldCollection>> ListCustomFieldCollectionsAsync(
         string? idIn = null, int? position = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single custom field collection by ID.</summary>
     /// <param name="id">The custom-field-collection ID.</param>
@@ -391,11 +401,12 @@ public interface IEasyVereinApiClient
     /// <param name="modelIn">Optional comma-separated list of filter models.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed field: name).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching custom filters.</returns>
-    Task<IReadOnlyList<CustomFilter>> ListCustomFiltersAsync(
+    Task<PagedResult<CustomFilter>> ListCustomFiltersAsync(
         string? idIn = null, string? name = null, string? model = null, string? modelIn = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single custom filter by ID.</summary>
     /// <param name="id">The custom-filter ID.</param>
@@ -432,13 +443,14 @@ public interface IEasyVereinApiClient
     /// <param name="showAllowedToUse">Optional filter returning only rates the organization may use.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed field: taxName).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching tax rates.</returns>
-    Task<IReadOnlyList<CustomTaxRate>> ListCustomTaxRatesAsync(
+    Task<PagedResult<CustomTaxRate>> ListCustomTaxRatesAsync(
         string? idIn = null, string? taxName = null, string? taxNameNe = null,
         string? customTaxRate = null, string? customTaxRateNe = null, bool? orgIsnull = null,
         bool? deleted = null, bool? showAllowedToUse = null, string? ordering = null,
-        string[]? search = null, CancellationToken ct = default);
+        string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single tax rate by ID.</summary>
     /// <param name="id">The tax-rate ID.</param>
@@ -474,12 +486,13 @@ public interface IEasyVereinApiClient
     /// <param name="federationNumber">Optional federation number filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching DOSB sports.</returns>
-    Task<IReadOnlyList<DosbSport>> ListDosbSportsAsync(
+    Task<PagedResult<DosbSport>> ListDosbSportsAsync(
         string? idIn = null, string? title = null, string? sportNumber = null,
         string? federationNumber = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single DOSB sport by ID.</summary>
     /// <param name="id">The DOSB-sport ID.</param>
@@ -496,11 +509,12 @@ public interface IEasyVereinApiClient
     /// <param name="authorIsme">Optional filter returning only requests authored by the current user.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed fields: title, description).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching feature requests.</returns>
-    Task<IReadOnlyList<FeatureRequest>> ListFeatureRequestsAsync(
+    Task<PagedResult<FeatureRequest>> ListFeatureRequestsAsync(
         string? idIn = null, string? status = null, string? category = null, bool? authorIsme = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single feature request by ID.</summary>
     /// <param name="id">The feature-request ID.</param>
@@ -539,14 +553,15 @@ public interface IEasyVereinApiClient
     /// <param name="updatedLt">Optional filter: updated before this date.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching forums.</returns>
-    Task<IReadOnlyList<Forum>> ListForumsAsync(
+    Task<PagedResult<Forum>> ListForumsAsync(
         string? idIn = null, string? name = null, string? nameNot = null,
         string? slug = null, string? slugNot = null, int? type = null,
         string? createdGt = null, string? createdLt = null,
         string? updatedGt = null, string? updatedLt = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single forum by ID.</summary>
     /// <param name="id">The forum ID.</param>
@@ -594,15 +609,16 @@ public interface IEasyVereinApiClient
     /// <param name="lendingState">Optional lending state filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching inventory objects.</returns>
-    Task<IReadOnlyList<InventoryObject>> ListInventoryObjectsAsync(
+    Task<PagedResult<InventoryObject>> ListInventoryObjectsAsync(
         string? idIn = null, string? name = null, string? identifier = null,
         bool? lendingAvailable = null, bool? deleted = null,
         long? locationObject = null, long? locationObjectNot = null,
         string? inventoryObjectGroups = null, string? inventoryObjectGroupsNot = null,
         string? lendingState = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single inventory object by ID.</summary>
     /// <param name="id">The inventory object ID.</param>
@@ -636,12 +652,13 @@ public interface IEasyVereinApiClient
     /// <param name="deleted">Optional soft-deleted filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching groups.</returns>
-    Task<IReadOnlyList<InventoryObjectGroup>> ListInventoryObjectGroupsAsync(
+    Task<PagedResult<InventoryObjectGroup>> ListInventoryObjectGroupsAsync(
         string? idIn = null, string? name = null, string? color = null, string? @short = null,
         bool? deleted = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single inventory object group by ID.</summary>
     /// <param name="id">The group ID.</param>
@@ -690,9 +707,10 @@ public interface IEasyVereinApiClient
     /// <param name="deleted">Optional soft-deleted filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching lendings.</returns>
-    Task<IReadOnlyList<Lending>> ListLendingsAsync(
+    Task<PagedResult<Lending>> ListLendingsAsync(
         string? idIn = null, long? parentInventoryObject = null, long? parentInventoryObjectNot = null,
         long? borrowMember = null, long? borrowMemberNot = null,
         long? borrowAddress = null, long? borrowAddressNot = null,
@@ -702,7 +720,7 @@ public interface IEasyVereinApiClient
         int? quantity = null, int? quantityGt = null, int? quantityLt = null,
         bool? futureReturnDate = null, bool? deleted = null,
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single lending by ID.</summary>
     /// <param name="id">The lending ID.</param>
@@ -832,13 +850,14 @@ public interface IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching events.</returns>
-    Task<IReadOnlyList<Event>> ListEventsAsync(string? name = null, string? startGte = null,
+    Task<PagedResult<Event>> ListEventsAsync(string? name = null, string? startGte = null,
         string? startLte = null, string? endGte = null, string? endLte = null,
         string? calendar = null, string? canceled = null, string? isPublic = null,
         string? idIn = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default);
+        PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single invoice by ID.</summary>
     /// <param name="id">The invoice ID.</param>
@@ -847,9 +866,10 @@ public interface IEasyVereinApiClient
     Task<Invoice?> GetInvoiceAsync(long id, CancellationToken ct = default);
 
     /// <summary>Gets all invoices.</summary>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of all invoices.</returns>
-    Task<IReadOnlyList<Invoice>> GetInvoicesAsync(CancellationToken ct = default);
+    Task<PagedResult<Invoice>> GetInvoicesAsync(PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Gets a single member by ID.</summary>
     /// <param name="id">The member ID.</param>
@@ -865,9 +885,10 @@ public interface IEasyVereinApiClient
     /// <param name="dateLt">Optional filter for dates less than the specified value.</param>
     /// <param name="ordering">Optional ordering criterion for the results.</param>
     /// <param name="search">Optional search terms to filter bookings.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching bookings.</returns>
-    Task<IReadOnlyList<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default, CancellationToken ct = default);
+    Task<PagedResult<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Lists calendars, optionally filtered by name, color, short, ordering, or search terms.</summary>
     /// <param name="name">Optional name filter.</param>
@@ -880,30 +901,33 @@ public interface IEasyVereinApiClient
     /// <param name="allowedGroups">Optional allowed groups filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching calendars.</returns>
-    Task<IReadOnlyList<Calendar>> ListCalendarsAsync(string? name = null, string? color = null,
+    Task<PagedResult<Calendar>> ListCalendarsAsync(string? name = null, string? color = null,
         string? short_ = null, string? nameNot = null, string? colorNot = null,
         string? shortNot = null, string? idIn = null, string? allowedGroups = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default);
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Lists contact details, optionally filtered by ID, first name, family name, or full name.</summary>
     /// <param name="id">Optional contact details ID to filter by.</param>
     /// <param name="firstName">Optional first name to filter by.</param>
     /// <param name="familyName">Optional family name to filter by.</param>
     /// <param name="name">Optional full name to search for.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching contact details.</returns>
-    Task<IReadOnlyList<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
-        string? familyName = null, string? name = null, CancellationToken ct = default);
+    Task<PagedResult<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
+        string? familyName = null, string? name = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Lists members, optionally filtered by ID, membership number, or search terms.</summary>
     /// <param name="id">Optional member ID to filter by.</param>
     /// <param name="membershipNumber">Optional membership number to filter by.</param>
     /// <param name="search">Optional search terms to filter members.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching members.</returns>
-    Task<IReadOnlyList<Member>> ListMembersAsync(long? id, string? membershipNumber, string[]? search, CancellationToken ct = default);
+    Task<PagedResult<Member>> ListMembersAsync(long? id, string? membershipNumber, string[]? search, PageRequest? paging = null, CancellationToken ct = default);
     /// <summary>Partially updates a booking.</summary>
     /// <param name="id">The booking ID to update.</param>
     /// <param name="patchData">An object containing the fields to patch.</param>
