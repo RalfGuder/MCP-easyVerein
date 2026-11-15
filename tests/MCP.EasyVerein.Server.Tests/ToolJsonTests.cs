@@ -72,7 +72,7 @@ public class ToolJsonTests
     {
         var json = ToolJson.Serialize(new Invoice { Id = 3, Path = value });
 
-        Assert.Contains(System.Text.Json.JsonSerializer.Serialize(value), json);
+        Assert.Equal(value, System.Text.Json.JsonDocument.Parse(json).RootElement.GetProperty("path").GetString());
     }
 
     /// <summary>Verifies that the member's contact details stay embedded because they carry the member's data.</summary>
@@ -106,6 +106,28 @@ public class ToolJsonTests
         var json = ToolJson.SerializePage(page);
 
         Assert.Equal("{\"items\":[{\"id\":1}],\"hasMore\":true,\"page\":1,\"limit\":1}", json);
+    }
+
+    /// <summary>Verifies that umlauts and other non-ASCII letters are written unescaped.</summary>
+    [Fact]
+    public void Serialize_WritesUmlautsUnescaped()
+    {
+        var json = ToolJson.Serialize(new BankAccount { Id = 1, Name = "Rücklagenkonto Größe 19 % €" });
+
+        Assert.Contains("Rücklagenkonto Größe 19 % €", json);
+        Assert.DoesNotContain(@"\u00", json);
+    }
+
+    /// <summary>Verifies that quotes and control characters stay escaped, so the JSON remains valid.</summary>
+    [Fact]
+    public void Serialize_KeepsQuotesAndControlCharactersEscaped()
+    {
+        const string name = "a\"b\nc";
+
+        var json = ToolJson.Serialize(new BankAccount { Id = 1, Name = name });
+
+        Assert.Contains(@"a\""b\nc", json);
+        Assert.Equal(name, System.Text.Json.JsonDocument.Parse(json).RootElement.GetProperty("name").GetString());
     }
 
     /// <summary>Verifies that valid paging arguments become a page request.</summary>
