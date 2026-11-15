@@ -91,11 +91,11 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
         [Description("The receiver of the booking")] string receiver,
         [Description("An optional description")] string? description,
         [Description("The booking date (ISO 8601)")] string? date,
-        [Description("Optional bank-account ID the booking belongs to (e.g. Handkasse, Vereinskonto; numeric ID of the bank-account entry)")] long? bankAccountId,
-        [Description("Optional billing-account ID (SKR42 account; numeric ID of the billing-account entry)")] long? billingAccountId,
-        [Description("Optional SKR42 sphere (1=ideell, 2=Vermögensverwaltung, 3=Zweckbetrieb, 4=wGB, 9=unkategorisiert)")] long? sphere,
-        [Description("Optional booking-project ID (numeric)")] long? bookingProjectId,
-        CancellationToken ct)
+        [Description("Optional bank-account ID the booking belongs to (e.g. Handkasse, Vereinskonto; numeric ID of the bank-account entry)")] long? bankAccountId = null,
+        [Description("Optional billing-account ID (SKR42 account; numeric ID of the billing-account entry)")] long? billingAccountId = null,
+        [Description("Optional SKR42 sphere (1=ideell, 2=Vermögensverwaltung, 3=Zweckbetrieb, 4=wGB, 9=unkategorisiert)")] long? sphere = null,
+        [Description("Optional booking-project ID (numeric)")] long? bookingProjectId = null,
+        CancellationToken ct = default)
     {
         Booking created;
         try
@@ -176,8 +176,8 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
         [Description("The new booking-project ID (the numeric ID of the target booking-project; the tool builds the full resource URL)")] long? bookingProjectId,
         [Description("The new billing-account ID (SKR42 account; the numeric ID of the billing-account entry; the tool builds the full resource URL)")] long? billingAccountId,
         [Description("The new SKR42 sphere (integer). Typical values: 1=ideeller Bereich, 2=Vermögensverwaltung, 3=Zweckbetrieb, 4=wirtschaftlicher Geschäftsbetrieb, 9=unkategorisiert (default)")] long? sphere,
-        [Description("The new bank-account ID (e.g. Handkasse, Vereinskonto; numeric ID of the bank-account entry)")] long? bankAccountId,
-        CancellationToken ct)
+        [Description("The new bank-account ID (e.g. Handkasse, Vereinskonto; numeric ID of the bank-account entry)")] long? bankAccountId = null,
+        CancellationToken ct = default)
     {
         try
         {
