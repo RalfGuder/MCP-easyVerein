@@ -130,11 +130,11 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (136)
+- **Domain.Tests** — Entity- und Value-Object-Tests (150)
 - **Application.Tests** — Konfigurationsauflösung (13)
 - **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (221)
 - **Server.Tests** — Tool-Tests (107)
-- **Gesamt: 477 Tests** (US-0063 bringt +16: 7 Domain + 3 Infrastructure + 6 Server)
+- **Gesamt: 491 Tests** (Fix nullable Invoice-Flags bringt +14 Domain)
 
 ### Laufender MCP-Server blockiert den Build
 

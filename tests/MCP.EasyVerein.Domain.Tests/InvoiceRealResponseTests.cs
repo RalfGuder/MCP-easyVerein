@@ -35,4 +35,28 @@ public class InvoiceRealResponseTests
         Assert.Equal("94KW7ABAR", invoice.RefNumber);
         Assert.True(invoice.IsReceipt);
     }
+
+    /// <summary>
+    /// Verifies that an invoice whose boolean flags are JSON null deserializes with <c>false</c>.
+    /// easyVerein returns <c>_isTaxRatePerInvoiceItem: null</c> for receipts created via the API (2026-11-15).
+    /// </summary>
+    [Theory]
+    [InlineData("gross")]
+    [InlineData("isDraft")]
+    [InlineData("isTemplate")]
+    [InlineData("isRequest")]
+    [InlineData("removeFileOnDelete")]
+    [InlineData("isReceipt")]
+    [InlineData("_isTaxRatePerInvoiceItem")]
+    [InlineData("_isSubjectToTax")]
+    [InlineData("useAddressBalance")]
+    public void Deserialize_NullBooleanFlag_ReadsAsFalse(string field)
+    {
+        var json = $$"""{ "id": 607991811, "{{field}}": null }""";
+
+        var invoice = JsonSerializer.Deserialize<Invoice>(json, Options());
+
+        Assert.NotNull(invoice);
+        Assert.Equal(607991811L, invoice!.Id);
+    }
 }
