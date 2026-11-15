@@ -87,6 +87,31 @@ public class BookingToolsTests
         Assert.Contains("777", result);
     }
 
+    /// <summary>
+    /// Verifies that the assignment parameters added later are optional in the generated MCP
+    /// tool schema, so clients with an older schema can still call the tools.
+    /// </summary>
+    [Theory]
+    [InlineData(nameof(BookingTools.CreateBooking), "bankAccountId")]
+    [InlineData(nameof(BookingTools.CreateBooking), "billingAccountId")]
+    [InlineData(nameof(BookingTools.CreateBooking), "sphere")]
+    [InlineData(nameof(BookingTools.CreateBooking), "bookingProjectId")]
+    [InlineData(nameof(BookingTools.UpdateBooking), "bankAccountId")]
+    public void ToolSchema_AssignmentParameter_IsNotRequired(string methodName, string parameter)
+    {
+        var tools = new BookingTools(new Mock<IEasyVereinApiClient>().Object, CreateConfig());
+        var method = typeof(BookingTools).GetMethod(methodName)!;
+
+        var tool = ModelContextProtocol.Server.McpServerTool.Create(method, tools);
+        var schema = tool.ProtocolTool.InputSchema;
+
+        Assert.True(schema.GetProperty("properties").TryGetProperty(parameter, out _));
+        var required = schema.TryGetProperty("required", out var r)
+            ? r.EnumerateArray().Select(e => e.GetString()).ToList()
+            : new List<string?>();
+        Assert.DoesNotContain(parameter, required);
+    }
+
     /// <summary>Verifies that <c>update_booking</c> sets the bank account as resource URL.</summary>
     [Fact]
     public async Task UpdateBooking_WithBankAccountId_SetsBankAccountUrl()
