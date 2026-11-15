@@ -26,7 +26,7 @@ Umfang **lesen und Konten frei-/abschalten**, kein create/delete: ein zweiter Pl
 - [x] MCP-Tools `list_accounting_plans`, `get_accounting_plan`: Konten mit id, Nummer und Name (bleiben in der Ausgabe eingebettet, nicht nur als ID).
 - [x] MCP-Tool `update_accounting_plan(id, addBillingAccountIds, removeBillingAccountIds)`: liest den Plan, sendet die resultierende Menge als URL-Referenzen per PATCH und liest danach neu ein; ohne echte Änderung kein PATCH; leere Angaben und eine ID in beiden Listen werden abgelehnt. Die Beschreibung verlangt eine ausdrückliche Anweisung des Nutzers.
 - [x] Tests nach TDD.
-- [ ] Live-Prüfung lesend (`list_accounting_plans`, `get_accounting_plan`).
+- [x] Live-Prüfung lesend (`list_accounting_plans`, `get_accounting_plan`): 2026-11-15 bestanden, 1 Plan (5430), 82 Konten mit id/number/name, Nicht-gefunden-Fall korrekt.
 - [ ] Live-Prüfung schreibend (`update_accounting_plan`): offen, weil sie den echten Kontenplan des Vereins ändern würde; erst bei einem echten Freischaltungsbedarf und nur auf Anweisung.
 
 ## Aufgaben
