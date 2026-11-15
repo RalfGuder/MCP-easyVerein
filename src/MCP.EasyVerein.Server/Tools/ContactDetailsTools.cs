@@ -18,7 +18,7 @@ public sealed class ContactDetailsTools(IEasyVereinApiClient client)
     /// <param name="id">Optional contact details ID filter.</param>
     /// <param name="firstName">Optional first name filter.</param>
     /// <param name="familyName">Optional family name filter.</param>
-    /// <param name="search">Optional search terms (OR-combined).</param>
+    /// <param name="search">Optional search terms (all must match).</param>
     /// <param name="limit">Entries per page (1-100).</param>
     /// <param name="page">Page number, starting at 1.</param>
     /// <param name="ct">Cancellation token.</param>
@@ -28,7 +28,7 @@ public sealed class ContactDetailsTools(IEasyVereinApiClient client)
         [Description("Contact details ID filter")] long? id,
         [Description("Exact first name filter")] string? firstName,
         [Description("Exact family name filter")] string? familyName,
-        [Description("Search terms; each term is matched against name, company and other searchable fields, several terms are combined with OR")] string[]? search,
+        [Description("Search terms; all terms must match (AND), each in name, company or another searchable field - e.g. [\"Anneliese\", \"Oehme\"]")] string[]? search,
         [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
         [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
         CancellationToken ct = default)

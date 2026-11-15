@@ -24,8 +24,8 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
         public string? FamilyName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets optional search terms. Each term is sent as its own <c>search</c> parameter:
-        /// the API ignores comma-joined terms and combines repeated parameters with OR.
+        /// Gets or sets optional search terms. They are sent comma-joined in one <c>search</c>
+        /// parameter; the API combines them with AND and evaluates only the last of repeated parameters.
         /// </summary>
         public string[]? Search { get; set; }
 
@@ -99,11 +99,9 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
             if (!string.IsNullOrEmpty(FamilyName))
                 parts.Add($"familyName={Uri.EscapeDataString(FamilyName)}");
 
-            if (Search != null)
-            {
-                foreach (var term in Search.Where(t => !string.IsNullOrWhiteSpace(t)))
-                    parts.Add($"search={Uri.EscapeDataString(term.Trim())}");
-            }
+            var terms = Search?.Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).ToArray();
+            if (terms is { Length: > 0 })
+                parts.Add($"search={Uri.EscapeDataString(string.Join(",", terms))}");
 
             return string.Join("&", parts);
         }
