@@ -19,7 +19,7 @@ Bei der Buchungsprüfung 2026 am 2026-11-15 haben alle per `create_receipt` erze
 - [x] Ein ungültiges `date` wird mit einer verständlichen Meldung abgelehnt, bevor etwas angelegt wird.
 - [x] Hat die Buchung kein Datum und ist kein `date` angegeben, bricht das Tool mit einer verständlichen Meldung ab, statt still das heutige Datum zu verwenden.
 - [x] Der Parameter ist im MCP-Schema wirklich optional (Default-Wert, vgl. PR #133).
-- [ ] Tests nach TDD; Live-Prüfung an einem Testfall: Belegdatum = Buchungsdatum.
+- [x] Tests nach TDD; Live-Prüfung an einem Testfall: Belegdatum = Buchungsdatum (2026-11-15: Testentwurf, PATCH `date` 2026-10-02 übernommen, Entwurf danach im Papierkorb).
 
 ## Umsetzung
 
