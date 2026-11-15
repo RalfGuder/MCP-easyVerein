@@ -133,8 +133,8 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 - **Domain.Tests** — Entity- und Value-Object-Tests (150)
 - **Application.Tests** — Konfigurationsauflösung (13)
 - **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (221)
-- **Server.Tests** — Tool-Tests (107)
-- **Gesamt: 491 Tests** (Fix nullable Invoice-Flags bringt +14 Domain)
+- **Server.Tests** — Tool-Tests (111)
+- **Gesamt: 495 Tests** (create_booking mit Bankkonto bringt +4 Server)
 
 ### Laufender MCP-Server blockiert den Build
 
