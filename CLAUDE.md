@@ -140,8 +140,8 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 - **Domain.Tests** — Entity- und Value-Object-Tests (161)
 - **Application.Tests** — Konfigurationsauflösung (13)
 - **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (232)
-- **Server.Tests** — Tool-Tests (140)
-- **Gesamt: 546 Tests**
+- **Server.Tests** — Tool-Tests (145)
+- **Gesamt: 551 Tests**
 
 ### Laufender MCP-Server blockiert den Build
 
