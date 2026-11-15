@@ -37,7 +37,7 @@ public class ListToolPagingTests
     {
         var methods = ListToolMethods();
 
-        Assert.Equal(24, methods.Count);
+        Assert.Equal(25, methods.Count);
         Assert.All(methods, method =>
         {
             var parameters = method.GetParameters();

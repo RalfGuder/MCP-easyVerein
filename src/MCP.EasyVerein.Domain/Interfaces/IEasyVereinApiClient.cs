@@ -6,6 +6,25 @@ namespace MCP.EasyVerein.Domain.Interfaces;
 /// <summary>Defines the contract for communicating with the easyVerein REST API.</summary>
 public interface IEasyVereinApiClient
 {
+    /// <summary>Lists the accounting plans (easyVerein keeps one per organization).</summary>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The accounting plans with their enabled billing accounts.</returns>
+    Task<PagedResult<AccountingPlan>> ListAccountingPlansAsync(PageRequest? paging = null, CancellationToken ct = default);
+
+    /// <summary>Gets an accounting plan by ID.</summary>
+    /// <param name="id">The accounting plan ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The accounting plan, or <c>null</c> if not found.</returns>
+    Task<AccountingPlan?> GetAccountingPlanAsync(long id, CancellationToken ct = default);
+
+    /// <summary>Updates an accounting plan with PATCH semantics.</summary>
+    /// <param name="id">The accounting plan ID.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated accounting plan as returned by the API.</returns>
+    Task<AccountingPlan> UpdateAccountingPlanAsync(long id, object patchData, CancellationToken ct = default);
+
     /// <summary>Lists all announcements, optionally filtered.</summary>
     Task<PagedResult<Announcement>> ListAnnouncementsAsync(
         string? ordering = null, string[]? search = null,

@@ -24,6 +24,7 @@ public static class ToolJson
     {
         (typeof(Member), nameof(Member.ContactDetails)),
         (typeof(Event), nameof(Event.LocationObject)),
+        (typeof(AccountingPlan), nameof(AccountingPlan.BillingAccounts)),
     };
 
     /// <summary>
