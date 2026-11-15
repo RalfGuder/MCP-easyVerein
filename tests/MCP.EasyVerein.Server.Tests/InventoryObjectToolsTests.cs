@@ -44,7 +44,7 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         var result = await tools.CreateInventoryObject(
-            "Beamer", "B-01", "Epson", 2, 450.5m, "2025-03-21", "Lager", true, 4424352, CancellationToken.None);
+            "Beamer", "B-01", "Epson", 2, 450.5m, "2025-03-21", "Lager", true, 4424352, null, CancellationToken.None);
 
         Assert.NotNull(captured);
         Assert.Equal("Beamer", captured!.Name);
@@ -74,7 +74,7 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         await tools.CreateInventoryObject(
-            "Beamer", "null", "null", 1, null, "null", "null", null, null, CancellationToken.None);
+            "Beamer", "null", "null", 1, null, "null", "null", null, null, null, CancellationToken.None);
 
         Assert.Null(captured!.Identifier);
         Assert.Null(captured.Description);
@@ -100,7 +100,7 @@ public class InventoryObjectToolsTests
             field == 1 ? tooLong : null,
             null, 1, null, null,
             field == 2 ? tooLong : null,
-            null, null, CancellationToken.None);
+            null, null, null, CancellationToken.None);
 
         Assert.StartsWith("ERROR:", result);
         Assert.Contains("500", result);
@@ -116,7 +116,7 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         var result = await tools.CreateInventoryObject(
-            "Beamer", null, null, null, null, null, null, null, null, CancellationToken.None);
+            "Beamer", null, null, null, null, null, null, null, null, null, CancellationToken.None);
 
         Assert.StartsWith("ERROR:", result);
         Assert.Contains("pieces", result);
@@ -132,7 +132,7 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         var result = await tools.CreateInventoryObject(
-            "Beamer", null, null, 1, null, "gestern", null, null, null, CancellationToken.None);
+            "Beamer", null, null, 1, null, "gestern", null, null, null, null, CancellationToken.None);
 
         Assert.StartsWith("ERROR:", result);
         Assert.Contains("purchase date", result);
@@ -154,7 +154,7 @@ public class InventoryObjectToolsTests
 
         await tools.UpdateInventoryObject(5, name: "null", identifier: null, description: "Neu",
             pieces: 3, price: 12.5m, purchaseDate: "2025-04-01", locationName: null,
-            lendingAvailable: false, lendingResponsible: 99, CancellationToken.None);
+            lendingAvailable: false, lendingResponsible: 99, null, CancellationToken.None);
 
         var patch = Assert.IsType<Dictionary<string, object>>(captured);
         Assert.Equal(6, patch.Count);
@@ -176,7 +176,7 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         var result = await tools.UpdateInventoryObject(
-            5, new string('x', 501), null, null, null, null, null, null, null, null, CancellationToken.None);
+            5, new string('x', 501), null, null, null, null, null, null, null, null, null, CancellationToken.None);
 
         Assert.StartsWith("ERROR:", result);
     }
@@ -191,9 +191,141 @@ public class InventoryObjectToolsTests
         var tools = new InventoryObjectTools(mock.Object);
 
         var result = await tools.UpdateInventoryObject(
-            5, null, null, null, null, null, "31.02.2025", null, null, null, CancellationToken.None);
+            5, null, null, null, null, null, "31.02.2025", null, null, null, null, CancellationToken.None);
 
         Assert.StartsWith("ERROR:", result);
+    }
+
+    /// <summary>
+    /// Verifies that <c>create_inventory_object</c> assigns existing groups by ID (US-0063).
+    /// </summary>
+    [Fact]
+    public async Task CreateInventoryObject_WithGroups_SetsGroupIds()
+    {
+        var mock = new Mock<IEasyVereinApiClient>();
+        InventoryObject? captured = null;
+        mock.Setup(c => c.GetInventoryObjectGroupAsync(11, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new InventoryObjectGroup { Id = 11 });
+        mock.Setup(c => c.CreateInventoryObjectAsync(It.IsAny<InventoryObject>(), It.IsAny<CancellationToken>()))
+            .Callback<InventoryObject, CancellationToken>((o, _) => captured = o)
+            .ReturnsAsync(new InventoryObject { Id = 1 });
+
+        var tools = new InventoryObjectTools(mock.Object);
+
+        await tools.CreateInventoryObject(
+            "Beamer", null, null, 1, null, null, null, null, null, new long[] { 11 }, CancellationToken.None);
+
+        Assert.Equal(new List<long> { 11 }, captured!.InventoryObjectGroupIds);
+    }
+
+    /// <summary>
+    /// Verifies that an unknown group ID is rejected with a readable message before creating anything (US-0063).
+    /// </summary>
+    [Fact]
+    public async Task CreateInventoryObject_WithUnknownGroup_ReturnsErrorWithoutCreating()
+    {
+        var mock = new Mock<IEasyVereinApiClient>(MockBehavior.Strict);
+        mock.Setup(c => c.GetInventoryObjectGroupAsync(11, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new InventoryObjectGroup { Id = 11 });
+        mock.Setup(c => c.GetInventoryObjectGroupAsync(99, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((InventoryObjectGroup?)null);
+
+        var tools = new InventoryObjectTools(mock.Object);
+
+        var result = await tools.CreateInventoryObject(
+            "Beamer", null, null, 1, null, null, null, null, null, new long[] { 11, 99 }, CancellationToken.None);
+
+        Assert.StartsWith("ERROR:", result);
+        Assert.Contains("99", result);
+        Assert.DoesNotContain("11", result);
+        mock.Verify(c => c.CreateInventoryObjectAsync(It.IsAny<InventoryObject>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    /// <summary>
+    /// Verifies that <c>create_inventory_object</c> returns the persisted state instead of the POST response,
+    /// which reports a phantom <c>lendingResponsible</c> that the API never stores (US-0063).
+    /// </summary>
+    [Fact]
+    public async Task CreateInventoryObject_ReturnsPersistedStateFromReRead()
+    {
+        var mock = new Mock<IEasyVereinApiClient>();
+        mock.Setup(c => c.CreateInventoryObjectAsync(It.IsAny<InventoryObject>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new InventoryObject { Id = 1, LendingResponsibleId = 8252487 });
+        mock.Setup(c => c.GetInventoryObjectAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new InventoryObject { Id = 1, LendingResponsibleId = null });
+
+        var tools = new InventoryObjectTools(mock.Object);
+
+        var result = await tools.CreateInventoryObject(
+            "Beamer", null, null, 1, null, null, null, null, null, null, CancellationToken.None);
+
+        Assert.Contains("\"id\": 1", result);
+        Assert.DoesNotContain("8252487", result);
+    }
+
+    /// <summary>
+    /// Verifies that <c>update_inventory_object</c> sends the validated group IDs (US-0063).
+    /// </summary>
+    [Fact]
+    public async Task UpdateInventoryObject_WithGroups_SendsGroupIds()
+    {
+        var mock = new Mock<IEasyVereinApiClient>();
+        object? captured = null;
+        mock.Setup(c => c.GetInventoryObjectGroupAsync(11, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new InventoryObjectGroup { Id = 11 });
+        mock.Setup(c => c.UpdateInventoryObjectAsync(5, It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Callback<long, object, CancellationToken>((_, patch, _) => captured = patch)
+            .ReturnsAsync(new InventoryObject { Id = 5 });
+
+        var tools = new InventoryObjectTools(mock.Object);
+
+        await tools.UpdateInventoryObject(
+            5, null, null, null, null, null, null, null, null, null, new long[] { 11 }, CancellationToken.None);
+
+        var patch = Assert.IsType<Dictionary<string, object>>(captured);
+        Assert.Single(patch);
+        Assert.Equal(new long[] { 11 }, patch["inventoryObjectGroups"]);
+    }
+
+    /// <summary>
+    /// Verifies that an empty group list clears the assignment and needs no validation (US-0063).
+    /// </summary>
+    [Fact]
+    public async Task UpdateInventoryObject_WithEmptyGroups_ClearsAssignment()
+    {
+        var mock = new Mock<IEasyVereinApiClient>(MockBehavior.Strict);
+        object? captured = null;
+        mock.Setup(c => c.UpdateInventoryObjectAsync(5, It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Callback<long, object, CancellationToken>((_, patch, _) => captured = patch)
+            .ReturnsAsync(new InventoryObject { Id = 5 });
+
+        var tools = new InventoryObjectTools(mock.Object);
+
+        await tools.UpdateInventoryObject(
+            5, null, null, null, null, null, null, null, null, null, Array.Empty<long>(), CancellationToken.None);
+
+        var patch = Assert.IsType<Dictionary<string, object>>(captured);
+        Assert.Empty(Assert.IsType<long[]>(patch["inventoryObjectGroups"]));
+    }
+
+    /// <summary>
+    /// Verifies that an unknown group ID is rejected before patching (US-0063).
+    /// </summary>
+    [Fact]
+    public async Task UpdateInventoryObject_WithUnknownGroup_ReturnsErrorWithoutPatching()
+    {
+        var mock = new Mock<IEasyVereinApiClient>(MockBehavior.Strict);
+        mock.Setup(c => c.GetInventoryObjectGroupAsync(99, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((InventoryObjectGroup?)null);
+
+        var tools = new InventoryObjectTools(mock.Object);
+
+        var result = await tools.UpdateInventoryObject(
+            5, null, null, null, null, null, null, null, null, null, new long[] { 99 }, CancellationToken.None);
+
+        Assert.StartsWith("ERROR:", result);
+        Assert.Contains("99", result);
+        mock.Verify(c => c.UpdateInventoryObjectAsync(It.IsAny<long>(), It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     /// <summary>

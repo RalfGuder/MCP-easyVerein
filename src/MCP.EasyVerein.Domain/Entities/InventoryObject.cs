@@ -25,10 +25,15 @@ public class InventoryObject : IHasId
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public long? LendingResponsibleId { get; set; }
 
-    /// <summary>Gets or sets the assigned inventory object group URLs (read-only). Maps to API field '<c>inventoryObjectGroups</c>'.</summary>
+    /// <summary>
+    /// Gets or sets the IDs of the assigned inventory object groups. Maps to API field '<c>inventoryObjectGroups</c>'.
+    /// The API reads URL references and writes integer IDs; <c>OPTIONS</c> reports the field as read-only,
+    /// but it is writable (verified live in US-0063).
+    /// </summary>
     [JsonPropertyName(InventoryObjectFields.InventoryObjectGroups)]
+    [JsonConverter(typeof(FlexibleIdListConverter))]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<string>? InventoryObjectGroups { get; set; }
+    public List<long>? InventoryObjectGroupIds { get; set; }
 
     /// <summary>Gets or sets the picture URL (read-only in this client; upload needs multipart). Maps to API field '<c>picture</c>'.</summary>
     [JsonPropertyName(InventoryObjectFields.Picture)]

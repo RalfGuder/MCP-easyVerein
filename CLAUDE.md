@@ -113,7 +113,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | Forum               | US-0024    | list, get, create, update (PATCH), delete (endgültig, kein Papierkorb) |
 | GetToken            | US-0025    | get_token (Login mit Zugangsdaten; Token nur maskiert, SENSITIVE) |
 | InvoiceItem        | US-0028    | list, get, create, update (PATCH), delete                |
-| InventoryObject     | US-0026    | list, get, create (pieces Pflicht), update (PATCH), delete (Papierkorb) |
+| InventoryObject     | US-0026, US-0063 | list, get, create (pieces Pflicht, liest nach POST neu), update (PATCH), delete (Papierkorb); Gruppenzuordnung per ID |
 | InventoryObjectGroup | US-0027   | list, get, create, update (PATCH), delete (Papierkorb)   |
 | Lending             | US-0029    | list, get, create, update (PATCH), delete (Papierkorb)   |
 
@@ -126,16 +126,15 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Nächste anstehende Endpoints
 
-- US-0063: Gruppenzuordnung für Inventarobjekte (inkl. `lendingResponsible`-Analyse)
 - Weitere: siehe offene Issues
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (129)
+- **Domain.Tests** — Entity- und Value-Object-Tests (136)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (218)
-- **Server.Tests** — Tool-Tests (101)
-- **Gesamt: 461 Tests** (US-0029 bringt +36: 8 Domain + 10 Infrastructure + 18 Server)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (221)
+- **Server.Tests** — Tool-Tests (107)
+- **Gesamt: 477 Tests** (US-0063 bringt +16: 7 Domain + 3 Infrastructure + 6 Server)
 
 ### Laufender MCP-Server blockiert den Build
 

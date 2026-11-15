@@ -77,7 +77,8 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
         [Description("Purchase date (YYYY-MM-DD or ISO 8601)")] string? purchaseDate,
         [Description("Free-text location name (max 500 chars)")] string? locationName,
         [Description("Whether the object can be lent")] bool? lendingAvailable,
-        [Description("Member ID of the person responsible for lending (defaults to the API user)")] long? lendingResponsible,
+        [Description("Member ID of the person responsible for lending (if omitted, no responsible person is stored)")] long? lendingResponsible,
+        [Description("IDs of the inventory object groups to assign (see list_inventory_object_groups)")] long[]? inventoryObjectGroups,
         CancellationToken ct)
     {
         try
@@ -94,6 +95,8 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
                     return $"ERROR: Invalid purchase date '{purchaseDate}'. Use YYYY-MM-DD or ISO 8601.";
                 parsedDate = date;
             }
+            var groupError = await ValidateGroupsAsync(inventoryObjectGroups, ct);
+            if (groupError != null) return groupError;
 
             var item = new InventoryObject
             {
@@ -105,10 +108,14 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
                 PurchaseDate = parsedDate,
                 LocationName = HasValue(locationName) ? locationName : null,
                 LendingAvailable = lendingAvailable,
-                LendingResponsibleId = lendingResponsible
+                LendingResponsibleId = lendingResponsible,
+                InventoryObjectGroupIds = inventoryObjectGroups is { Length: > 0 } ? inventoryObjectGroups.ToList() : null
             };
             var created = await client.CreateInventoryObjectAsync(item, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            // The POST response reports values the API does not store (e.g. a phantom lendingResponsible),
+            // so return the persisted state instead.
+            var persisted = await client.GetInventoryObjectAsync(created.Id, ct) ?? created;
+            return JsonSerializer.Serialize(persisted, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception ex)
         {
@@ -129,6 +136,7 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
         [Description("New free-text location name (max 500 chars)")] string? locationName,
         [Description("Whether the object can be lent")] bool? lendingAvailable,
         [Description("Member ID of the person responsible for lending")] long? lendingResponsible,
+        [Description("IDs of the inventory object groups; replaces the current assignment, an empty list removes all groups")] long[]? inventoryObjectGroups,
         CancellationToken ct)
     {
         try
@@ -137,6 +145,8 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
             if (error != null) return error;
             if (HasValue(purchaseDate) && !TryParseDate(purchaseDate!, out _))
                 return $"ERROR: Invalid purchase date '{purchaseDate}'. Use YYYY-MM-DD or ISO 8601.";
+            var groupError = await ValidateGroupsAsync(inventoryObjectGroups, ct);
+            if (groupError != null) return groupError;
 
             var patch = new Dictionary<string, object>();
             if (HasValue(name)) patch[InventoryObjectFields.Name] = name!;
@@ -148,6 +158,7 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
             if (HasValue(locationName)) patch[InventoryObjectFields.LocationName] = locationName!;
             if (lendingAvailable.HasValue) patch[InventoryObjectFields.LendingAvailable] = lendingAvailable.Value;
             if (lendingResponsible.HasValue) patch[InventoryObjectFields.LendingResponsible] = lendingResponsible.Value;
+            if (inventoryObjectGroups != null) patch[InventoryObjectFields.InventoryObjectGroups] = inventoryObjectGroups;
 
             var updated = await client.UpdateInventoryObjectAsync(id, patch, ct);
             return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
@@ -186,6 +197,22 @@ public sealed class InventoryObjectTools(IEasyVereinApiClient client)
         if (HasValue(locationName) && locationName!.Length > MaxTextLength)
             return $"ERROR: The location name must not exceed {MaxTextLength} characters.";
         return null;
+    }
+
+    /// <summary>Checks that every given inventory object group exists.</summary>
+    /// <returns>An error message listing the unknown IDs, or <c>null</c> if all groups exist.</returns>
+    private async Task<string?> ValidateGroupsAsync(long[]? groupIds, CancellationToken ct)
+    {
+        if (groupIds is not { Length: > 0 }) return null;
+        var missing = new List<long>();
+        foreach (var groupId in groupIds.Distinct())
+        {
+            if (await client.GetInventoryObjectGroupAsync(groupId, ct) == null)
+                missing.Add(groupId);
+        }
+        return missing.Count == 0
+            ? null
+            : $"ERROR: Inventory object group(s) not found: {string.Join(", ", missing)}. Use list_inventory_object_groups to look up valid IDs.";
     }
 
     /// <summary>Parses a date-only or ISO 8601 date string using the invariant culture.</summary>

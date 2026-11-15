@@ -43,7 +43,7 @@ public class InventoryObjectEntityTests
         Assert.Equal(335646309L, item.Id);
         Assert.Equal("https://easyverein.com/api/v2.0/organization/30189", item.Org);
         Assert.Equal(4424352L, item.LendingResponsibleId);
-        Assert.Single(item.InventoryObjectGroups!);
+        Assert.Equal(new List<long> { 11 }, item.InventoryObjectGroupIds);
         Assert.Equal("https://easyverein.com/app/image/defaultInventory.png", item.Picture);
         Assert.Equal(1, item.CurrentlyLend);
         Assert.Equal("https://easyverein.com/api/v2.0/lending/37839", item.Lendings![0]);
@@ -117,5 +117,18 @@ public class InventoryObjectEntityTests
         Assert.DoesNotContain("_delete", json);
         Assert.DoesNotContain("purchaseDate", json);
         Assert.DoesNotContain("description", json);
+    }
+
+    /// <summary>
+    /// Verifies that group assignments are written as plain integer IDs, as the API expects on create.
+    /// </summary>
+    [Fact]
+    public void Serialize_WithGroupIds_WritesIntegerArray()
+    {
+        var item = new InventoryObject { Name = "Beamer", Pieces = 1, InventoryObjectGroupIds = new List<long> { 11, 12 } };
+
+        var json = JsonSerializer.Serialize(item);
+
+        Assert.Contains("\"inventoryObjectGroups\":[11,12]", json);
     }
 }
