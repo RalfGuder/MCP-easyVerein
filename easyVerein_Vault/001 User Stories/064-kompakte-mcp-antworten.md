@@ -19,17 +19,24 @@ Prüfung der Schnittstelle am 2026-11-15:
 
 ## Akzeptanzkriterien
 
-- [ ] Alle `list_*`-Tools haben die optionalen Parameter `limit` und `page`.
-- [ ] `limit` hat einen Standardwert (Vorschlag: 50) und ist auf höchstens 100 begrenzt; ungültige Werte (≤ 0) werden mit einer verständlichen Meldung abgelehnt.
-- [ ] `page` beginnt bei 1; ohne Angabe wird Seite 1 geliefert.
-- [ ] Die Antwort eines list-Tools enthält Angaben zur Seitennavigation: Gesamtanzahl (`totalCount`) und ob weitere Seiten existieren (`hasMore`).
-- [ ] Verschachtelte Referenzen werden nur als ID ausgegeben, z. B. `"bankAccount": 361879047`, `"billingAccount": 58770`, `"relatedInvoice": [607989039]`. Details sind über die passenden `get_*`-Tools abrufbar.
-- [ ] Felder mit dem Wert `null` entfallen in allen Tool-Antworten.
-- [ ] Alle Tool-Antworten sind kompaktes JSON (ohne Einrückung).
-- [ ] Die `JsonSerializerOptions` werden zentral als eine wiederverwendete Instanz bereitgestellt statt je Aufruf neu erzeugt.
-- [ ] Die Tool-Beschreibungen nennen `limit`/`page` und weisen darauf hin, wie weitere Seiten abgerufen werden.
+- [x] Alle `list_*`-Tools haben die optionalen Parameter `limit` und `page`.
+- [x] `limit` hat einen Standardwert (Vorschlag: 50) und ist auf höchstens 100 begrenzt; ungültige Werte (≤ 0) werden mit einer verständlichen Meldung abgelehnt.
+- [x] `page` beginnt bei 1; ohne Angabe wird Seite 1 geliefert.
+- [x] Die Antwort eines list-Tools enthält Angaben zur Seitennavigation: Gesamtanzahl (`totalCount`) und ob weitere Seiten existieren (`hasMore`).
+- [x] Verschachtelte Referenzen werden nur als ID ausgegeben, z. B. `"bankAccount": 361879047`, `"billingAccount": 58770`, `"relatedInvoice": [607989039]`. Details sind über die passenden `get_*`-Tools abrufbar.
+- [x] Felder mit dem Wert `null` entfallen in allen Tool-Antworten.
+- [x] Alle Tool-Antworten sind kompaktes JSON (ohne Einrückung).
+- [x] Die `JsonSerializerOptions` werden zentral als eine wiederverwendete Instanz bereitgestellt statt je Aufruf neu erzeugt.
+- [x] Die Tool-Beschreibungen nennen `limit`/`page` und weisen darauf hin, wie weitere Seiten abgerufen werden.
 - [ ] Die erneute Prüfung von `list_events` ab 01.11.2026 bleibt unter dem Token-Limit.
-- [ ] Tests nach TDD (Red-Green-Refactor), Mindest-Coverage 70 % bleibt erhalten.
+- [x] Tests nach TDD (Red-Green-Refactor), Mindest-Coverage 70 % bleibt erhalten.
+
+## Umsetzungsentscheidungen
+
+- `IEasyVereinApiClient.List*Async` (und `GetInvoicesAsync`) nehmen optional `PageRequest paging` und liefern `PagedResult<T>`. `PagedResult<T>` implementiert `IReadOnlyList<T>`; ohne `paging` werden wie bisher alle Seiten geholt.
+- Die ID-Ausgabe gilt für alle Tool-Antworten (list, get, create, update). Sie wird nur in der Tool-Ausgabe angewendet (`ToolJson`, Resolver-Modifier); API-Payloads bleiben unverändert.
+- Ausnahmen, die eingebettet bleiben, weil sie der eigentliche Inhalt sind: `Member.contactDetails` (Name, Anschrift) und `Event.locationObject` (für Orte gibt es kein `get`-Tool).
+- Ungültige Werte für `limit`/`page` liefern `ERROR: ArgumentOutOfRangeException: limit muss zwischen 1 und 100 liegen.` bzw. `page muss mindestens 1 sein.`
 
 ## Aufgaben
 

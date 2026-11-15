@@ -38,6 +38,23 @@ dotnet run
 | Windows 10/11 | x86_64 | Unterstützt |
 | macOS 13+ | x86_64 / ARM64 | Unterstützt |
 
+## Antwortformat
+
+Die Tools antworten mit kompaktem JSON ohne `null`-Felder. Verweise auf andere Datensätze (z. B. Bankkonto oder Rechnung einer Buchung) stehen nur als ID in der Antwort; die Details liefert das passende `get_*`-Tool.
+
+Die `list_*`-Tools liefern seitenweise:
+
+| Parameter | Bedeutung | Standard |
+|-----------|-----------|----------|
+| `limit` | Einträge je Seite (1–100) | 50 |
+| `page` | Seitennummer ab 1 | 1 |
+
+```json
+{"items": [ ... ], "totalCount": 95, "hasMore": true, "page": 1, "limit": 50}
+```
+
+Solange `hasMore` `true` ist, gibt es weitere Seiten (`page` + 1).
+
 ## Branch-Strategie
 
 Dieses Projekt verwendet **GitHub Flow** als Branch-Strategie.
