@@ -40,7 +40,7 @@ dotnet run
 
 ## Antwortformat
 
-Die Tools antworten mit kompaktem JSON ohne `null`-Felder. Verweise auf andere Datensätze (z. B. Bankkonto oder Rechnung einer Buchung) stehen nur als ID in der Antwort; die Details liefert das passende `get_*`-Tool.
+Die Tools antworten mit kompaktem JSON ohne `null`-Felder. Verweise auf andere Datensätze (z. B. Bankkonto oder Rechnung einer Buchung) stehen nur als ID in der Antwort, auch wenn die API sie als URL liefert (z. B. `bookingProject`); die Details liefert das passende `get_*`-Tool.
 
 Die `list_*`-Tools liefern seitenweise:
 

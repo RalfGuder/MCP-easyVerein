@@ -120,7 +120,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 ### Antwortformat der Tools (US-0064)
 
 - Alle Tool-Antworten laufen über `ToolJson` (Server): kompaktes JSON, `null`-Felder entfallen.
-- Referenzen auf andere Ressourcen erscheinen nur als ID (`"bankAccount": 361879047`, `"relatedInvoice": [607989039]`); Details über `get_*`. Ausnahmen, die eingebettet bleiben: `Member.contactDetails`, `Event.locationObject`.
+- Referenzen auf andere Ressourcen erscheinen nur als ID (`"bankAccount": 361879047`, `"relatedInvoice": [607989039]`); Details über `get_*`. Ausnahmen, die eingebettet bleiben: `Member.contactDetails`, `Event.locationObject`. String-Felder mit API-Ressourcen-URL (`…/api/vX.Y/<ressource>/<id>`, z. B. `bookingProject`, `org`) werden ebenfalls als ID geschrieben; Datei-/Bildlinks bleiben.
 - `list_*`-Tools: optionale Parameter `limit` (Default 50, max. 100) und `page` (ab 1); Antwort `{"items": [...], "totalCount": n, "hasMore": bool, "page": p, "limit": l}`. easyVerein paginiert über `page` (ignoriert `offset`!) und liefert in v2.0 kein `count`: `totalCount` steht nur auf der letzten Seite (berechnet) bzw. bei v1.x.
 - `IEasyVereinApiClient.List*Async` nehmen optional `PageRequest paging` und liefern `PagedResult<T>` (implementiert `IReadOnlyList<T>`); ohne `paging` werden alle Seiten geholt.
 
@@ -140,8 +140,8 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 - **Domain.Tests** — Entity- und Value-Object-Tests (161)
 - **Application.Tests** — Konfigurationsauflösung (13)
 - **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (228)
-- **Server.Tests** — Tool-Tests (129)
-- **Gesamt: 531 Tests**
+- **Server.Tests** — Tool-Tests (133)
+- **Gesamt: 535 Tests**
 
 ### Laufender MCP-Server blockiert den Build
 
