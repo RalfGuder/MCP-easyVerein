@@ -491,7 +491,7 @@ public class EasyVereinApiClientTests
         });
         var client = CreateClient(handler);
 
-        await client.ListContactDetailsAsync(id: 12345, firstName: "Bob", familyName: "Smith", name: "BSmith");
+        await client.ListContactDetailsAsync(id: 12345, firstName: "Bob", familyName: "Smith", search: new[] { "BSmith" });
         await client.GetContactDetailsAsync(999);
 
         Assert.NotNull(handler.LastRequestUri);

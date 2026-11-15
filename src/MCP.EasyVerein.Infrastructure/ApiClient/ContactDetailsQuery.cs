@@ -8,7 +8,8 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
     internal class ContactDetailsQuery
     {
         /// <summary>
-        /// Gets or sets an optional contact details identifier filter.
+        /// Gets or sets an optional contact details identifier filter. Sent as <c>id__in</c>,
+        /// because the API ignores a plain <c>id</c> filter.
         /// </summary>
         public long? Id { get; set; }
 
@@ -23,9 +24,10 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
         public string? FamilyName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets an optional name filter.
+        /// Gets or sets optional search terms. Each term is sent as its own <c>search</c> parameter:
+        /// the API ignores comma-joined terms and combines repeated parameters with OR.
         /// </summary>
-        public string? Name { get; set; }
+        public string[]? Search { get; set; }
 
         /// <summary>Field selection only, without any filters. Use for single-resource GETs.</summary>
         internal const string FieldQuery =
@@ -89,7 +91,7 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
             var parts = new List<string> { FieldQuery };
 
             if (Id != null)
-                parts.Add($"id={Id}");
+                parts.Add($"id__in={Id}");
 
             if (!string.IsNullOrEmpty(FirstName))
                 parts.Add($"firstName={Uri.EscapeDataString(FirstName)}");
@@ -97,8 +99,11 @@ namespace MCP.EasyVerein.Infrastructure.ApiClient
             if (!string.IsNullOrEmpty(FamilyName))
                 parts.Add($"familyName={Uri.EscapeDataString(FamilyName)}");
 
-            if (!string.IsNullOrEmpty(Name))
-                parts.Add($"familyName={Uri.EscapeDataString(Name)}");
+            if (Search != null)
+            {
+                foreach (var term in Search.Where(t => !string.IsNullOrWhiteSpace(t)))
+                    parts.Add($"search={Uri.EscapeDataString(term.Trim())}");
+            }
 
             return string.Join("&", parts);
         }
