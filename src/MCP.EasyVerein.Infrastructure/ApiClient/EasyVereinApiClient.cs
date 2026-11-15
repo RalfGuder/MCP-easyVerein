@@ -1919,19 +1919,19 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="id">Optional filter by contact details identifier.</param>
     /// <param name="firstName">Optional filter by first name.</param>
     /// <param name="familyName">Optional filter by family name.</param>
-    /// <param name="name">Optional filter by name.</param>
+    /// <param name="search">Optional search terms; each term is matched against the searchable fields, several terms are combined with OR.</param>
     /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="ContactDetails"/> records.</returns>
     public async Task<PagedResult<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
-        string? familyName = null, string? name = null, PageRequest? paging = null, CancellationToken ct = default)
+        string? familyName = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new ContactDetailsQuery
         {
             Id = id,
             FirstName = firstName,
             FamilyName = familyName,
-            Name = name
+            Search = search
         };
         return await HandleListResponseWithPagination<ContactDetails>(
             BuildListUrl("contact-details", query.ToString(), paging), paging, ct);

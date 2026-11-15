@@ -913,12 +913,12 @@ public interface IEasyVereinApiClient
     /// <param name="id">Optional contact details ID to filter by.</param>
     /// <param name="firstName">Optional first name to filter by.</param>
     /// <param name="familyName">Optional family name to filter by.</param>
-    /// <param name="name">Optional full name to search for.</param>
+    /// <param name="search">Optional search terms; each term is matched against the searchable fields, several terms are combined with OR.</param>
     /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching contact details.</returns>
     Task<PagedResult<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
-        string? familyName = null, string? name = null, PageRequest? paging = null, CancellationToken ct = default);
+        string? familyName = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default);
 
     /// <summary>Lists members, optionally filtered by ID, membership number, or search terms.</summary>
     /// <param name="id">Optional member ID to filter by.</param>

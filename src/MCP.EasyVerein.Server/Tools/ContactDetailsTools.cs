@@ -13,25 +13,29 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class ContactDetailsTools(IEasyVereinApiClient client)
 {
     /// <summary>
-    /// Lists contact details with optional filters for ID, first name, family name, and full name.
+    /// Lists contact details with optional filters for ID, first name, family name, and search terms.
     /// </summary>
     /// <param name="id">Optional contact details ID filter.</param>
     /// <param name="firstName">Optional first name filter.</param>
     /// <param name="familyName">Optional family name filter.</param>
-    /// <param name="fullName">Optional full name filter.</param>
+    /// <param name="search">Optional search terms (OR-combined).</param>
     /// <param name="limit">Entries per page (1-100).</param>
     /// <param name="page">Page number, starting at 1.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON page of matching contact details, or an error message.</returns>
     [McpServerTool, Description("List all contact details. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
-    public async Task<string> ListContactDetails(long? id, string? firstName, string? familyName, string? fullName,
+    public async Task<string> ListContactDetails(
+        [Description("Contact details ID filter")] long? id,
+        [Description("Exact first name filter")] string? firstName,
+        [Description("Exact family name filter")] string? familyName,
+        [Description("Search terms; each term is matched against name, company and other searchable fields, several terms are combined with OR")] string[]? search,
         [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
         [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
         CancellationToken ct = default)
     {
         try
         {
-            var contacts = await client.ListContactDetailsAsync(id, firstName, familyName, fullName, ToolJson.ToPageRequest(limit, page), ct);
+            var contacts = await client.ListContactDetailsAsync(id, firstName, familyName, search, ToolJson.ToPageRequest(limit, page), ct);
             return ToolJson.SerializePage(contacts);
         }
         catch (Exception ex)
