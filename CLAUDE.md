@@ -117,6 +117,13 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | InventoryObjectGroup | US-0027   | list, get, create, update (PATCH), delete (Papierkorb)   |
 | Lending             | US-0029    | list, get, create, update (PATCH), delete (Papierkorb)   |
 
+### Antwortformat der Tools (US-0064)
+
+- Alle Tool-Antworten laufen über `ToolJson` (Server): kompaktes JSON, `null`-Felder entfallen.
+- Referenzen auf andere Ressourcen erscheinen nur als ID (`"bankAccount": 361879047`, `"relatedInvoice": [607989039]`); Details über `get_*`. Ausnahmen, die eingebettet bleiben: `Member.contactDetails`, `Event.locationObject`.
+- `list_*`-Tools: optionale Parameter `limit` (Default 50, max. 100) und `page` (ab 1); Antwort `{"items": [...], "totalCount": n, "hasMore": bool, "page": p, "limit": l}`.
+- `IEasyVereinApiClient.List*Async` nehmen optional `PageRequest paging` und liefern `PagedResult<T>` (implementiert `IReadOnlyList<T>`); ohne `paging` werden alle Seiten geholt.
+
 ### HTTP-Methoden in der easyVerein API v1.7
 
 - **PATCH** (partielles Update): Alle 53 Ressourcen unterstützen PATCH
@@ -130,11 +137,11 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (150)
+- **Domain.Tests** — Entity- und Value-Object-Tests (163)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (221)
-- **Server.Tests** — Tool-Tests (116)
-- **Gesamt: 500 Tests** (optionale Booking-Parameter bringen +5 Server)
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (226)
+- **Server.Tests** — Tool-Tests (128)
+- **Gesamt: 530 Tests**
 
 ### Laufender MCP-Server blockiert den Build
 

@@ -1,7 +1,7 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
+using MCP.EasyVerein.Domain.ValueObjects;
 using ModelContextProtocol.Server;
 
 namespace MCP.EasyVerein.Server.Tools;
@@ -15,7 +15,7 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class FeatureRequestTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists feature requests with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_feature_requests"), Description("List entries of the public easyVerein product idea board (feature requests); not organization data")]
+    [McpServerTool(Name = "list_feature_requests"), Description("List entries of the public easyVerein product idea board (feature requests); not organization data. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListFeatureRequests(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Status code filter (numeric, e.g. '3')")] string? status,
@@ -23,12 +23,14 @@ public sealed class FeatureRequestTools(IEasyVereinApiClient client)
         [Description("true = only requests submitted by the current user")] bool? authorIsme,
         [Description("Ordering (e.g. '-proVotesCount' or '-date')")] string? ordering,
         [Description("Search terms (allowed fields: title, description)")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var requests = await client.ListFeatureRequestsAsync(idIn, status, category, authorIsme, ordering, search, ct);
-            return JsonSerializer.Serialize(requests, new JsonSerializerOptions { WriteIndented = true });
+            var requests = await client.ListFeatureRequestsAsync(idIn, status, category, authorIsme, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(requests);
         }
         catch (Exception ex)
         {
@@ -46,7 +48,7 @@ public sealed class FeatureRequestTools(IEasyVereinApiClient client)
         {
             var request = await client.GetFeatureRequestAsync(id, ct);
             return request != null
-                ? JsonSerializer.Serialize(request, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(request)
                 : $"Feature request with ID {id} not found.";
         }
         catch (Exception ex)
@@ -73,7 +75,7 @@ public sealed class FeatureRequestTools(IEasyVereinApiClient client)
 
             var request = new FeatureRequest { Title = title, Description = description, Category = category };
             var created = await client.CreateFeatureRequestAsync(request, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {

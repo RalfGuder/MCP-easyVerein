@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -14,7 +13,7 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class BookingProjectTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists booking projects with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_booking_projects"), Description("List all booking projects")]
+    [McpServerTool(Name = "list_booking_projects"), Description("List all booking projects. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListBookingProjects(
         [Description("Exact name filter")] string? name,
         [Description("Exact short-label filter (max 4 chars)")] string? @short,
@@ -24,13 +23,15 @@ public sealed class BookingProjectTools(IEasyVereinApiClient client)
         [Description("Budget less-than filter")] string? budgetLt,
         [Description("Ordering (e.g. 'name' or '-budget')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var projects = await client.ListBookingProjectsAsync(
-                name, @short, completed, idIn, budgetGt, budgetLt, ordering, search, ct);
-            return JsonSerializer.Serialize(projects, new JsonSerializerOptions { WriteIndented = true });
+                name, @short, completed, idIn, budgetGt, budgetLt, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(projects);
         }
         catch (Exception ex)
         {
@@ -48,7 +49,7 @@ public sealed class BookingProjectTools(IEasyVereinApiClient client)
         {
             var project = await client.GetBookingProjectAsync(id, ct);
             return project != null
-                ? JsonSerializer.Serialize(project, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(project)
                 : $"Booking project with ID {id} not found.";
         }
         catch (Exception ex)
@@ -84,7 +85,7 @@ public sealed class BookingProjectTools(IEasyVereinApiClient client)
             if (HasValue(color)) project.Color = color;
 
             var created = await client.CreateBookingProjectAsync(project, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -115,7 +116,7 @@ public sealed class BookingProjectTools(IEasyVereinApiClient client)
             if (HasValue(projectCostCentre)) patch[BookingProjectFields.ProjectCostCentre] = projectCostCentre!;
 
             var updated = await client.UpdateBookingProjectAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

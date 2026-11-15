@@ -26,7 +26,7 @@ public sealed class CustomFilterTools(IEasyVereinApiClient client)
         "{\"condition\":\"AND\",\"rules\":[{\"id\":\"date\",\"field\":\"date\",\"type\":\"date\",\"input\":\"text\",\"operator\":\"greater_or_equal\",\"value\":\"2024-01-01\"}]}";
 
     /// <summary>Lists custom filters with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_custom_filters"), Description("List all saved custom filters")]
+    [McpServerTool(Name = "list_custom_filters"), Description("List all saved custom filters. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListCustomFilters(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Exact name filter")] string? name,
@@ -34,12 +34,14 @@ public sealed class CustomFilterTools(IEasyVereinApiClient client)
         [Description("Comma-separated list of filter models")] string? modelIn,
         [Description("Ordering (e.g. 'name' or '-created_at')")] string? ordering,
         [Description("Search terms (allowed field: name)")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var filters = await client.ListCustomFiltersAsync(idIn, name, model, modelIn, ordering, search, ct);
-            return JsonSerializer.Serialize(filters, new JsonSerializerOptions { WriteIndented = true });
+            var filters = await client.ListCustomFiltersAsync(idIn, name, model, modelIn, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(filters);
         }
         catch (Exception ex)
         {
@@ -57,7 +59,7 @@ public sealed class CustomFilterTools(IEasyVereinApiClient client)
         {
             var filter = await client.GetCustomFilterAsync(id, ct);
             return filter != null
-                ? JsonSerializer.Serialize(filter, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(filter)
                 : $"Custom filter with ID {id} not found.";
         }
         catch (Exception ex)
@@ -78,7 +80,7 @@ public sealed class CustomFilterTools(IEasyVereinApiClient client)
         {
             var filter = new CustomFilter { Name = name, Model = model, Rules = ParseRules(rules) };
             var created = await client.CreateCustomFilterAsync(filter, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -117,7 +119,7 @@ public sealed class CustomFilterTools(IEasyVereinApiClient client)
             }
 
             var updated = await client.UpdateCustomFilterAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

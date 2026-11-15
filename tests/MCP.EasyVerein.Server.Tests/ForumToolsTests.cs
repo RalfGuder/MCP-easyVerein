@@ -32,7 +32,7 @@ public class ForumToolsTests
         Assert.True(captured.LinkRedirects);
         Assert.Equal(3, captured.Order);
         Assert.False(captured.DisplaySubForumList);
-        Assert.Contains("\"id\": 1", result);
+        Assert.Contains("\"id\":1", result);
     }
 
     /// <summary>

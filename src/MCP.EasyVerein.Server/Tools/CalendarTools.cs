@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -28,7 +27,7 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
     /// <param name="search">Optional search terms.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string containing matching calendars, or an error message.</returns>
-    [McpServerTool(Name = "list_calendars"), Description("List all calendars")]
+    [McpServerTool(Name = "list_calendars"), Description("List all calendars. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListCalendars(
         [Description("Filter by calendar name")] string? name,
         [Description("Filter by color (hex value)")] string? color,
@@ -40,13 +39,15 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
         [Description("Filter by allowed group ID")] string? allowedGroups,
         [Description("Ordering criteria (e.g. 'name' or '-name')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var calendars = await client.ListCalendarsAsync(name, color, short_, nameNot, colorNot,
-                shortNot, idIn, allowedGroups, ordering, search, ct);
-            return JsonSerializer.Serialize(calendars, new JsonSerializerOptions { WriteIndented = true });
+                shortNot, idIn, allowedGroups, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(calendars);
         }
         catch (Exception ex)
         {
@@ -68,7 +69,7 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
         {
             var calendar = await client.GetCalendarAsync(id, ct);
             return calendar != null
-                ? JsonSerializer.Serialize(calendar, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(calendar)
                 : $"Calendar with ID {id} not found.";
         }
         catch (Exception ex)
@@ -111,7 +112,7 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
                 DeleteEventsAfterDeletion = deleteFlag
             };
             var created = await client.CreateCalendarAsync(calendar, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -151,7 +152,7 @@ public sealed class CalendarTools(IEasyVereinApiClient client)
             if (HasValue(deleteEventsAfterDeletion) && bool.TryParse(deleteEventsAfterDeletion, out var deleteVal)) patch[CalendarFields.DeleteEventsAfterDeletion] = deleteVal;
 
             var updated = await client.UpdateCalendarAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

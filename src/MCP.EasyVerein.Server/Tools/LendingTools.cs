@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Globalization;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -21,7 +20,7 @@ public sealed class LendingTools(IEasyVereinApiClient client)
     private static readonly string[] TimeFormats = ["hh\\:mm", "hh\\:mm\\:ss"];
 
     /// <summary>Lists lendings with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_lendings"), Description("List the organization's lendings of inventory objects")]
+    [McpServerTool(Name = "list_lendings"), Description("List the organization's lendings of inventory objects. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListLendings(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Inventory object ID filter")] long? parentInventoryObject,
@@ -45,7 +44,9 @@ public sealed class LendingTools(IEasyVereinApiClient client)
         [Description("Soft-deleted filter (true = only lendings in the wastebasket)")] bool? deleted,
         [Description("Ordering (e.g. 'borrowingDate' or '-quantity')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
@@ -56,8 +57,8 @@ public sealed class LendingTools(IEasyVereinApiClient client)
                 borrowingDate, borrowingDateGte, borrowingDateLte,
                 returnDate, returnDateGte, returnDateLte,
                 quantity, quantityGt, quantityLt,
-                futureReturnDate, deleted, ordering, search, ct);
-            return JsonSerializer.Serialize(lendings, new JsonSerializerOptions { WriteIndented = true });
+                futureReturnDate, deleted, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(lendings);
         }
         catch (Exception ex)
         {
@@ -75,7 +76,7 @@ public sealed class LendingTools(IEasyVereinApiClient client)
         {
             var lending = await client.GetLendingAsync(id, ct);
             return lending != null
-                ? JsonSerializer.Serialize(lending, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(lending)
                 : $"Lending with ID {id} not found.";
         }
         catch (Exception ex)
@@ -126,7 +127,7 @@ public sealed class LendingTools(IEasyVereinApiClient client)
             };
 
             var created = await client.CreateLendingAsync(lending, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -165,7 +166,7 @@ public sealed class LendingTools(IEasyVereinApiClient client)
             if (HasValue(state)) patch[LendingFields.State] = state!;
 
             var updated = await client.UpdateLendingAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

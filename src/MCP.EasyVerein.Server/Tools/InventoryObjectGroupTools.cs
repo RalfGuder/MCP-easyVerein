@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -23,7 +22,7 @@ public sealed class InventoryObjectGroupTools(IEasyVereinApiClient client)
     private const int MaxShortLength = 4;
 
     /// <summary>Lists inventory object groups with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_inventory_object_groups"), Description("List the organization's inventory object groups")]
+    [McpServerTool(Name = "list_inventory_object_groups"), Description("List the organization's inventory object groups. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListInventoryObjectGroups(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Group name filter")] string? name,
@@ -32,13 +31,15 @@ public sealed class InventoryObjectGroupTools(IEasyVereinApiClient client)
         [Description("Soft-deleted filter (true = only groups in the wastebasket)")] bool? deleted,
         [Description("Ordering (e.g. 'name' or '-short')")] string? ordering,
         [Description("Search terms (searches name, short, color)")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var groups = await client.ListInventoryObjectGroupsAsync(
-                idIn, name, color, @short, deleted, ordering, search, ct);
-            return JsonSerializer.Serialize(groups, new JsonSerializerOptions { WriteIndented = true });
+                idIn, name, color, @short, deleted, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(groups);
         }
         catch (Exception ex)
         {
@@ -56,7 +57,7 @@ public sealed class InventoryObjectGroupTools(IEasyVereinApiClient client)
         {
             var group = await client.GetInventoryObjectGroupAsync(id, ct);
             return group != null
-                ? JsonSerializer.Serialize(group, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(group)
                 : $"Inventory object group with ID {id} not found.";
         }
         catch (Exception ex)
@@ -86,7 +87,7 @@ public sealed class InventoryObjectGroupTools(IEasyVereinApiClient client)
 
             var group = new InventoryObjectGroup { Name = name, Color = color, Short = @short };
             var created = await client.CreateInventoryObjectGroupAsync(group, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -114,7 +115,7 @@ public sealed class InventoryObjectGroupTools(IEasyVereinApiClient client)
             if (HasValue(@short)) patch[InventoryObjectGroupFields.Short] = @short!;
 
             var updated = await client.UpdateInventoryObjectGroupAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

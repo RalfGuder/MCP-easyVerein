@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Globalization;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -15,19 +14,21 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class ContactDetailsLogTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists contact-details logs with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_contact_details_logs"), Description("List all contact-details logs (change/audit logs of contact details)")]
+    [McpServerTool(Name = "list_contact_details_logs"), Description("List all contact-details logs (change/audit logs of contact details). Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListContactDetailsLogs(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Exact date filter (ISO-8601)")] string? date,
         [Description("Date greater-or-equal filter (ISO-8601)")] string? dateGte,
         [Description("Date less-or-equal filter (ISO-8601)")] string? dateLte,
         [Description("Ordering (e.g. 'date' or '-date')")] string? ordering,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var logs = await client.ListContactDetailsLogsAsync(idIn, date, dateGte, dateLte, ordering, ct);
-            return JsonSerializer.Serialize(logs, new JsonSerializerOptions { WriteIndented = true });
+            var logs = await client.ListContactDetailsLogsAsync(idIn, date, dateGte, dateLte, ordering, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(logs);
         }
         catch (Exception ex)
         {
@@ -45,7 +46,7 @@ public sealed class ContactDetailsLogTools(IEasyVereinApiClient client)
         {
             var log = await client.GetContactDetailsLogAsync(id, ct);
             return log != null
-                ? JsonSerializer.Serialize(log, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(log)
                 : $"Contact-details log with ID {id} not found.";
         }
         catch (Exception ex)
@@ -76,7 +77,7 @@ public sealed class ContactDetailsLogTools(IEasyVereinApiClient client)
             if (shared.HasValue) log.Shared = shared;
 
             var created = await client.CreateContactDetailsLogAsync(log, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -109,7 +110,7 @@ public sealed class ContactDetailsLogTools(IEasyVereinApiClient client)
             if (shared.HasValue) patch[ContactDetailsLogFields.Shared] = shared.Value;
 
             var updated = await client.UpdateContactDetailsLogAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

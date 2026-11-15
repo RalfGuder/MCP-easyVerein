@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -14,7 +13,7 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class ContactDetailsGroupTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists contact-details groups with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_contact_details_groups"), Description("List all contact-details groups (address groups)")]
+    [McpServerTool(Name = "list_contact_details_groups"), Description("List all contact-details groups (address groups). Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListContactDetailsGroups(
         [Description("Exact name filter")] string? name,
         [Description("Exact color filter (hex value, e.g. '#aabbcc')")] string? color,
@@ -23,13 +22,15 @@ public sealed class ContactDetailsGroupTools(IEasyVereinApiClient client)
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Ordering (e.g. 'name' or '-name')")] string? ordering,
         [Description("Search terms (allowed fields: name, short)")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var groups = await client.ListContactDetailsGroupsAsync(
-                name, color, @short, deleted, idIn, ordering, search, ct);
-            return JsonSerializer.Serialize(groups, new JsonSerializerOptions { WriteIndented = true });
+                name, color, @short, deleted, idIn, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(groups);
         }
         catch (Exception ex)
         {
@@ -47,7 +48,7 @@ public sealed class ContactDetailsGroupTools(IEasyVereinApiClient client)
         {
             var group = await client.GetContactDetailsGroupAsync(id, ct);
             return group != null
-                ? JsonSerializer.Serialize(group, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(group)
                 : $"Contact-details group with ID {id} not found.";
         }
         catch (Exception ex)
@@ -73,7 +74,7 @@ public sealed class ContactDetailsGroupTools(IEasyVereinApiClient client)
             if (orderSequence.HasValue) group.OrderSequence = orderSequence;
 
             var created = await client.CreateContactDetailsGroupAsync(group, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -100,7 +101,7 @@ public sealed class ContactDetailsGroupTools(IEasyVereinApiClient client)
             if (orderSequence.HasValue) patch[ContactDetailsGroupFields.OrderSequence] = orderSequence.Value;
 
             var updated = await client.UpdateContactDetailsGroupAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

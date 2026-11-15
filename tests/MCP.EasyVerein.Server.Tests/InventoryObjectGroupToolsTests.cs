@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Domain.ValueObjects;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Server.Tools;
@@ -17,15 +18,15 @@ public class InventoryObjectGroupToolsTests
         var mock = new Mock<IEasyVereinApiClient>();
         mock.Setup(c => c.ListInventoryObjectGroupsAsync(
                 "1,2", "Zelte", "#ff8800", "ZLT", false, "-name",
-                It.Is<string[]>(s => s.Length == 1 && s[0] == "Zelt"), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<InventoryObjectGroup> { new() { Id = 7, Name = "Zelte" } });
+                It.Is<string[]>(s => s.Length == 1 && s[0] == "Zelt"), It.IsAny<PageRequest?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(PagedResult<InventoryObjectGroup>.FromCompleteList(new List<InventoryObjectGroup> { new() { Id = 7, Name = "Zelte" } }));
 
         var tools = new InventoryObjectGroupTools(mock.Object);
 
         var result = await tools.ListInventoryObjectGroups(
-            "1,2", "Zelte", "#ff8800", "ZLT", false, "-name", new[] { "Zelt" }, CancellationToken.None);
+            "1,2", "Zelte", "#ff8800", "ZLT", false, "-name", new[] { "Zelt" }, ct: CancellationToken.None);
 
-        Assert.Contains("\"id\": 7", result);
+        Assert.Contains("\"id\":7", result);
     }
 
     /// <summary>
@@ -48,7 +49,7 @@ public class InventoryObjectGroupToolsTests
         Assert.Equal("Zelte", captured!.Name);
         Assert.Equal("#ff8800", captured.Color);
         Assert.Equal("ZLT", captured.Short);
-        Assert.Contains("\"id\": 1", result);
+        Assert.Contains("\"id\":1", result);
     }
 
     /// <summary>

@@ -71,15 +71,16 @@ public sealed class PortoBuchungenPrompt
         ## Ausschluss bereits klassifizierter Buchungen
 
         Überspringe Buchungen, bei denen bereits mindestens eines der folgenden gesetzt ist:
-        - `billingAccount` (nicht null und id != null)
-        - `bookingProject` (nicht null)
+        - `billingAccount` (Konto-ID vorhanden; fehlt das Feld, ist kein Konto gesetzt)
+        - `bookingProject` (vorhanden)
         - `sphere` ist nicht 9 (also schon klassifiziert, 9 = Default/unklassifiziert)
 
         ## Ablauf
 
         {{zeitraumBlock}}
 
-        1. Rufe `list_bookings` mit `dateGt` = Startdatum − 1 Tag und `dateLt` = Enddatum + 1 Tag auf.
+        1. Rufe `list_bookings` mit `dateGt` = Startdatum − 1 Tag, `dateLt` = Enddatum + 1 Tag und `limit` = 100 auf.
+           Solange `hasMore` true ist, rufe die nächste Seite (`page` + 1) ab; die Buchungen stehen in `items`.
         2. Filtere das Ergebnis nach Porto-Kandidaten (siehe oben). Zeige am Ende die Anzahl.
         3. Schließe bereits klassifizierte Buchungen aus und nenne die Zahl der verbleibenden Kandidaten.
         4. Löse einmal zu Beginn die beiden IDs auf und merke sie dir:

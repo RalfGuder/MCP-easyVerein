@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -20,16 +19,18 @@ public sealed class AnnouncementTools(IEasyVereinApiClient client)
     /// <param name="search">Optional search terms.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string containing matching announcements, or an error message.</returns>
-    [McpServerTool(Name = "list_announcements"), Description("List all announcements")]
+    [McpServerTool(Name = "list_announcements"), Description("List all announcements. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListAnnouncements(
         [Description("Ordering criteria (e.g. 'start' or '-start')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var announcements = await client.ListAnnouncementsAsync(ordering, search, ct);
-            return JsonSerializer.Serialize(announcements, new JsonSerializerOptions { WriteIndented = true });
+            var announcements = await client.ListAnnouncementsAsync(ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(announcements);
         }
         catch (Exception ex)
         {
@@ -52,7 +53,7 @@ public sealed class AnnouncementTools(IEasyVereinApiClient client)
         {
             var announcement = await client.GetAnnouncementAsync(id, ct);
             return announcement != null
-                ? JsonSerializer.Serialize(announcement, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(announcement)
                 : $"Announcement with ID {id} not found.";
         }
         catch (Exception ex)
@@ -105,7 +106,7 @@ public sealed class AnnouncementTools(IEasyVereinApiClient client)
             if (accountTypeVisibility.HasValue) announcement.AccountTypeVisibility = accountTypeVisibility.Value;
 
             var created = await client.CreateAnnouncementAsync(announcement, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -160,7 +161,7 @@ public sealed class AnnouncementTools(IEasyVereinApiClient client)
             if (accountTypeVisibility.HasValue) patch[AnnouncementFields.AccountTypeVisibility] = accountTypeVisibility.Value;
 
             var updated = await client.UpdateAnnouncementAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

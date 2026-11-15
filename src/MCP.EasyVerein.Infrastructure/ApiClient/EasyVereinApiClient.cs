@@ -98,11 +98,12 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <summary>Lists announcements with optional filters.</summary>
     /// <param name="ordering">Sort order.</param>
     /// <param name="search">Search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of announcements.</returns>
-    public async Task<IReadOnlyList<Announcement>> ListAnnouncementsAsync(
+    public async Task<PagedResult<Announcement>> ListAnnouncementsAsync(
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new AnnouncementQuery
         {
@@ -110,7 +111,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             Search = search
         };
         return await HandleListResponseWithPagination<Announcement>(
-            BuildListUrl("announcement", query.ToString()), ct);
+            BuildListUrl("announcement", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates an announcement with PATCH semantics.</summary>
@@ -173,13 +174,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching bank accounts.</returns>
-    public async Task<IReadOnlyList<BankAccount>> ListBankAccountsAsync(
+    public async Task<PagedResult<BankAccount>> ListBankAccountsAsync(
         string? name = null, string? iban = null, string? bic = null,
         string? accountHolder = null, string? bankName = null,
         string? idIn = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new BankAccountQuery
         {
@@ -194,7 +196,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<BankAccount>(
-            BuildListUrl("bank-account", query.ToString()), ct);
+            BuildListUrl("bank-account", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a bank account with PATCH semantics.</summary>
@@ -260,16 +262,17 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="showOwnBillingAccounts">Optional filter to show only own billing accounts ("true"/"false").</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching billing accounts.</returns>
-    public async Task<IReadOnlyList<BillingAccount>> ListBillingAccountsAsync(
+    public async Task<PagedResult<BillingAccount>> ListBillingAccountsAsync(
         string? name = null, string? idIn = null,
         string? skr = null, string? skrIn = null,
         string? numberGte = null, string? numberLte = null,
         string? deleted = null, string? accountingPlanIsNull = null,
         string? showOwnBillingAccounts = null,
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new BillingAccountQuery
         {
@@ -287,7 +290,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<BillingAccount>(
-            BuildListUrl("billing-account", query.ToString()), ct);
+            BuildListUrl("billing-account", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a billing account with PATCH semantics.</summary>
@@ -350,14 +353,15 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="budgetLt">Optional budget less-than filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching booking projects.</returns>
-    public async Task<IReadOnlyList<BookingProject>> ListBookingProjectsAsync(
+    public async Task<PagedResult<BookingProject>> ListBookingProjectsAsync(
         string? name = null, string? @short = null,
         string? completed = null, string? idIn = null,
         string? budgetGt = null, string? budgetLt = null,
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new BookingProjectQuery
         {
@@ -372,7 +376,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<BookingProject>(
-            BuildListUrl("booking-project", query.ToString()), ct);
+            BuildListUrl("booking-project", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a booking project with PATCH semantics.</summary>
@@ -431,12 +435,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="relatedInvoice">Optional parent-invoice-ID filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching invoice items.</returns>
-    public async Task<IReadOnlyList<InvoiceItem>> ListInvoiceItemsAsync(
+    public async Task<PagedResult<InvoiceItem>> ListInvoiceItemsAsync(
         string? idIn = null, string? relatedInvoice = null,
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new InvoiceItemQuery
         {
@@ -447,7 +452,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<InvoiceItem>(
-            BuildListUrl("invoice-item", query.ToString()), ct);
+            BuildListUrl("invoice-item", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates an invoice item with PATCH semantics.</summary>
@@ -507,17 +512,18 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching chairman levels.</returns>
-    public async Task<IReadOnlyList<ChairmanLevel>> ListChairmanLevelsAsync(
+    public async Task<PagedResult<ChairmanLevel>> ListChairmanLevelsAsync(
         string? name = null, string? @short = null,
         string? idIn = null, string? ordering = null,
-        string[]? search = null, CancellationToken ct = default)
+        string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new ChairmanLevelQuery { Name = name, Short = @short, IdIn = idIn, Ordering = ordering, Search = search };
 
         return await HandleListResponseWithPagination<ChairmanLevel>(
-            BuildListUrl("chairman-level", query.ToString()), ct);
+            BuildListUrl("chairman-level", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a chairman level with PATCH semantics.</summary>
@@ -579,12 +585,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated list of IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed fields: name, short).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching contact-details groups.</returns>
-    public async Task<IReadOnlyList<ContactDetailsGroup>> ListContactDetailsGroupsAsync(
+    public async Task<PagedResult<ContactDetailsGroup>> ListContactDetailsGroupsAsync(
         string? name = null, string? color = null, string? @short = null,
         bool? deleted = null, string? idIn = null, string? ordering = null,
-        string[]? search = null, CancellationToken ct = default)
+        string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new ContactDetailsGroupQuery
         {
@@ -598,7 +605,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<ContactDetailsGroup>(
-            BuildListUrl("contact-details-group", query.ToString()), ct);
+            BuildListUrl("contact-details-group", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a contact-details group with PATCH semantics.</summary>
@@ -658,11 +665,12 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="dateGte">Optional date greater-or-equal filter.</param>
     /// <param name="dateLte">Optional date less-or-equal filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching contact-details logs.</returns>
-    public async Task<IReadOnlyList<ContactDetailsLog>> ListContactDetailsLogsAsync(
+    public async Task<PagedResult<ContactDetailsLog>> ListContactDetailsLogsAsync(
         string? idIn = null, string? date = null, string? dateGte = null,
-        string? dateLte = null, string? ordering = null, CancellationToken ct = default)
+        string? dateLte = null, string? ordering = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new ContactDetailsLogQuery
         {
@@ -674,7 +682,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<ContactDetailsLog>(
-            BuildListUrl("contact-details-log", query.ToString()), ct);
+            BuildListUrl("contact-details-log", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a contact-details log with PATCH semantics.</summary>
@@ -742,14 +750,15 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="collectionIsnull">Optional no-collection filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed fields: name, color, short).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching custom fields.</returns>
-    public async Task<IReadOnlyList<CustomField>> ListCustomFieldsAsync(
+    public async Task<PagedResult<CustomField>> ListCustomFieldsAsync(
         string? idIn = null, string? name = null, string? color = null, string? kind = null,
         string? settingsType = null, string? settingsTypeIn = null, bool? memberEdit = null,
         bool? memberShow = null, bool? deleted = null, string? collection = null,
         bool? collectionIsnull = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new CustomFieldQuery
         {
@@ -769,7 +778,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<CustomField>(
-            BuildListUrl("custom-field", query.ToString()), ct);
+            BuildListUrl("custom-field", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a custom field with PATCH semantics.</summary>
@@ -828,11 +837,12 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="position">Optional position filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching custom field collections.</returns>
-    public async Task<IReadOnlyList<CustomFieldCollection>> ListCustomFieldCollectionsAsync(
+    public async Task<PagedResult<CustomFieldCollection>> ListCustomFieldCollectionsAsync(
         string? idIn = null, int? position = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new CustomFieldCollectionQuery
         {
@@ -843,7 +853,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<CustomFieldCollection>(
-            BuildListUrl("custom-field-collection", query.ToString()), ct);
+            BuildListUrl("custom-field-collection", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a custom field collection with PATCH semantics.</summary>
@@ -904,11 +914,12 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="modelIn">Optional comma-separated list of filter models.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed field: name).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching custom filters.</returns>
-    public async Task<IReadOnlyList<CustomFilter>> ListCustomFiltersAsync(
+    public async Task<PagedResult<CustomFilter>> ListCustomFiltersAsync(
         string? idIn = null, string? name = null, string? model = null, string? modelIn = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default)
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new CustomFilterQuery
         {
@@ -921,7 +932,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<CustomFilter>(
-            BuildListUrl("custom-filter", query.ToString()), ct);
+            BuildListUrl("custom-filter", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a custom filter with PATCH semantics.</summary>
@@ -986,13 +997,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="showAllowedToUse">Optional filter returning only usable rates.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed field: taxName).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching tax rates.</returns>
-    public async Task<IReadOnlyList<CustomTaxRate>> ListCustomTaxRatesAsync(
+    public async Task<PagedResult<CustomTaxRate>> ListCustomTaxRatesAsync(
         string? idIn = null, string? taxName = null, string? taxNameNe = null,
         string? customTaxRate = null, string? customTaxRateNe = null, bool? orgIsnull = null,
         bool? deleted = null, bool? showAllowedToUse = null, string? ordering = null,
-        string[]? search = null, CancellationToken ct = default)
+        string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new CustomTaxRateQuery
         {
@@ -1009,7 +1021,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<CustomTaxRate>(
-            BuildListUrl("custom-tax-rate", query.ToString()), ct);
+            BuildListUrl("custom-tax-rate", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates an organization-specific tax rate with PATCH semantics.</summary>
@@ -1049,12 +1061,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="federationNumber">Optional federation number filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching DOSB sports.</returns>
-    public async Task<IReadOnlyList<DosbSport>> ListDosbSportsAsync(
+    public async Task<PagedResult<DosbSport>> ListDosbSportsAsync(
         string? idIn = null, string? title = null, string? sportNumber = null,
         string? federationNumber = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new DosbSportQuery
         {
@@ -1067,7 +1080,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<DosbSport>(
-            BuildListUrl("dosb-sport", query.ToString()), ct);
+            BuildListUrl("dosb-sport", query.ToString(), paging), paging, ct);
     }
 
     // ------------------------------------------------------------------ //
@@ -1104,11 +1117,12 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="authorIsme">Optional own-requests filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms (allowed fields: title, description).</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching feature requests.</returns>
-    public async Task<IReadOnlyList<FeatureRequest>> ListFeatureRequestsAsync(
+    public async Task<PagedResult<FeatureRequest>> ListFeatureRequestsAsync(
         string? idIn = null, string? status = null, string? category = null, bool? authorIsme = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default)
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new FeatureRequestQuery
         {
@@ -1121,7 +1135,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<FeatureRequest>(
-            BuildListUrl("feature-request", query.ToString()), ct);
+            BuildListUrl("feature-request", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>
@@ -1191,14 +1205,15 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="updatedLt">Optional filter: updated before this date.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching forums.</returns>
-    public async Task<IReadOnlyList<Forum>> ListForumsAsync(
+    public async Task<PagedResult<Forum>> ListForumsAsync(
         string? idIn = null, string? name = null, string? nameNot = null,
         string? slug = null, string? slugNot = null, int? type = null,
         string? createdGt = null, string? createdLt = null,
         string? updatedGt = null, string? updatedLt = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default)
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new ForumQuery
         {
@@ -1217,7 +1232,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<Forum>(
-            BuildListUrl("forum", query.ToString()), ct);
+            BuildListUrl("forum", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a forum with PATCH semantics.</summary>
@@ -1311,15 +1326,16 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="lendingState">Optional lending state filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching inventory objects.</returns>
-    public async Task<IReadOnlyList<InventoryObject>> ListInventoryObjectsAsync(
+    public async Task<PagedResult<InventoryObject>> ListInventoryObjectsAsync(
         string? idIn = null, string? name = null, string? identifier = null,
         bool? lendingAvailable = null, bool? deleted = null,
         long? locationObject = null, long? locationObjectNot = null,
         string? inventoryObjectGroups = null, string? inventoryObjectGroupsNot = null,
         string? lendingState = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new InventoryObjectQuery
         {
@@ -1338,7 +1354,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<InventoryObject>(
-            BuildListUrl("inventory-object", query.ToString()), ct);
+            BuildListUrl("inventory-object", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates an inventory object with PATCH semantics.</summary>
@@ -1403,12 +1419,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="deleted">Optional soft-deleted filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching groups.</returns>
-    public async Task<IReadOnlyList<InventoryObjectGroup>> ListInventoryObjectGroupsAsync(
+    public async Task<PagedResult<InventoryObjectGroup>> ListInventoryObjectGroupsAsync(
         string? idIn = null, string? name = null, string? color = null, string? @short = null,
         bool? deleted = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new InventoryObjectGroupQuery
         {
@@ -1422,7 +1439,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<InventoryObjectGroup>(
-            BuildListUrl("inventory-object-group", query.ToString()), ct);
+            BuildListUrl("inventory-object-group", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates an inventory object group with PATCH semantics.</summary>
@@ -1496,9 +1513,10 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="deleted">Optional soft-deleted filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching lendings.</returns>
-    public async Task<IReadOnlyList<Lending>> ListLendingsAsync(
+    public async Task<PagedResult<Lending>> ListLendingsAsync(
         string? idIn = null, long? parentInventoryObject = null, long? parentInventoryObjectNot = null,
         long? borrowMember = null, long? borrowMemberNot = null,
         long? borrowAddress = null, long? borrowAddressNot = null,
@@ -1508,7 +1526,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         int? quantity = null, int? quantityGt = null, int? quantityLt = null,
         bool? futureReturnDate = null, bool? deleted = null,
         string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new LendingQuery
         {
@@ -1537,7 +1555,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         };
 
         return await HandleListResponseWithPagination<Lending>(
-            BuildListUrl("lending", query.ToString()), ct);
+            BuildListUrl("lending", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Updates a lending with PATCH semantics.</summary>
@@ -1767,13 +1785,14 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="idIn">Optional comma-separated IDs filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="Event"/> records.</returns>
-    public async Task<IReadOnlyList<Event>> ListEventsAsync(string? name = null, string? startGte = null,
+    public async Task<PagedResult<Event>> ListEventsAsync(string? name = null, string? startGte = null,
         string? startLte = null, string? endGte = null, string? endLte = null,
         string? calendar = null, string? canceled = null, string? isPublic = null,
         string? idIn = null, string? ordering = null, string[]? search = null,
-        CancellationToken ct = default)
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new EventQuery
         {
@@ -1789,7 +1808,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             Ordering = ordering,
             Search = search
         };
-        return await HandleListResponseWithPagination<Event>(BuildListUrl("event", query.ToString()), ct);
+        return await HandleListResponseWithPagination<Event>(BuildListUrl("event", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>
@@ -1809,12 +1828,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <summary>
     /// Retrieves all invoices with automatic pagination.
     /// </summary>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of all <see cref="Invoice"/> records.</returns>
-    public async Task<IReadOnlyList<Invoice>> GetInvoicesAsync(CancellationToken ct = default)
+    public async Task<PagedResult<Invoice>> GetInvoicesAsync(PageRequest? paging = null, CancellationToken ct = default)
     {
         return await HandleListResponseWithPagination<Invoice>(
-            BuildListUrl("invoice", InvoiceQuery.FieldQuery), ct);
+            BuildListUrl("invoice", InvoiceQuery.FieldQuery, paging), paging, ct);
     }
 
     /// <summary>
@@ -1839,10 +1859,11 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="dateLt">Optional filter for dates less than the specified value.</param>
     /// <param name="ordering">Optional ordering criterion for the results.</param>
     /// <param name="search">Optional search terms to filter bookings.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="Booking"/> records.</returns>
-    public async Task<IReadOnlyList<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,
-        CancellationToken ct = default)
+    public async Task<PagedResult<Booking>> ListBookingsAsync(string? idIn = null, string? date = default, string? dateGt = default, string? dateLt = default, string? ordering = default, string[]? search = default,
+        PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new BookingQuery
         {
@@ -1854,7 +1875,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             Ordering = ordering
         };
         return await HandleListResponseWithPagination<Booking>(
-            BuildListUrl("booking", query.ToString()), ct);
+            BuildListUrl("booking", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>Lists calendars with optional filters and automatic pagination.</summary>
@@ -1868,12 +1889,13 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="allowedGroups">Optional allowed groups filter.</param>
     /// <param name="ordering">Optional ordering criterion.</param>
     /// <param name="search">Optional search terms.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="Calendar"/> records.</returns>
-    public async Task<IReadOnlyList<Calendar>> ListCalendarsAsync(string? name = null, string? color = null,
+    public async Task<PagedResult<Calendar>> ListCalendarsAsync(string? name = null, string? color = null,
         string? short_ = null, string? nameNot = null, string? colorNot = null,
         string? shortNot = null, string? idIn = null, string? allowedGroups = null,
-        string? ordering = null, string[]? search = null, CancellationToken ct = default)
+        string? ordering = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new CalendarQuery
         {
@@ -1888,7 +1910,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             Ordering = ordering,
             Search = search
         };
-        return await HandleListResponseWithPagination<Calendar>(BuildListUrl("calendar", query.ToString()), ct);
+        return await HandleListResponseWithPagination<Calendar>(BuildListUrl("calendar", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>
@@ -1898,10 +1920,11 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="firstName">Optional filter by first name.</param>
     /// <param name="familyName">Optional filter by family name.</param>
     /// <param name="name">Optional filter by name.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="ContactDetails"/> records.</returns>
-    public async Task<IReadOnlyList<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
-        string? familyName = null, string? name = null, CancellationToken ct = default)
+    public async Task<PagedResult<ContactDetails>> ListContactDetailsAsync(long? id = null, string? firstName = null,
+        string? familyName = null, string? name = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new ContactDetailsQuery
         {
@@ -1911,7 +1934,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             Name = name
         };
         return await HandleListResponseWithPagination<ContactDetails>(
-            BuildListUrl("contact-details", query.ToString()), ct);
+            BuildListUrl("contact-details", query.ToString(), paging), paging, ct);
     }
 
     /// <summary>
@@ -1920,9 +1943,10 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="id">Optional filter by member identifier.</param>
     /// <param name="membershipNumber">Optional filter by membership number.</param>
     /// <param name="search">Optional search terms to filter members.</param>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching <see cref="Member"/> records.</returns>
-    public async Task<IReadOnlyList<Member>> ListMembersAsync(long? id = null, string? membershipNumber = null, string[]? search = null, CancellationToken ct = default)
+    public async Task<PagedResult<Member>> ListMembersAsync(long? id = null, string? membershipNumber = null, string[]? search = null, PageRequest? paging = null, CancellationToken ct = default)
     {
         var query = new MemberQuery
         {
@@ -1931,7 +1955,7 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             Search = search
         };
         return await HandleListResponseWithPagination<Member>(
-            BuildListUrl("member", query.ToString()), ct);
+            BuildListUrl("member", query.ToString(), paging), paging, ct);
     }
 
     // --- Bookings (FR-045) ---
@@ -2045,14 +2069,19 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// </summary>
     /// <param name="resource">The API resource path (e.g. "member").</param>
     /// <param name="query">Optional query string for field selection and filters.</param>
-    /// <returns>The fully constructed list URL with a limit of 100.</returns>
-    private string BuildListUrl(string resource, string? query)
+    /// <param name="paging">
+    /// Optional page to fetch. With a page, the URL carries its <c>limit</c> and <c>offset</c>;
+    /// without, it requests the maximum page size so that all pages can be followed.
+    /// </param>
+    /// <returns>The fully constructed list URL.</returns>
+    private string BuildListUrl(string resource, string? query, PageRequest? paging)
     {
-        if (string.IsNullOrEmpty(query))
-        {
-            return $"{BuildUrl(resource)}?limit=100";
-        }
-        return $"{BuildUrl(resource)}?{query}&limit=100";
+        var pagingQuery = paging is null
+            ? $"limit={PageRequest.MaxLimit}"
+            : $"limit={paging.Limit}&offset={paging.Offset}";
+        return string.IsNullOrEmpty(query)
+            ? $"{BuildUrl(resource)}?{pagingQuery}"
+            : $"{BuildUrl(resource)}?{query}&{pagingQuery}";
     }
 
     /// <summary>
@@ -2090,26 +2119,32 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     }
 
     /// <summary>
-    /// Fetches all pages of a paginated list endpoint and aggregates the results.
+    /// Fetches a paginated list endpoint. With a page request, exactly one page is fetched and
+    /// the API's <c>count</c> and <c>next</c> become the paging metadata; without, all pages are
+    /// followed and returned as a single complete page (US-0064).
     /// </summary>
     /// <typeparam name="T">The entity type of the list items.</typeparam>
-    /// <param name="initialUrl">The URL of the first page.</param>
+    /// <param name="initialUrl">The URL of the first (or requested) page.</param>
+    /// <param name="paging">Optional page request; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
-    /// <returns>A read-only list containing all results across all pages.</returns>
-    private async Task<IReadOnlyList<T>> HandleListResponseWithPagination<T>(
-        string initialUrl, CancellationToken ct)
+    /// <returns>The requested page, or all results as a single page.</returns>
+    private async Task<PagedResult<T>> HandleListResponseWithPagination<T>(
+        string initialUrl, PageRequest? paging, CancellationToken ct)
     {
+        if (paging is not null)
+        {
+            var single = await FetchListPageAsync<T>(initialUrl, ct);
+            var items = single?.Results ?? new List<T>();
+            return new PagedResult<T>(items.AsReadOnly(), single?.Count ?? items.Count,
+                hasMore: single?.Next is not null, paging.Page, paging.Limit);
+        }
+
         var allResults = new List<T>();
-        var url = initialUrl;
+        string? url = initialUrl;
 
         while (url != null)
         {
-            var response = await SendWithErrorHandling(
-                () => _httpClient.GetAsync(url, ct), ct);
-
-            await EnsureSuccessOrThrowAsync(response, ct);
-            var content = await response.Content.ReadAsStringAsync(ct);
-            var page = JsonSerializer.Deserialize<ApiListResponse<T>>(content, _jsonOptions);
+            var page = await FetchListPageAsync<T>(url, ct);
 
             if (page?.Results != null)
                 allResults.AddRange(page.Results);
@@ -2117,7 +2152,28 @@ public class EasyVereinApiClient : IEasyVereinApiClient
             url = page?.Next;
         }
 
-        return allResults.AsReadOnly();
+        return PagedResult<T>.FromCompleteList(allResults.AsReadOnly());
+    }
+
+    /// <summary>
+    /// Fetches and deserializes a single page of a list endpoint.
+    /// </summary>
+    /// <typeparam name="T">The entity type of the list items.</typeparam>
+    /// <param name="url">The URL of the page.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The deserialized page, or <c>null</c> for an empty body.</returns>
+    /// <exception cref="UnauthorizedAccessException">The API rejected the token.</exception>
+    /// <exception cref="HttpRequestException">The API answered with an error status.</exception>
+    /// <exception cref="InvalidOperationException">Network failure or timeout.</exception>
+    /// <exception cref="JsonException">The body is not a valid list response.</exception>
+    private async Task<ApiListResponse<T>?> FetchListPageAsync<T>(string url, CancellationToken ct)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(url, ct), ct);
+
+        await EnsureSuccessOrThrowAsync(response, ct);
+        var content = await response.Content.ReadAsStringAsync(ct);
+        return JsonSerializer.Deserialize<ApiListResponse<T>>(content, _jsonOptions);
     }
 
     /// <summary>

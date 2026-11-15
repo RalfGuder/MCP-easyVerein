@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -14,18 +13,20 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class CustomFieldCollectionTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists custom field collections with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_custom_field_collections"), Description("List all custom field collections (groups/tabs of user-defined fields)")]
+    [McpServerTool(Name = "list_custom_field_collections"), Description("List all custom field collections (groups/tabs of user-defined fields). Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListCustomFieldCollections(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Position filter")] int? position,
         [Description("Ordering (e.g. 'name' or '-position')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var collections = await client.ListCustomFieldCollectionsAsync(idIn, position, ordering, search, ct);
-            return JsonSerializer.Serialize(collections, new JsonSerializerOptions { WriteIndented = true });
+            var collections = await client.ListCustomFieldCollectionsAsync(idIn, position, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(collections);
         }
         catch (Exception ex)
         {
@@ -43,7 +44,7 @@ public sealed class CustomFieldCollectionTools(IEasyVereinApiClient client)
         {
             var collection = await client.GetCustomFieldCollectionAsync(id, ct);
             return collection != null
-                ? JsonSerializer.Serialize(collection, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(collection)
                 : $"Custom field collection with ID {id} not found.";
         }
         catch (Exception ex)
@@ -67,7 +68,7 @@ public sealed class CustomFieldCollectionTools(IEasyVereinApiClient client)
             if (position.HasValue) collection.Position = position;
 
             var created = await client.CreateCustomFieldCollectionAsync(collection, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -92,7 +93,7 @@ public sealed class CustomFieldCollectionTools(IEasyVereinApiClient client)
             if (position.HasValue) patch[CustomFieldCollectionFields.Position] = position.Value;
 
             var updated = await client.UpdateCustomFieldCollectionAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

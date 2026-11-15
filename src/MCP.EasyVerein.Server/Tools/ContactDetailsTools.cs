@@ -1,7 +1,7 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
+using MCP.EasyVerein.Domain.ValueObjects;
 using ModelContextProtocol.Server;
 
 namespace MCP.EasyVerein.Server.Tools;
@@ -19,15 +19,20 @@ public sealed class ContactDetailsTools(IEasyVereinApiClient client)
     /// <param name="firstName">Optional first name filter.</param>
     /// <param name="familyName">Optional family name filter.</param>
     /// <param name="fullName">Optional full name filter.</param>
+    /// <param name="limit">Entries per page (1-100).</param>
+    /// <param name="page">Page number, starting at 1.</param>
     /// <param name="ct">Cancellation token.</param>
-    /// <returns>A JSON string containing matching contact details, or an error message.</returns>
-    [McpServerTool, Description("List all contact details")]
-    public async Task<string> ListContactDetails(long? id, string? firstName, string? familyName, string? fullName, CancellationToken ct)
+    /// <returns>A JSON page of matching contact details, or an error message.</returns>
+    [McpServerTool, Description("List all contact details. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
+    public async Task<string> ListContactDetails(long? id, string? firstName, string? familyName, string? fullName,
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var contacts = await client.ListContactDetailsAsync(id, firstName, familyName, fullName, ct);
-            return JsonSerializer.Serialize(contacts, new JsonSerializerOptions { WriteIndented = true });
+            var contacts = await client.ListContactDetailsAsync(id, firstName, familyName, fullName, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(contacts);
         }
         catch (Exception ex)
         {
@@ -46,7 +51,7 @@ public sealed class ContactDetailsTools(IEasyVereinApiClient client)
     {
         var contact = await client.GetContactDetailsAsync(id, ct);
         return contact != null
-            ? JsonSerializer.Serialize(contact, new JsonSerializerOptions { WriteIndented = true })
+            ? ToolJson.Serialize(contact)
             : $"Contact details with ID {id} not found.";
     }
 
@@ -69,7 +74,7 @@ public sealed class ContactDetailsTools(IEasyVereinApiClient client)
             PrivateEmail = privateEmail
         };
         var created = await client.CreateContactDetailsAsync(contact, ct);
-        return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+        return ToolJson.Serialize(created);
     }
 
     /// <summary>
@@ -99,7 +104,7 @@ public sealed class ContactDetailsTools(IEasyVereinApiClient client)
         {
 
             var updated = await client.UpdateContactDetailsAsync(id, contactDetails, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

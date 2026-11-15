@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -14,7 +13,7 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class CustomFieldTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists custom fields with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_custom_fields"), Description("List all custom fields (user-defined fields)")]
+    [McpServerTool(Name = "list_custom_fields"), Description("List all custom fields (user-defined fields). Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListCustomFields(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Exact name filter")] string? name,
@@ -29,14 +28,16 @@ public sealed class CustomFieldTools(IEasyVereinApiClient client)
         [Description("No-collection filter (true for fields in no tab)")] bool? collectionIsnull,
         [Description("Ordering (e.g. 'name' or '-position')")] string? ordering,
         [Description("Search terms (allowed fields: name, color, short)")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var fields = await client.ListCustomFieldsAsync(
                 idIn, name, color, kind, settingsType, settingsTypeIn, memberEdit,
-                memberShow, deleted, collection, collectionIsnull, ordering, search, ct);
-            return JsonSerializer.Serialize(fields, new JsonSerializerOptions { WriteIndented = true });
+                memberShow, deleted, collection, collectionIsnull, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(fields);
         }
         catch (Exception ex)
         {
@@ -54,7 +55,7 @@ public sealed class CustomFieldTools(IEasyVereinApiClient client)
         {
             var field = await client.GetCustomFieldAsync(id, ct);
             return field != null
-                ? JsonSerializer.Serialize(field, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(field)
                 : $"Custom field with ID {id} not found.";
         }
         catch (Exception ex)
@@ -98,7 +99,7 @@ public sealed class CustomFieldTools(IEasyVereinApiClient client)
             if (needsAdminApproval.HasValue) field.NeedsAdminApproval = needsAdminApproval;
 
             var created = await client.CreateCustomFieldAsync(field, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -143,7 +144,7 @@ public sealed class CustomFieldTools(IEasyVereinApiClient client)
             if (needsAdminApproval.HasValue) patch[CustomFieldFields.NeedsAdminApproval] = needsAdminApproval.Value;
 
             var updated = await client.UpdateCustomFieldAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {
