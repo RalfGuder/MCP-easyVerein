@@ -14,12 +14,17 @@ Bei der Buchungsprüfung 2026 am 2026-11-15 haben alle per `create_receipt` erze
 
 ## Akzeptanzkriterien
 
-- [ ] Ohne Angabe übernimmt `create_receipt` das Datum der verknüpften Buchung als Belegdatum (`date` der Invoice).
-- [ ] Der neue optionale Parameter `date` (ISO 8601, z. B. `2026-07-09`) überschreibt das Buchungsdatum, z. B. mit dem Datum des Kassenbons.
-- [ ] Ein ungültiges `date` wird mit einer verständlichen Meldung abgelehnt, bevor etwas angelegt wird.
-- [ ] Hat die Buchung kein Datum und ist kein `date` angegeben, bricht das Tool mit einer verständlichen Meldung ab, statt still das heutige Datum zu verwenden.
-- [ ] Der Parameter ist im MCP-Schema wirklich optional (Default-Wert, vgl. PR #133).
+- [x] Ohne Angabe übernimmt `create_receipt` das Datum der verknüpften Buchung als Belegdatum (`date` der Invoice).
+- [x] Der neue optionale Parameter `date` (ISO 8601, z. B. `2026-07-09`) überschreibt das Buchungsdatum, z. B. mit dem Datum des Kassenbons.
+- [x] Ein ungültiges `date` wird mit einer verständlichen Meldung abgelehnt, bevor etwas angelegt wird.
+- [x] Hat die Buchung kein Datum und ist kein `date` angegeben, bricht das Tool mit einer verständlichen Meldung ab, statt still das heutige Datum zu verwenden.
+- [x] Der Parameter ist im MCP-Schema wirklich optional (Default-Wert, vgl. PR #133).
 - [ ] Tests nach TDD; Live-Prüfung an einem Testfall: Belegdatum = Buchungsdatum.
+
+## Umsetzung
+
+- Das Belegdatum wird im Finalisierungs-PATCH als `date` im Format `yyyy-MM-dd` gesendet; der Entwurf selbst bleibt ohne Datum.
+- `Booking.Date` wird ohne eigenen Converter gelesen und dabei in die Zeitzone des Rechners umgerechnet. Das Belegdatum wird deshalb als Kalendertag in Europe/Berlin bestimmt, damit es auf jedem Server stimmt.
 
 ## Aufgaben
 
