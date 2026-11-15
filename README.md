@@ -53,7 +53,7 @@ Die `list_*`-Tools liefern seitenweise:
 {"items": [ ... ], "totalCount": 95, "hasMore": true, "page": 1, "limit": 50}
 ```
 
-Solange `hasMore` `true` ist, gibt es weitere Seiten (`page` + 1).
+Solange `hasMore` `true` ist, gibt es weitere Seiten (`page` + 1). `totalCount` steht nur in der Antwort, wenn die Gesamtzahl bekannt ist; die easyVerein-API v2.0 meldet sie nicht, daher erscheint sie dort erst auf der letzten Seite.
 
 ## Branch-Strategie
 

@@ -28,7 +28,7 @@ Prüfung der Schnittstelle am 2026-11-15:
 - [x] Alle Tool-Antworten sind kompaktes JSON (ohne Einrückung).
 - [x] Die `JsonSerializerOptions` werden zentral als eine wiederverwendete Instanz bereitgestellt statt je Aufruf neu erzeugt.
 - [x] Die Tool-Beschreibungen nennen `limit`/`page` und weisen darauf hin, wie weitere Seiten abgerufen werden.
-- [ ] Die erneute Prüfung von `list_events` ab 01.11.2026 bleibt unter dem Token-Limit.
+- [x] Die erneute Prüfung von `list_events` ab 01.11.2026 bleibt unter dem Token-Limit (live 2026-11-15: 95 Termine in 2 Seiten à 50, Seite 2 ≈ 22.000 Zeichen statt 85.000 gesamt).
 - [x] Tests nach TDD (Red-Green-Refactor), Mindest-Coverage 70 % bleibt erhalten.
 
 ## Umsetzungsentscheidungen
@@ -36,6 +36,7 @@ Prüfung der Schnittstelle am 2026-11-15:
 - `IEasyVereinApiClient.List*Async` (und `GetInvoicesAsync`) nehmen optional `PageRequest paging` und liefern `PagedResult<T>`. `PagedResult<T>` implementiert `IReadOnlyList<T>`; ohne `paging` werden wie bisher alle Seiten geholt.
 - Die ID-Ausgabe gilt für alle Tool-Antworten (list, get, create, update). Sie wird nur in der Tool-Ausgabe angewendet (`ToolJson`, Resolver-Modifier); API-Payloads bleiben unverändert.
 - Ausnahmen, die eingebettet bleiben, weil sie der eigentliche Inhalt sind: `Member.contactDetails` (Name, Anschrift) und `Event.locationObject` (für Orte gibt es kein `get`-Tool).
+- Live-Befund: easyVerein paginiert über `page` und ignoriert `offset`; v2.0 liefert kein `count`, nur `next`/`previous`/`current`. `totalCount` wird daher auf der letzten Seite berechnet (`(page−1)·limit + Einträge`) und fehlt, solange weitere Seiten existieren.
 - Ungültige Werte für `limit`/`page` liefern `ERROR: ArgumentOutOfRangeException: limit muss zwischen 1 und 100 liegen.` bzw. `page muss mindestens 1 sein.`
 
 ## Aufgaben
