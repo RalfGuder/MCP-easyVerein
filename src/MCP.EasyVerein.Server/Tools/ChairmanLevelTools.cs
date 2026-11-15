@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -14,20 +13,22 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class ChairmanLevelTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists chairman levels with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_chairman_levels"), Description("List all chairman levels")]
+    [McpServerTool(Name = "list_chairman_levels"), Description("List all chairman levels. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListChairmanLevels(
         [Description("Exact name filter")] string? name,
         [Description("Exact short-label filter (max 4 chars)")] string? @short,
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Ordering (e.g. 'name' or '-name')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var levels = await client.ListChairmanLevelsAsync(
-                name, @short, idIn, ordering, search, ct);
-            return JsonSerializer.Serialize(levels, new JsonSerializerOptions { WriteIndented = true });
+                name, @short, idIn, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(levels);
         }
         catch (Exception ex)
         {
@@ -45,7 +46,7 @@ public sealed class ChairmanLevelTools(IEasyVereinApiClient client)
         {
             var level = await client.GetChairmanLevelAsync(id, ct);
             return level != null
-                ? JsonSerializer.Serialize(level, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(level)
                 : $"Chairman level with ID {id} not found.";
         }
         catch (Exception ex)
@@ -91,7 +92,7 @@ public sealed class ChairmanLevelTools(IEasyVereinApiClient client)
             if (HasValue(moduleForum)) level.ModuleForum = moduleForum;
 
             var created = await client.CreateChairmanLevelAsync(level, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -138,7 +139,7 @@ public sealed class ChairmanLevelTools(IEasyVereinApiClient client)
             if (HasValue(moduleForum)) patch[ChairmanLevelFields.ModuleForum] = moduleForum!;
 
             var updated = await client.UpdateChairmanLevelAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

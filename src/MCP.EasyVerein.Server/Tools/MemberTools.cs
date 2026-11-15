@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -21,16 +20,19 @@ public sealed class MemberTools(IEasyVereinApiClient client)
     /// <param name="search">Optional search terms.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string containing matching members, or an error message.</returns>
-    [McpServerTool(Name = "list_members"), Description("List all members")]
+    [McpServerTool(Name = "list_members"), Description("List all members. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListMembers(
         [Description("The ID of a member")]long? id,
         [Description("The membership number of a member")] string? membershipNumber,
-        [Description("Search terms for the member")] string[]? search , CancellationToken ct)
+        [Description("Search terms for the member")] string[]? search,
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var members = await client.ListMembersAsync(id, membershipNumber, search, ct);
-            return JsonSerializer.Serialize(members, new JsonSerializerOptions { WriteIndented = true });
+            var members = await client.ListMembersAsync(id, membershipNumber, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(members);
         }
         catch (Exception ex)
         {
@@ -52,7 +54,7 @@ public sealed class MemberTools(IEasyVereinApiClient client)
         {
             var member = await client.GetMemberAsync(id, ct);
             return member != null
-                ? JsonSerializer.Serialize(member, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(member)
                 : $"Member with ID {id} not found.";
         }
         catch (Exception ex)
@@ -88,7 +90,7 @@ public sealed class MemberTools(IEasyVereinApiClient client)
                 PrivateEmail = privateEmail
             };
             var created = await client.CreateMemberAsync(emailOrUserName, contactDetails, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception e)
         {
@@ -141,7 +143,7 @@ public sealed class MemberTools(IEasyVereinApiClient client)
             if (HasValue(useBalanceForMembershipFee) && bool.TryParse(useBalanceForMembershipFee, out var useBalanceVal)) patchData[MemberFields.UseBalanceForMembershipFee] = useBalanceVal;
 
             var updated = await client.UpdateMemberAsync(id, patchData, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
 
         }
         catch (Exception e)

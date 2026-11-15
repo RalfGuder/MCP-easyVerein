@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Domain.ValueObjects;
 using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
@@ -160,12 +161,12 @@ public class CustomFilterToolsTests
     {
         var mock = new Mock<IEasyVereinApiClient>();
         mock.Setup(c => c.ListCustomFiltersAsync(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string?>(),
-                It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string[]?>(), It.IsAny<CancellationToken>()))
+                It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string[]?>(), It.IsAny<PageRequest?>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new UnauthorizedAccessException("401"));
 
         var tools = new CustomFilterTools(mock.Object);
 
-        var result = await tools.ListCustomFilters(null, null, null, null, null, null, CancellationToken.None);
+        var result = await tools.ListCustomFilters(null, null, null, null, null, null, ct: CancellationToken.None);
 
         Assert.StartsWith("ERROR: UnauthorizedAccessException", result);
     }

@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Domain.ValueObjects;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Server.Tools;
@@ -16,14 +17,14 @@ public class DosbSportToolsTests
     {
         var mock = new Mock<IEasyVereinApiClient>();
         mock.Setup(c => c.ListDosbSportsAsync("1,2", "Fußball", "042", "07", "title",
-                It.Is<string[]?>(s => s != null && s[0] == "Ball"), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<DosbSport> { new() { Id = 55, Title = "Fußball" } });
+                It.Is<string[]?>(s => s != null && s[0] == "Ball"), It.IsAny<PageRequest?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(PagedResult<DosbSport>.FromCompleteList(new List<DosbSport> { new() { Id = 55, Title = "Fußball" } }));
 
         var tools = new DosbSportTools(mock.Object);
 
-        var result = await tools.ListDosbSports("1,2", "Fußball", "042", "07", "title", new[] { "Ball" }, CancellationToken.None);
+        var result = await tools.ListDosbSports("1,2", "Fußball", "042", "07", "title", new[] { "Ball" }, ct: CancellationToken.None);
 
-        Assert.Contains("\"id\": 55", result);
+        Assert.Contains("\"id\":55", result);
         Assert.Contains("Fu", result);
     }
 

@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -17,7 +16,7 @@ public sealed class ForumTools(IEasyVereinApiClient client)
     private const int MaxNameLength = 100;
 
     /// <summary>Lists forums with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_forums"), Description("List the organization's member forums")]
+    [McpServerTool(Name = "list_forums"), Description("List the organization's member forums. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListForums(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Exact forum name filter")] string? name,
@@ -31,14 +30,16 @@ public sealed class ForumTools(IEasyVereinApiClient client)
         [Description("Updated before this date (YYYY-MM-DD)")] string? updatedLt,
         [Description("Ordering (e.g. 'order' or '-created')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var forums = await client.ListForumsAsync(
                 idIn, name, nameNot, slug, slugNot, type,
-                createdGt, createdLt, updatedGt, updatedLt, ordering, search, ct);
-            return JsonSerializer.Serialize(forums, new JsonSerializerOptions { WriteIndented = true });
+                createdGt, createdLt, updatedGt, updatedLt, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(forums);
         }
         catch (Exception ex)
         {
@@ -56,7 +57,7 @@ public sealed class ForumTools(IEasyVereinApiClient client)
         {
             var forum = await client.GetForumAsync(id, ct);
             return forum != null
-                ? JsonSerializer.Serialize(forum, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(forum)
                 : $"Forum with ID {id} not found.";
         }
         catch (Exception ex)
@@ -93,7 +94,7 @@ public sealed class ForumTools(IEasyVereinApiClient client)
                 DisplaySubForumList = displaySubForumList
             };
             var created = await client.CreateForumAsync(forum, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -127,7 +128,7 @@ public sealed class ForumTools(IEasyVereinApiClient client)
             if (displaySubForumList.HasValue) patch[ForumFields.DisplaySubForumList] = displaySubForumList.Value;
 
             var updated = await client.UpdateForumAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

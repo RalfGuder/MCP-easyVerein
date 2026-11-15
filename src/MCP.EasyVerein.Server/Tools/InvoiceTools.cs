@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
@@ -19,13 +18,16 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
     /// </summary>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string containing all invoices, or an error message.</returns>
-    [McpServerTool(Name = "list_invoices"), Description("List all invoices")]
-    public async Task<string> ListInvoices(CancellationToken ct)
+    [McpServerTool(Name = "list_invoices"), Description("List all invoices. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
+    public async Task<string> ListInvoices(
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var invoices = await client.GetInvoicesAsync(ct);
-            return JsonSerializer.Serialize(invoices, new JsonSerializerOptions { WriteIndented = true });
+            var invoices = await client.GetInvoicesAsync(ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(invoices);
         }
         catch (Exception ex)
         {
@@ -44,7 +46,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
     {
         var invoice = await client.GetInvoiceAsync(id, ct);
         return invoice != null
-            ? JsonSerializer.Serialize(invoice, new JsonSerializerOptions { WriteIndented = true })
+            ? ToolJson.Serialize(invoice)
             : $"Invoice with ID {id} not found.";
     }
 
@@ -118,7 +120,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
                 IsDraft = isDraft ?? false
             };
             var created = await client.CreateInvoiceAsync(invoice, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -174,7 +176,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
             if (isDraft.HasValue) patch[InvoiceFields.IsDraft] = isDraft.Value;
 
             var updated = await client.UpdateInvoiceAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {
@@ -264,7 +266,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
             };
             var finalized = await client.UpdateInvoiceAsync(createdInvoice.Id, patch, ct);
 
-            return JsonSerializer.Serialize(finalized, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(finalized);
         }
         catch (Exception ex)
         {

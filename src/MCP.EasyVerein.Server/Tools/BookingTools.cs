@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
@@ -25,19 +24,22 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
     /// <param name="ordering">The ordering.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string containing matching bookings, or an error message.</returns>
-    [McpServerTool(Name = "list_bookings"), Description("List all bookings")]
+    [McpServerTool(Name = "list_bookings"), Description("List all bookings. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListBookings(
         [Description("Comma-separated list of booking IDs (e.g. '12345' or '12345,67890')")] string? idIn,
         [Description("Booking date")] string? date,
         [Description("Booking date greater than")] string? dateGt,
         [Description("Booking date less than")] string? dateLt,
         [Description("Search terms")] string[]? search,
-        [Description("Ordering criteria")] string? ordering, CancellationToken ct)
+        [Description("Ordering criteria")] string? ordering,
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var bookings = await client.ListBookingsAsync(idIn, date, dateGt, dateLt, ordering, search, ct);
-            return JsonSerializer.Serialize(bookings, new JsonSerializerOptions { WriteIndented = true });
+            var bookings = await client.ListBookingsAsync(idIn, date, dateGt, dateLt, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(bookings);
         }
         catch (Exception ex)
         {
@@ -59,7 +61,7 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
         {
             var booking = await client.GetBookingAsync(id, ct);
             return booking != null
-                ? JsonSerializer.Serialize(booking, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(booking)
                 : $"Booking with ID {id} not found.";
         }
         catch (Exception ex)
@@ -116,12 +118,12 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
 
         var assignments = BuildAssignmentPatch(bookingProjectId, billingAccountId, sphere, bankAccountId);
         if (assignments.Count == 0)
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
 
         try
         {
             var updated = await client.UpdateBookingAsync(created.Id, assignments, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {
@@ -188,7 +190,7 @@ public sealed class BookingTools(IEasyVereinApiClient client, EasyVereinConfigur
             if (receiver != null) patch[BookingFields.Receiver] = receiver;
 
             var updated = await client.UpdateBookingAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

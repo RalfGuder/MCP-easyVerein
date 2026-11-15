@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Domain.ValueObjects;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Server.Tools;
@@ -17,16 +18,16 @@ public class InventoryObjectToolsTests
         var mock = new Mock<IEasyVereinApiClient>();
         mock.Setup(c => c.ListInventoryObjectsAsync(
                 "1,2", "Zelt", "594", true, false, 10L, 11L, "12", "13", "lent", "-name",
-                It.Is<string[]>(s => s.Length == 1 && s[0] == "Zelt"), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<InventoryObject> { new() { Id = 7, Name = "Zelt" } });
+                It.Is<string[]>(s => s.Length == 1 && s[0] == "Zelt"), It.IsAny<PageRequest?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(PagedResult<InventoryObject>.FromCompleteList(new List<InventoryObject> { new() { Id = 7, Name = "Zelt" } }));
 
         var tools = new InventoryObjectTools(mock.Object);
 
         var result = await tools.ListInventoryObjects(
             "1,2", "Zelt", "594", true, false, 10, 11, "12", "13", "lent", "-name",
-            new[] { "Zelt" }, CancellationToken.None);
+            new[] { "Zelt" }, ct: CancellationToken.None);
 
-        Assert.Contains("\"id\": 7", result);
+        Assert.Contains("\"id\":7", result);
     }
 
     /// <summary>
@@ -56,7 +57,7 @@ public class InventoryObjectToolsTests
         Assert.Equal("Lager", captured.LocationName);
         Assert.True(captured.LendingAvailable);
         Assert.Equal(4424352L, captured.LendingResponsibleId);
-        Assert.Contains("\"id\": 1", result);
+        Assert.Contains("\"id\":1", result);
     }
 
     /// <summary>
@@ -259,7 +260,7 @@ public class InventoryObjectToolsTests
         var result = await tools.CreateInventoryObject(
             "Beamer", null, null, 1, null, null, null, null, null, null, CancellationToken.None);
 
-        Assert.Contains("\"id\": 1", result);
+        Assert.Contains("\"id\":1", result);
         Assert.DoesNotContain("8252487", result);
     }
 

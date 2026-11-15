@@ -1,3 +1,4 @@
+using MCP.EasyVerein.Domain.ValueObjects;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Server.Tools;
@@ -19,8 +20,8 @@ public class LendingToolsTests
                 "2025-10-27", "2025-10-01", "2025-10-31",
                 "2025-11-03", "2025-11-01", "2025-11-30",
                 1, 0, 5, true, false, "-borrowingDate",
-                It.Is<string[]>(s => s.Length == 1 && s[0] == "Zelt"), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Lending> { new() { Id = 37839, State = "lent" } });
+                It.Is<string[]>(s => s.Length == 1 && s[0] == "Zelt"), It.IsAny<PageRequest?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(PagedResult<Lending>.FromCompleteList(new List<Lending> { new() { Id = 37839, State = "lent" } }));
 
         var tools = new LendingTools(mock.Object);
 
@@ -29,9 +30,9 @@ public class LendingToolsTests
             "lent", "returned",
             "2025-10-27", "2025-10-01", "2025-10-31",
             "2025-11-03", "2025-11-01", "2025-11-30",
-            1, 0, 5, true, false, "-borrowingDate", new[] { "Zelt" }, CancellationToken.None);
+            1, 0, 5, true, false, "-borrowingDate", new[] { "Zelt" }, ct: CancellationToken.None);
 
-        Assert.Contains("\"id\": 37839", result);
+        Assert.Contains("\"id\":37839", result);
     }
 
     /// <summary>Verifies that <c>get_lending</c> returns a readable message when nothing is found.</summary>
@@ -75,7 +76,7 @@ public class LendingToolsTests
         Assert.Equal("14:30", captured.BorrowTime);
         Assert.Equal("09:15:00", captured.ReturnTime);
         Assert.Equal("lent", captured.State);
-        Assert.Contains("\"id\": 555", result);
+        Assert.Contains("\"id\":555", result);
     }
 
     /// <summary>
@@ -235,14 +236,14 @@ public class LendingToolsTests
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<bool?>(), It.IsAny<bool?>(),
-                It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
+                It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<PageRequest?>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new UnauthorizedAccessException("bad token"));
 
         var tools = new LendingTools(mock.Object);
 
         var result = await tools.ListLendings(
             null, null, null, null, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null, null, CancellationToken.None);
+            null, null, null, null, null, null, null, null, null, null, ct: CancellationToken.None);
 
         Assert.StartsWith("ERROR", result);
         Assert.Contains("bad token", result);

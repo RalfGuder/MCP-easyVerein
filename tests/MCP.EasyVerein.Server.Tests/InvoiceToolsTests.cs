@@ -273,6 +273,6 @@ public class InvoiceToolsTests
         Assert.Contains("relatedBookings", patchJson);
         Assert.Contains("booking/240005841", patchJson);
 
-        Assert.Contains("\"id\": 469293618", result);
+        Assert.Contains("\"id\":469293618", result);
     }
 }

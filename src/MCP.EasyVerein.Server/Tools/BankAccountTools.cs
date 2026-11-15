@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -14,7 +13,7 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class BankAccountTools(IEasyVereinApiClient client)
 {
     /// <summary>Lists bank accounts with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_bank_accounts"), Description("List all bank accounts")]
+    [McpServerTool(Name = "list_bank_accounts"), Description("List all bank accounts. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListBankAccounts(
         [Description("Exact name filter")] string? name,
         [Description("Exact IBAN filter")] string? iban,
@@ -24,13 +23,15 @@ public sealed class BankAccountTools(IEasyVereinApiClient client)
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Ordering (e.g. 'name' or '-startsaldo')")] string? ordering,
         [Description("Search terms (name, short, bankName, accountHolder)")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var accounts = await client.ListBankAccountsAsync(
-                name, iban, bic, accountHolder, bankName, idIn, ordering, search, ct);
-            return JsonSerializer.Serialize(accounts, new JsonSerializerOptions { WriteIndented = true });
+                name, iban, bic, accountHolder, bankName, idIn, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(accounts);
         }
         catch (Exception ex)
         {
@@ -48,7 +49,7 @@ public sealed class BankAccountTools(IEasyVereinApiClient client)
         {
             var account = await client.GetBankAccountAsync(id, ct);
             return account != null
-                ? JsonSerializer.Serialize(account, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(account)
                 : $"Bank account with ID {id} not found.";
         }
         catch (Exception ex)
@@ -93,7 +94,7 @@ public sealed class BankAccountTools(IEasyVereinApiClient client)
             if (DateTime.TryParse(lastImportedDate, out var lid)) account.LastImportedDate = lid;
 
             var created = await client.CreateBankAccountAsync(account, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -139,7 +140,7 @@ public sealed class BankAccountTools(IEasyVereinApiClient client)
             if (DateTime.TryParse(lastImportedDate, out var lid)) patch[BankAccountFields.LastImportedDate] = lid;
 
             var updated = await client.UpdateBankAccountAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

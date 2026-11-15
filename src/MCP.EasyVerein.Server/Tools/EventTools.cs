@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Domain.ValueObjects;
@@ -29,7 +28,7 @@ public sealed class EventTools(IEasyVereinApiClient client)
     /// <param name="search">Optional search terms.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string containing matching events, or an error message.</returns>
-    [McpServerTool(Name = "list_events"), Description("List all events")]
+    [McpServerTool(Name = "list_events"), Description("List all events. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListEvents(
         [Description("Filter by event name")] string? name,
         [Description("Start date greater than or equal (ISO 8601)")] string? startGte,
@@ -42,13 +41,15 @@ public sealed class EventTools(IEasyVereinApiClient client)
         [Description("Filter by comma-separated IDs")] string? idIn,
         [Description("Ordering criteria (e.g. 'start' or '-start')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
             var events = await client.ListEventsAsync(name, startGte, startLte, endGte, endLte,
-                calendar, canceled, isPublic, idIn, ordering, search, ct);
-            return JsonSerializer.Serialize(events, new JsonSerializerOptions { WriteIndented = true });
+                calendar, canceled, isPublic, idIn, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(events);
         }
         catch (Exception ex)
         {
@@ -70,7 +71,7 @@ public sealed class EventTools(IEasyVereinApiClient client)
         {
             var ev = await client.GetEventAsync(id, ct);
             return ev != null
-                ? JsonSerializer.Serialize(ev, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(ev)
                 : $"Event with ID {id} not found.";
         }
         catch (Exception ex)
@@ -98,7 +99,7 @@ public sealed class EventTools(IEasyVereinApiClient client)
         {
             var ev = new Event { Name = name, Description = description, LocationName = locationName };
             var created = await client.CreateEventAsync(ev, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {

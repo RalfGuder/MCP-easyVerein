@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text.Json;
 using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
@@ -15,18 +14,20 @@ namespace MCP.EasyVerein.Server.Tools;
 public sealed class InvoiceItemTools(IEasyVereinApiClient client, EasyVereinConfiguration config)
 {
     /// <summary>Lists invoice items with optional filters and automatic pagination.</summary>
-    [McpServerTool(Name = "list_invoice_items"), Description("List all invoice items")]
+    [McpServerTool(Name = "list_invoice_items"), Description("List all invoice items. Paged: limit (1-100, default 50) and page (from 1); the response holds items, totalCount and hasMore - request the next page while hasMore is true.")]
     public async Task<string> ListInvoiceItems(
         [Description("Comma-separated list of IDs filter")] string? idIn,
         [Description("Parent invoice ID filter (numeric)")] string? relatedInvoice,
         [Description("Ordering (e.g. 'id' or '-id')")] string? ordering,
         [Description("Search terms")] string[]? search,
-        CancellationToken ct)
+        [Description("Entries per page (1-100, default 50)")] int limit = PageRequest.DefaultLimit,
+        [Description("Page number, starting at 1 (default 1)")] int page = PageRequest.FirstPage,
+        CancellationToken ct = default)
     {
         try
         {
-            var items = await client.ListInvoiceItemsAsync(idIn, relatedInvoice, ordering, search, ct);
-            return JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true });
+            var items = await client.ListInvoiceItemsAsync(idIn, relatedInvoice, ordering, search, ToolJson.ToPageRequest(limit, page), ct);
+            return ToolJson.SerializePage(items);
         }
         catch (Exception ex)
         {
@@ -44,7 +45,7 @@ public sealed class InvoiceItemTools(IEasyVereinApiClient client, EasyVereinConf
         {
             var item = await client.GetInvoiceItemAsync(id, ct);
             return item != null
-                ? JsonSerializer.Serialize(item, new JsonSerializerOptions { WriteIndented = true })
+                ? ToolJson.Serialize(item)
                 : $"Invoice item with ID {id} not found.";
         }
         catch (Exception ex)
@@ -88,7 +89,7 @@ public sealed class InvoiceItemTools(IEasyVereinApiClient client, EasyVereinConf
                 item.BillingAccount = $"{config.GetVersionedBaseUrl()}/billing-account/{billingAccountId.Value}";
 
             var created = await client.CreateInvoiceItemAsync(item, ct);
-            return JsonSerializer.Serialize(created, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(created);
         }
         catch (Exception ex)
         {
@@ -124,7 +125,7 @@ public sealed class InvoiceItemTools(IEasyVereinApiClient client, EasyVereinConf
             if (HasValue(costCentre)) patch[InvoiceItemFields.CostCentre] = costCentre!;
 
             var updated = await client.UpdateInvoiceItemAsync(id, patch, ct);
-            return JsonSerializer.Serialize(updated, new JsonSerializerOptions { WriteIndented = true });
+            return ToolJson.Serialize(updated);
         }
         catch (Exception ex)
         {

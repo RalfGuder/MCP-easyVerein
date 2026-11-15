@@ -27,7 +27,7 @@ public class CustomTaxRateToolsTests
         Assert.NotNull(captured);
         Assert.Equal("Ermäßigt", captured!.TaxName);
         Assert.Equal(7m, captured.CustomTaxRateValue);
-        Assert.Contains("\"id\": 1", result);
+        Assert.Contains("\"id\":1", result);
     }
 
     /// <summary>
