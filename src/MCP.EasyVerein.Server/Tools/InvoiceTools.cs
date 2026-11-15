@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
@@ -197,7 +198,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
     /// <param name="receiver">Optional receiver override (defaults to the booking's receiver).</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the finalized invoice, or an error message.</returns>
-    [McpServerTool(Name = "create_receipt"), Description("High-level: creates a receipt invoice with one position and links it to an existing booking. Use this when classifying a booking that has no auto-generated receipt. Amount + receiver are taken from the booking.")]
+    [McpServerTool(Name = "create_receipt"), Description("High-level: creates a receipt invoice with one position and links it to an existing booking. Use this when classifying a booking that has no auto-generated receipt. Amount + receiver are taken from the booking. The receipt date is the booking date unless 'date' is given.")]
     public async Task<string> CreateReceipt(
         [Description("The ID of the booking this receipt should be linked to (numeric)")] long bookingId,
         [Description("Billing-account ID for the position (numeric)")] long billingAccountId,
@@ -206,14 +207,27 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
         [Description("Optional title for the position (defaults to a generated one)")] string? title,
         [Description("Optional description for the position and the invoice (defaults to the booking description)")] string? description,
         [Description("Optional receiver override (defaults to the booking's counterpart IBAN/BIC)")] string? receiver,
-        CancellationToken ct)
+        [Description("Optional receipt date (yyyy-MM-dd, e.g. the date on the till receipt); defaults to the booking date")] string? date = null,
+        CancellationToken ct = default)
     {
         try
         {
+            DateOnly? requestedDate = null;
+            if (HasValue(date))
+            {
+                if (!DateOnly.TryParseExact(date, ReceiptDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+                    return $"ERROR: Invalid date '{date}'. Expected format {ReceiptDateFormat} (e.g. 2026-07-09).";
+                requestedDate = parsed;
+            }
+
             // 1. Load the booking to determine amount, kind (expense/revenue), receiver, description.
             var booking = await client.GetBookingAsync(bookingId, ct);
             if (booking is null)
                 return $"ERROR: Booking with ID {bookingId} not found.";
+
+            var receiptDate = requestedDate ?? ToBerlinCalendarDay(booking.Date);
+            if (receiptDate is null)
+                return $"ERROR: Booking {bookingId} has no date. Pass 'date' ({ReceiptDateFormat}) to set the receipt date.";
 
             var amount = booking.Amount ?? 0m;
             var absAmount = Math.Abs(amount);
@@ -259,6 +273,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
             var patch = new Dictionary<string, object>
             {
                 [InvoiceFields.IsDraft] = false,
+                [InvoiceFields.Date] = receiptDate.Value.ToString(ReceiptDateFormat, CultureInfo.InvariantCulture),
                 [InvoiceFields.RelatedBookings] = new[]
                 {
                     $"{config.GetVersionedBaseUrl()}/booking/{bookingId}"
@@ -285,6 +300,47 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
     {
         await client.DeleteInvoiceAsync(id, ct);
         return $"Invoice with ID {id} has been deleted.";
+    }
+
+    /// <summary>The format of the receipt date sent to the API and accepted from the caller.</summary>
+    private const string ReceiptDateFormat = "yyyy-MM-dd";
+
+    /// <summary>
+    /// The time zone of the easyVerein bookings. Booking dates arrive as midnight in Berlin
+    /// (e.g. <c>2026-10-02T00:00:00+02:00</c>) and must keep that calendar day on any server.
+    /// </summary>
+    private static readonly TimeZoneInfo BerlinTimeZone = FindBerlinTimeZone();
+
+    /// <summary>
+    /// Converts a booking date to its calendar day in Berlin. Dates without kind are taken as is;
+    /// dates read as an instant (UTC or local) are converted to Berlin time first.
+    /// </summary>
+    /// <param name="value">The booking date, or <c>null</c>.</param>
+    /// <returns>The calendar day, or <c>null</c> if <paramref name="value"/> is <c>null</c>.</returns>
+    private static DateOnly? ToBerlinCalendarDay(DateTime? value)
+    {
+        if (value is null)
+            return null;
+
+        var day = value.Value.Kind == DateTimeKind.Unspecified
+            ? value.Value
+            : TimeZoneInfo.ConvertTime(value.Value, BerlinTimeZone);
+        return DateOnly.FromDateTime(day);
+    }
+
+    /// <summary>Finds the Berlin time zone by its IANA ID, falling back to the Windows ID.</summary>
+    /// <returns>The Berlin time zone.</returns>
+    /// <exception cref="TimeZoneNotFoundException">Neither ID is known on this system.</exception>
+    private static TimeZoneInfo FindBerlinTimeZone()
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+        }
     }
 
     /// <summary>Checks whether a string parameter has a real value (not null, empty, or the literal "null").</summary>
