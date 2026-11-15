@@ -913,7 +913,7 @@ public interface IEasyVereinApiClient
     /// <param name="id">Optional contact details ID to filter by.</param>
     /// <param name="firstName">Optional first name to filter by.</param>
     /// <param name="familyName">Optional family name to filter by.</param>
-    /// <param name="search">Optional search terms; each term is matched against the searchable fields, several terms are combined with OR.</param>
+    /// <param name="search">Optional search terms; all terms must match (AND), each in any of the searchable fields.</param>
     /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A read-only list of matching contact details.</returns>

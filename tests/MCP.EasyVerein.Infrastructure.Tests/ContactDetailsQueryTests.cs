@@ -52,17 +52,18 @@ public class ContactDetailsQueryTests
     }
 
     /// <summary>
-    /// Verifies that every search term is sent as its own <c>search</c> parameter; the API ignores
-    /// comma-joined terms and combines repeated parameters with OR.
+    /// Verifies that all search terms go into one comma-joined <c>search</c> parameter. The API
+    /// combines comma-separated terms with AND; of repeated parameters it evaluates only the last.
     /// </summary>
     [Fact]
-    public async Task List_WithSearch_SendsOneParameterPerTerm()
+    public async Task List_WithSearch_SendsOneCommaJoinedParameter()
     {
-        var query = await QueryOf(c => c.ListContactDetailsAsync(search: new[] { "Rudolf", "Oehme" }));
+        var query = await QueryOf(c => c.ListContactDetailsAsync(search: new[] { "Anneliese", "Oehme" }));
 
-        Assert.Contains("&search=Rudolf&search=Oehme", query);
+        Assert.Contains("&search=Anneliese,Oehme", query);
+        Assert.Single(query.Split('&'), part => part.StartsWith("search=", StringComparison.Ordinal));
         Assert.DoesNotContain("familyName=", query);
-        Assert.DoesNotContain("name=Rudolf", query);
+        Assert.DoesNotContain("name=Anneliese", query);
     }
 
     /// <summary>Verifies that empty search terms are skipped.</summary>
