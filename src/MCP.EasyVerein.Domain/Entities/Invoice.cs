@@ -105,7 +105,9 @@ public class Invoice : IHasId
     [JsonPropertyName(InvoiceFields.Charges)] public InvoiceCharges? Charges { get; set; }
 
     /// <summary>Gets or sets whether the invoice amount is gross. Maps to API field '<c>gross</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.Gross)] public bool Gross { get; set; }
+    [JsonPropertyName(InvoiceFields.Gross)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool Gross { get; set; }
 
     /// <summary>Gets or sets the cancellation description. Maps to API field '<c>cancellationDescription</c>'.</summary>
     [JsonPropertyName(InvoiceFields.CancellationDescription)] public string? CancellationDescription { get; set; }
@@ -117,10 +119,14 @@ public class Invoice : IHasId
     [JsonPropertyName(InvoiceFields.RefNumber)] public string? RefNumber { get; set; }
 
     /// <summary>Gets or sets whether the invoice is a draft. Maps to API field '<c>isDraft</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.IsDraft)] public bool IsDraft { get; set; }
+    [JsonPropertyName(InvoiceFields.IsDraft)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool IsDraft { get; set; }
 
     /// <summary>Gets or sets whether this is a template. Maps to API field '<c>isTemplate</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.IsTemplate)] public bool IsTemplate { get; set; }
+    [JsonPropertyName(InvoiceFields.IsTemplate)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool IsTemplate { get; set; }
 
     /// <summary>Gets or sets the creation date for recurring invoices. Maps to API field '<c>creationDateForRecurringInvoices</c>'.</summary>
     [JsonPropertyName(InvoiceFields.CreationDateForRecurringInvoices)]
@@ -134,7 +140,9 @@ public class Invoice : IHasId
     [JsonPropertyName(InvoiceFields.PaymentInformation)] public string? PaymentInformation { get; set; }
 
     /// <summary>Gets or sets whether this is a request/expense report. Maps to API field '<c>isRequest</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.IsRequest)] public bool IsRequest { get; set; }
+    [JsonPropertyName(InvoiceFields.IsRequest)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool IsRequest { get; set; }
 
     /// <summary>Gets or sets the tax rate. Maps to API field '<c>taxRate</c>'.</summary>
     [JsonPropertyName(InvoiceFields.TaxRate)] public decimal? TaxRate { get; set; }
@@ -158,19 +166,27 @@ public class Invoice : IHasId
     [JsonPropertyName(InvoiceFields.SelectionAccount)] public int? SelectionAccount { get; set; }
 
     /// <summary>Gets or sets whether the file is removed on delete. Maps to API field '<c>removeFileOnDelete</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.RemoveFileOnDelete)] public bool RemoveFileOnDelete { get; set; }
+    [JsonPropertyName(InvoiceFields.RemoveFileOnDelete)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool RemoveFileOnDelete { get; set; }
 
     /// <summary>Gets or sets the custom payment method ID. Maps to API field '<c>customPaymentMethod</c>'.</summary>
     [JsonPropertyName(InvoiceFields.CustomPaymentMethod)] public int? CustomPaymentMethod { get; set; }
 
     /// <summary>Gets or sets whether this is a receipt. Maps to API field '<c>isReceipt</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.IsReceipt)] public bool IsReceipt { get; set; }
+    [JsonPropertyName(InvoiceFields.IsReceipt)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool IsReceipt { get; set; }
 
     /// <summary>Gets or sets whether tax rates are per invoice item. Maps to API field '<c>_isTaxRatePerInvoiceItem</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.IsTaxRatePerInvoiceItem)] public bool IsTaxRatePerInvoiceItem { get; set; }
+    [JsonPropertyName(InvoiceFields.IsTaxRatePerInvoiceItem)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool IsTaxRatePerInvoiceItem { get; set; }
 
     /// <summary>Gets or sets whether this invoice is subject to tax. Maps to API field '<c>_isSubjectToTax</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.IsSubjectToTax)] public bool IsSubjectToTax { get; set; }
+    [JsonPropertyName(InvoiceFields.IsSubjectToTax)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool IsSubjectToTax { get; set; }
 
     /// <summary>Gets or sets the invoice mode. Maps to API field '<c>mode</c>'.</summary>
     [JsonPropertyName(InvoiceFields.Mode)] public string? Mode { get; set; }
@@ -196,7 +212,9 @@ public class Invoice : IHasId
     [JsonPropertyName(InvoiceFields.ClosingDescription)] public string? ClosingDescription { get; set; }
 
     /// <summary>Gets or sets whether the address balance is used for payment. Maps to API field '<c>useAddressBalance</c>'.</summary>
-    [JsonPropertyName(InvoiceFields.UseAddressBalance)] public bool UseAddressBalance { get; set; }
+    [JsonPropertyName(InvoiceFields.UseAddressBalance)]
+    [JsonConverter(typeof(NullAsFalseBoolConverter))]
+    public bool UseAddressBalance { get; set; }
 
     /// <summary>Gets or sets the scheduled deletion date. Maps to API field '<c>_deleteAfterDate</c>'.</summary>
     [JsonPropertyName(InvoiceFields.DeleteAfterDate)]
