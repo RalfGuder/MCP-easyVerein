@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -80,6 +81,9 @@ public static class ToolJson
         {
             WriteIndented = false,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            // Umlauts and other non-ASCII letters unescaped: shorter and readable. Safe because tool
+            // output is never embedded in HTML; quotes and control characters stay escaped.
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             TypeInfoResolver = resolver,
         };
     }
