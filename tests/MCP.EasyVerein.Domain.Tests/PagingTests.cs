@@ -5,7 +5,7 @@ namespace MCP.EasyVerein.Domain.Tests;
 /// <summary>Unit tests for <see cref="PageRequest"/> and <see cref="PagedResult{T}"/> (US-0064).</summary>
 public class PagingTests
 {
-    /// <summary>Verifies the defaults: page 1 with 50 entries and offset 0.</summary>
+    /// <summary>Verifies the defaults: page 1 with 50 entries.</summary>
     [Fact]
     public void PageRequest_Default_IsFirstPageWithFiftyEntries()
     {
@@ -13,19 +13,6 @@ public class PagingTests
 
         Assert.Equal(1, request.Page);
         Assert.Equal(50, request.Limit);
-        Assert.Equal(0, request.Offset);
-    }
-
-    /// <summary>Verifies that the offset is computed from page and limit.</summary>
-    [Theory]
-    [InlineData(1, 100, 0)]
-    [InlineData(2, 50, 50)]
-    [InlineData(3, 20, 40)]
-    public void PageRequest_Offset_IsComputedFromPageAndLimit(int page, int limit, int expectedOffset)
-    {
-        var request = new PageRequest(limit, page);
-
-        Assert.Equal(expectedOffset, request.Offset);
     }
 
     /// <summary>Verifies that a limit outside 1..100 is rejected with a clear message.</summary>
@@ -87,6 +74,15 @@ public class PagingTests
         Assert.False(result.HasMore);
         Assert.Equal(1, result.Page);
         Assert.Equal(3, result.Limit);
+    }
+
+    /// <summary>Verifies that an unknown total count is kept as <c>null</c>.</summary>
+    [Fact]
+    public void PagedResult_UnknownTotalCount_IsNull()
+    {
+        var result = new PagedResult<string>(new[] { "a" }, totalCount: null, hasMore: true, page: 1, limit: 1);
+
+        Assert.Null(result.TotalCount);
     }
 
     /// <summary>Verifies that a paged result rejects a null item list.</summary>

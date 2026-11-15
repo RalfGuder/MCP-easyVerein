@@ -46,7 +46,4 @@ public sealed record PageRequest
 
     /// <summary>Gets the 1-based page number.</summary>
     public int Page { get; }
-
-    /// <summary>Gets the zero-based offset of the first entry on this page.</summary>
-    public int Offset => (Page - FirstPage) * Limit;
 }

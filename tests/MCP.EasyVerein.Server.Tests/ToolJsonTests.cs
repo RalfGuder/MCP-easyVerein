@@ -67,6 +67,17 @@ public class ToolJsonTests
         Assert.Equal("{\"items\":[{\"id\":1}],\"totalCount\":95,\"hasMore\":true,\"page\":2,\"limit\":50}", json);
     }
 
+    /// <summary>Verifies that an unknown total count is left out of the envelope.</summary>
+    [Fact]
+    public void SerializePage_UnknownTotal_OmitsTotalCount()
+    {
+        var page = new PagedResult<BankAccount>(new[] { new BankAccount { Id = 1 } }, null, true, 1, 1);
+
+        var json = ToolJson.SerializePage(page);
+
+        Assert.Equal("{\"items\":[{\"id\":1}],\"hasMore\":true,\"page\":1,\"limit\":1}", json);
+    }
+
     /// <summary>Verifies that valid paging arguments become a page request.</summary>
     [Fact]
     public void ToPageRequest_ValidArguments_ReturnsRequest()

@@ -33,9 +33,20 @@ public class PagingApiClientTests
     private static string Page(int count, string? next, params long[] ids) =>
         JsonSerializer.Serialize(new { count, next, results = ids.Select(id => new { id, name = $"K{id}" }) });
 
-    /// <summary>Verifies that a page request fetches exactly one page with limit and offset.</summary>
+    /// <summary>Builds a v2.0 list response body, which carries no <c>count</c> field.</summary>
+    /// <param name="current">The current page number reported by the API.</param>
+    /// <param name="next">The URL of the next page, or <c>null</c>.</param>
+    /// <param name="ids">The IDs of the results on this page.</param>
+    /// <returns>The serialized JSON body.</returns>
+    private static string PageV2(int current, string? next, params long[] ids) =>
+        JsonSerializer.Serialize(new { next, previous = (string?)null, current, results = ids.Select(id => new { id }) });
+
+    /// <summary>
+    /// Verifies that a page request fetches exactly one page with <c>limit</c> and <c>page</c>.
+    /// easyVerein ignores <c>offset</c>, so it must not be used.
+    /// </summary>
     [Fact]
-    public async Task List_WithPaging_RequestsSinglePageWithLimitAndOffset()
+    public async Task List_WithPaging_RequestsSinglePageWithLimitAndPage()
     {
         var handler = new MultiPageFakeHttpHandler(new[]
         {
@@ -47,7 +58,8 @@ public class PagingApiClientTests
 
         var query = handler.LastRequestUri!.Query;
         Assert.Contains("limit=20", query);
-        Assert.Contains("offset=40", query);
+        Assert.Contains("page=3", query);
+        Assert.DoesNotContain("offset", query);
         Assert.Equal(2, result.Count);
         Assert.Equal(95, result.TotalCount);
         Assert.True(result.HasMore);
@@ -67,7 +79,7 @@ public class PagingApiClientTests
         var query = handler.LastRequestUri!.Query;
         Assert.Contains("name=Handkasse", query);
         Assert.Contains("limit=10", query);
-        Assert.Contains("offset=0", query);
+        Assert.Contains("page=1", query);
     }
 
     /// <summary>Verifies that the last page reports no further pages.</summary>
@@ -82,6 +94,35 @@ public class PagingApiClientTests
         Assert.Single(result);
         Assert.Equal(3, result.TotalCount);
         Assert.False(result.HasMore);
+    }
+
+    /// <summary>Verifies that without <c>count</c> (v2.0) the total is computed on the last page.</summary>
+    [Fact]
+    public async Task List_WithPagingWithoutCount_LastPage_ComputesTotal()
+    {
+        var handler = new MultiPageFakeHttpHandler(new[] { (HttpStatusCode.OK, PageV2(3, null, 41, 42)) });
+        var client = CreateClient(handler);
+
+        var result = await client.ListBankAccountsAsync(paging: new PageRequest(20, 3));
+
+        Assert.Equal(42, result.TotalCount);
+        Assert.False(result.HasMore);
+    }
+
+    /// <summary>Verifies that without <c>count</c> (v2.0) the total stays unknown while more pages exist.</summary>
+    [Fact]
+    public async Task List_WithPagingWithoutCount_MorePages_TotalIsUnknown()
+    {
+        var handler = new MultiPageFakeHttpHandler(new[]
+        {
+            (HttpStatusCode.OK, PageV2(1, "https://easyverein.com/api/v2.0/bank-account?limit=2&page=2", 1, 2))
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.ListBankAccountsAsync(paging: new PageRequest(2, 1));
+
+        Assert.Null(result.TotalCount);
+        Assert.True(result.HasMore);
     }
 
     /// <summary>Verifies that without a page request all pages are fetched and returned as one page.</summary>

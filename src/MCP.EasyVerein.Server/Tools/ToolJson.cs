@@ -131,13 +131,13 @@ public static class ToolJson
     /// <summary>The envelope written for a page of list results.</summary>
     /// <typeparam name="T">The entity type of the list items.</typeparam>
     /// <param name="Items">The entries on this page.</param>
-    /// <param name="TotalCount">The total number of entries across all pages.</param>
+    /// <param name="TotalCount">The total number of entries across all pages; omitted if unknown.</param>
     /// <param name="HasMore">Whether further pages exist.</param>
     /// <param name="Page">The 1-based page number.</param>
     /// <param name="Limit">The number of entries per page.</param>
     private sealed record PageEnvelope<T>(
         [property: JsonPropertyName("items")] IReadOnlyList<T> Items,
-        [property: JsonPropertyName("totalCount")] int TotalCount,
+        [property: JsonPropertyName("totalCount")] int? TotalCount,
         [property: JsonPropertyName("hasMore")] bool HasMore,
         [property: JsonPropertyName("page")] int Page,
         [property: JsonPropertyName("limit")] int Limit);

@@ -2070,15 +2070,16 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     /// <param name="resource">The API resource path (e.g. "member").</param>
     /// <param name="query">Optional query string for field selection and filters.</param>
     /// <param name="paging">
-    /// Optional page to fetch. With a page, the URL carries its <c>limit</c> and <c>offset</c>;
-    /// without, it requests the maximum page size so that all pages can be followed.
+    /// Optional page to fetch. With a page, the URL carries its <c>limit</c> and <c>page</c>
+    /// (easyVerein ignores <c>offset</c>); without, it requests the maximum page size so that
+    /// all pages can be followed.
     /// </param>
     /// <returns>The fully constructed list URL.</returns>
     private string BuildListUrl(string resource, string? query, PageRequest? paging)
     {
         var pagingQuery = paging is null
             ? $"limit={PageRequest.MaxLimit}"
-            : $"limit={paging.Limit}&offset={paging.Offset}";
+            : $"limit={paging.Limit}&page={paging.Page}";
         return string.IsNullOrEmpty(query)
             ? $"{BuildUrl(resource)}?{pagingQuery}"
             : $"{BuildUrl(resource)}?{query}&{pagingQuery}";
@@ -2120,8 +2121,9 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
     /// <summary>
     /// Fetches a paginated list endpoint. With a page request, exactly one page is fetched and
-    /// the API's <c>count</c> and <c>next</c> become the paging metadata; without, all pages are
-    /// followed and returned as a single complete page (US-0064).
+    /// <c>next</c> tells whether more pages exist. The total comes from the API's <c>count</c>
+    /// (v1.x); v2.0 sends none, so it is computed on the last page and unknown before.
+    /// Without a page request, all pages are followed and returned as a single complete page (US-0064).
     /// </summary>
     /// <typeparam name="T">The entity type of the list items.</typeparam>
     /// <param name="initialUrl">The URL of the first (or requested) page.</param>
@@ -2135,8 +2137,10 @@ public class EasyVereinApiClient : IEasyVereinApiClient
         {
             var single = await FetchListPageAsync<T>(initialUrl, ct);
             var items = single?.Results ?? new List<T>();
-            return new PagedResult<T>(items.AsReadOnly(), single?.Count ?? items.Count,
-                hasMore: single?.Next is not null, paging.Page, paging.Limit);
+            var hasMore = single?.Next is not null;
+            var totalCount = single?.Count
+                ?? (hasMore ? null : ((paging.Page - PageRequest.FirstPage) * paging.Limit) + items.Count);
+            return new PagedResult<T>(items.AsReadOnly(), totalCount, hasMore, paging.Page, paging.Limit);
         }
 
         var allResults = new List<T>();
