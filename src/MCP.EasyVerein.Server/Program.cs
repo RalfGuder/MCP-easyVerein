@@ -54,6 +54,7 @@ builder.Services
     })
     .WithStdioServerTransport()
     .WithTools<MemberTools>()
+    .WithTools<AccountingPlanTools>()
     .WithTools<InvoiceTools>()
     .WithTools<EventTools>()
     .WithTools<ContactDetailsTools>()

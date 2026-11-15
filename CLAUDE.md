@@ -87,7 +87,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ## Projektstatus
 
-### Implementierte Endpoints (25)
+### Implementierte Endpoints (26)
 
 | Endpoint            | User Story | MCP-Tools                                                |
 |---------------------|------------|----------------------------------------------------------|
@@ -116,6 +116,7 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 | InventoryObject     | US-0026, US-0063 | list, get, create (pieces Pflicht, liest nach POST neu), update (PATCH), delete (Papierkorb); Gruppenzuordnung per ID |
 | InventoryObjectGroup | US-0027   | list, get, create, update (PATCH), delete (Papierkorb)   |
 | Lending             | US-0029    | list, get, create, update (PATCH), delete (Papierkorb)   |
+| AccountingPlan      | US-0035    | list, get, update (Konten frei-/abschalten per add/remove-IDs); kein create/delete (ein Plan je Verein) |
 
 ### Antwortformat der Tools (US-0064)
 
@@ -137,11 +138,11 @@ Unterstützt: v1.4, v1.5, v1.6, v1.7, v2.0 (Default: v2.0)
 
 ### Teststruktur
 
-- **Domain.Tests** — Entity- und Value-Object-Tests (161)
+- **Domain.Tests** — Entity- und Value-Object-Tests (163)
 - **Application.Tests** — Konfigurationsauflösung (13)
-- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (232)
-- **Server.Tests** — Tool-Tests (145)
-- **Gesamt: 551 Tests**
+- **Infrastructure.Tests** — HTTP-Client mit gemocktem HttpMessageHandler (236)
+- **Server.Tests** — Tool-Tests (151)
+- **Gesamt: 563 Tests**
 
 ### Laufender MCP-Server blockiert den Build
 

@@ -59,6 +59,46 @@ public class EasyVereinApiClient : IEasyVereinApiClient
     }
 
     // ------------------------------------------------------------------ //
+    // Accounting plan (US-0035)
+    // ------------------------------------------------------------------ //
+
+    /// <summary>Lists the accounting plans with their enabled billing accounts.</summary>
+    /// <param name="paging">Optional page to fetch; <c>null</c> fetches all pages.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The accounting plans.</returns>
+    public async Task<PagedResult<AccountingPlan>> ListAccountingPlansAsync(PageRequest? paging = null, CancellationToken ct = default)
+    {
+        return await HandleListResponseWithPagination<AccountingPlan>(
+            BuildListUrl("accounting-plan", AccountingPlanQuery.FieldQuery, paging), paging, ct);
+    }
+
+    /// <summary>Gets an accounting plan by ID.</summary>
+    /// <param name="id">The accounting plan ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The accounting plan, or <c>null</c> if not found.</returns>
+    public async Task<AccountingPlan?> GetAccountingPlanAsync(long id, CancellationToken ct = default)
+    {
+        var response = await SendWithErrorHandling(
+            () => _httpClient.GetAsync(BuildGetUrl($"accounting-plan/{id}", AccountingPlanQuery.FieldQuery), ct), ct);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        return await HandleResponse<AccountingPlan>(response, ct);
+    }
+
+    /// <summary>Updates an accounting plan with PATCH semantics.</summary>
+    /// <param name="id">The accounting plan ID.</param>
+    /// <param name="patchData">An object containing the fields to patch.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated accounting plan as returned by the API.</returns>
+    public async Task<AccountingPlan> UpdateAccountingPlanAsync(long id, object patchData, CancellationToken ct = default)
+    {
+        var json = JsonSerializer.Serialize(patchData, patchData.GetType(), _jsonOptions);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await SendWithErrorHandling(
+            () => _httpClient.PatchAsync(BuildUrl($"accounting-plan/{id}"), content, ct), ct);
+        return await HandleResponse<AccountingPlan>(response, ct);
+    }
+
+    // ------------------------------------------------------------------ //
     // Announcements
     // ------------------------------------------------------------------ //
 

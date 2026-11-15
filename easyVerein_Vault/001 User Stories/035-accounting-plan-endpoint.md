@@ -5,30 +5,34 @@
 ## User Story
 
 **Als** Vereinsadministrator,
-**möchte ich** Kontenpläne über den MCP-Server abfragen, anlegen, bearbeiten und löschen können,
-**damit** ich die Kontenplan-Verwaltung für die Buchhaltung vollständig über den MCP-Server verwalten kann.
+**möchte ich** den Kontenplan über den MCP-Server abfragen und einzelne Buchungskonten darin frei- oder abschalten können,
+**damit** ich vor dem Buchen prüfen kann, ob ein Konto freigeschaltet ist, ohne die easyVerein-Oberfläche zu öffnen.
+
+## Ausgangslage
+
+- Bei der Buchungsprüfung am 2026-11-15 ließ sich nur im Browser prüfen, ob ein Konto im Kontenplan freigeschaltet ist. Ist es nicht freigeschaltet, zeigt „Buchung editieren“ einen leeren Dialog.
+- Live (lesend) geprüft: Es gibt **einen** Kontenplan je Verein (ID 5430). Er enthält `billingAccounts` als Liste von URL-Referenzen (82 Konten); mit `query={id,billingAccounts{id,number,name}}` kommen Nummer und Name direkt mit. Weitere Felder: `org`, `created_at`, `updated_at`. Der Endpoint hat keine Filter.
+- Ergebnis nebenbei: 64000 (58785) und 44000 (58311) sind freigeschaltet.
+
+## Entscheidung (2026-11-15)
+
+Umfang **lesen und Konten frei-/abschalten**, kein create/delete: ein zweiter Plan oder das Löschen des einzigen Plans ist nicht sinnvoll.
 
 ## Akzeptanzkriterien
 
-- [ ] **Entity `AccountingPlan`:** Domain-Entity mit allen API-Feldern und `[JsonPropertyName]`-Attributen über `AccountingPlanFields`-Konstanten
-- [ ] **ValueObject `AccountingPlanFields.cs`:** Alle API-Feldnamen als Konstanten
-- [ ] **Query-Klasse `AccountingPlanQuery.cs`:** Filterung nach ID und weiteren Standard-Feldern
-- [ ] **API-Client:** `ListAccountingPlansAsync`, `GetAccountingPlanAsync`, `CreateAccountingPlanAsync`, `UpdateAccountingPlanAsync`, `DeleteAccountingPlanAsync`
-- [ ] **MCP-Tools:** `AccountingPlanTools.cs` mit allen CRUD-Operationen – inkl. Error-Handling
-- [ ] **PATCH-Semantik:** Update sendet nur geänderte Felder als Dictionary
-- [ ] **Pagination:** Listen-Endpunkt ruft automatisch alle Seiten ab
-- [ ] **Tests:** Unit-Tests nach TDD (Red-Green-Refactor)
+- [x] Entity `AccountingPlan` mit `id`, `org`, `billingAccounts` (URL-Referenz oder Objekt mit id/number/name), `created_at`, `updated_at`; Konstanten in `AccountingPlanFields`.
+- [x] `AccountingPlanQuery` mit verschachtelter Feldauswahl `billingAccounts{id,number,name}`.
+- [x] API-Client: `ListAccountingPlansAsync` (mit Paging), `GetAccountingPlanAsync`, `UpdateAccountingPlanAsync`.
+- [x] MCP-Tools `list_accounting_plans`, `get_accounting_plan`: Konten mit id, Nummer und Name (bleiben in der Ausgabe eingebettet, nicht nur als ID).
+- [x] MCP-Tool `update_accounting_plan(id, addBillingAccountIds, removeBillingAccountIds)`: liest den Plan, sendet die resultierende Menge als URL-Referenzen per PATCH und liest danach neu ein; ohne echte Änderung kein PATCH; leere Angaben und eine ID in beiden Listen werden abgelehnt. Die Beschreibung verlangt eine ausdrückliche Anweisung des Nutzers.
+- [x] Tests nach TDD.
+- [ ] Live-Prüfung lesend (`list_accounting_plans`, `get_accounting_plan`).
+- [ ] Live-Prüfung schreibend (`update_accounting_plan`): offen, weil sie den echten Kontenplan des Vereins ändern würde; erst bei einem echten Freischaltungsbedarf und nur auf Anweisung.
 
 ## Aufgaben
 
-1. easyVerein API-Dokumentation für den `accounting-plan`-Endpoint analysieren
-2. `AccountingPlanFields.cs`, `AccountingPlan.cs`, `AccountingPlanQuery.cs` erstellen
-3. `ApiQueries.cs` um AccountingPlan-Query erweitern
-4. `IEasyVereinApiClient` und `EasyVereinApiClient` um CRUD-Methoden erweitern
-5. `AccountingPlanTools.cs` als MCP-Tool-Klasse erstellen
-6. `Program.cs` um Registrierung erweitern
-7. Unit-Tests schreiben
-8. Manuelle Verifikation gegen die easyVerein API
+- Entity, Fields, Query, Client, Tools, Registrierung in `Program.cs`, `ToolJson`-Ausnahme für die eingebetteten Konten.
+- Tests: Domain (Deserialisierung URL/Objekt), Infrastructure (Feldauswahl, GET 404, PATCH), Server (Ausgabe, add/remove, Validierung, kein PATCH ohne Änderung).
 
 ## Technische Hinweise
 
