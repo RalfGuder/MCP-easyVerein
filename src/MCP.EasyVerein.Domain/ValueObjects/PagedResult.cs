@@ -1,10 +1,14 @@
+using System.Collections;
+
 namespace MCP.EasyVerein.Domain.ValueObjects;
 
 /// <summary>
 /// A page of list results together with the paging metadata reported by the API (US-0064).
+/// Acts as a read-only list of its <see cref="Items"/>, so callers that need only the
+/// entries can keep treating it as a plain list.
 /// </summary>
 /// <typeparam name="T">The entity type of the list items.</typeparam>
-public sealed class PagedResult<T>
+public sealed class PagedResult<T> : IReadOnlyList<T>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="PagedResult{T}"/> class.
@@ -38,4 +42,33 @@ public sealed class PagedResult<T>
 
     /// <summary>Gets the number of entries per page that was requested.</summary>
     public int Limit { get; }
+
+    /// <summary>Gets the number of entries on this page.</summary>
+    public int Count => Items.Count;
+
+    /// <summary>Gets the entry at the given position on this page.</summary>
+    /// <param name="index">The zero-based position.</param>
+    /// <returns>The entry at <paramref name="index"/>.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the page.</exception>
+    public T this[int index] => Items[index];
+
+    /// <summary>
+    /// Wraps a complete, unpaged list as a single page without further pages.
+    /// </summary>
+    /// <param name="items">All entries.</param>
+    /// <returns>A result whose total count and limit equal the number of entries.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="items"/> is <c>null</c>.</exception>
+    public static PagedResult<T> FromCompleteList(IReadOnlyList<T> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        return new PagedResult<T>(items, items.Count, hasMore: false, PageRequest.FirstPage, items.Count);
+    }
+
+    /// <summary>Returns an enumerator over the entries on this page.</summary>
+    /// <returns>An enumerator over <see cref="Items"/>.</returns>
+    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+
+    /// <summary>Returns a non-generic enumerator over the entries on this page.</summary>
+    /// <returns>An enumerator over <see cref="Items"/>.</returns>
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

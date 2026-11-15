@@ -66,6 +66,29 @@ public class PagingTests
         Assert.Equal(2, result.Limit);
     }
 
+    /// <summary>Verifies that a paged result behaves as a read-only list of its items.</summary>
+    [Fact]
+    public void PagedResult_ActsAsReadOnlyListOfItems()
+    {
+        IReadOnlyList<string> result = new PagedResult<string>(new[] { "a", "b" }, 2, false, 1, 50);
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("b", result[1]);
+        Assert.Equal(new[] { "a", "b" }, result.ToList());
+    }
+
+    /// <summary>Verifies that <see cref="PagedResult{T}.FromCompleteList"/> wraps a complete list as a single page.</summary>
+    [Fact]
+    public void PagedResult_FromCompleteList_WrapsCompleteListAsSinglePage()
+    {
+        var result = PagedResult<string>.FromCompleteList(new[] { "a", "b", "c" });
+
+        Assert.Equal(3, result.TotalCount);
+        Assert.False(result.HasMore);
+        Assert.Equal(1, result.Page);
+        Assert.Equal(3, result.Limit);
+    }
+
     /// <summary>Verifies that a paged result rejects a null item list.</summary>
     [Fact]
     public void PagedResult_NullItems_Throws()
