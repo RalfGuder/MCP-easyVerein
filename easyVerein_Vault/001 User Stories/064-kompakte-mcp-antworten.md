@@ -28,7 +28,7 @@ Prüfung der Schnittstelle am 2026-11-15:
 - [x] Alle Tool-Antworten sind kompaktes JSON (ohne Einrückung).
 - [x] Die `JsonSerializerOptions` werden zentral als eine wiederverwendete Instanz bereitgestellt statt je Aufruf neu erzeugt.
 - [x] Die Tool-Beschreibungen nennen `limit`/`page` und weisen darauf hin, wie weitere Seiten abgerufen werden.
-- [ ] Die erneute Prüfung von `list_events` ab 01.11.2026 bleibt unter dem Token-Limit.
+- [x] Die erneute Prüfung von `list_events` ab 01.11.2026 bleibt unter dem Token-Limit (live 2026-11-15: 95 Termine in 2 Seiten à 50, Seite 2 ≈ 22.000 Zeichen statt 85.000 gesamt).
 - [x] Tests nach TDD (Red-Green-Refactor), Mindest-Coverage 70 % bleibt erhalten.
 
 ## Umsetzungsentscheidungen
