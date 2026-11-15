@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -24,6 +25,15 @@ public static class ToolJson
         (typeof(Member), nameof(Member.ContactDetails)),
         (typeof(Event), nameof(Event.LocationObject)),
     };
+
+    /// <summary>
+    /// Matches an easyVerein API resource URL such as
+    /// <c>https://easyverein.com/api/v2.0/booking-project/362887461</c>; group <c>id</c> holds the ID.
+    /// File and picture links (e.g. <c>/app/file?…</c>) do not match.
+    /// </summary>
+    private static readonly Regex ResourceUrl = new(
+        @"^https?://[^/\s]+/api/v\d+(?:\.\d+)?/[a-z][a-z-]*/(?<id>\d+)/?$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
 
     /// <summary>Gets the shared serializer options for all tool responses.</summary>
     public static JsonSerializerOptions Options { get; } = CreateOptions();
@@ -76,6 +86,7 @@ public static class ToolJson
     /// <summary>
     /// Replaces the converter of every property that references another resource
     /// (a type implementing <see cref="IHasId"/>, or a list of such) with an ID-only writer.
+    /// String properties without own converter get a writer that turns API resource URLs into IDs.
     /// </summary>
     /// <param name="typeInfo">The type metadata being built.</param>
     private static void WriteReferencesAsId(JsonTypeInfo typeInfo)
@@ -89,6 +100,12 @@ public static class ToolJson
         {
             if (IsEmbedded(typeInfo.Type, property))
             {
+                continue;
+            }
+
+            if (property.PropertyType == typeof(string))
+            {
+                property.CustomConverter ??= ResourceUrlStringConverter.Instance;
                 continue;
             }
 
@@ -141,6 +158,34 @@ public static class ToolJson
         [property: JsonPropertyName("hasMore")] bool HasMore,
         [property: JsonPropertyName("page")] int Page,
         [property: JsonPropertyName("limit")] int Limit);
+
+    /// <summary>
+    /// Writes a string unchanged, unless it is an API resource URL; then only the ID is written.
+    /// Reading is not supported.
+    /// </summary>
+    private sealed class ResourceUrlStringConverter : JsonConverter<string>
+    {
+        /// <summary>Gets the shared instance.</summary>
+        public static ResourceUrlStringConverter Instance { get; } = new();
+
+        /// <summary>Not supported: tool output is never read back.</summary>
+        /// <exception cref="NotSupportedException">Always.</exception>
+        public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+            throw new NotSupportedException();
+
+        /// <summary>Writes the ID for a resource URL, otherwise the string itself.</summary>
+        public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+        {
+            var match = ResourceUrl.Match(value);
+            if (match.Success && long.TryParse(match.Groups["id"].Value, out var id))
+            {
+                writer.WriteNumberValue(id);
+                return;
+            }
+
+            writer.WriteStringValue(value);
+        }
+    }
 
     /// <summary>Writes a referenced entity as its ID only. Reading is not supported.</summary>
     /// <typeparam name="T">The referenced entity type.</typeparam>

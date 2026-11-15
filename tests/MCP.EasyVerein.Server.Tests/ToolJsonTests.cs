@@ -45,6 +45,36 @@ public class ToolJsonTests
         Assert.DoesNotContain("Vereinskonto", json);
     }
 
+    /// <summary>Verifies that string fields holding an API resource URL are written as the ID.</summary>
+    [Fact]
+    public void Serialize_WritesResourceUrlStringsAsId()
+    {
+        var booking = new Booking { Id = 1, BookingProject = "https://easyverein.com/api/v2.0/booking-project/362887461" };
+        var item = new InvoiceItem
+        {
+            Id = 2,
+            BillingAccount = "https://easyverein.com/api/v1.7/billing-account/58770/",
+            RelatedInvoice = "https://easyverein.com/api/v2.0/invoice/607989039"
+        };
+
+        Assert.Contains("\"bookingProject\":362887461", ToolJson.Serialize(booking));
+        var itemJson = ToolJson.Serialize(item);
+        Assert.Contains("\"billingAccount\":58770", itemJson);
+        Assert.Contains("\"relatedInvoice\":607989039", itemJson);
+    }
+
+    /// <summary>Verifies that other strings, including non-resource URLs such as file links, stay unchanged.</summary>
+    [Theory]
+    [InlineData("https://easyverein.com/app/file?category=invoice&path=42")]
+    [InlineData("https://easyverein.com/api/v2.0/booking-project/abc")]
+    [InlineData("Beitrag Oehme 2026/10")]
+    public void Serialize_KeepsOtherStrings(string value)
+    {
+        var json = ToolJson.Serialize(new Invoice { Id = 3, Path = value });
+
+        Assert.Contains(System.Text.Json.JsonSerializer.Serialize(value), json);
+    }
+
     /// <summary>Verifies that the member's contact details stay embedded because they carry the member's data.</summary>
     [Fact]
     public void Serialize_KeepsMemberContactDetailsEmbedded()
