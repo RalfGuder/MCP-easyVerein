@@ -1,6 +1,6 @@
 # US-0060 MCP-Prompt `review_porto_buchungen`
 
-**Issue:** [#94](https://github.com/RalfGuder/MCP-easyVerein/issues/94)
+**Issue:** [#94](https://github.com/RalfGuder/MCP-easyVerein/issues/94) (geschlossen 2026-11-27, umgesetzt mit PR #95)
 
 ## User Story
 
@@ -10,16 +10,16 @@
 
 ## Akzeptanzkriterien
 
-- [ ] Neue Klasse `PortoBuchungenPrompt` mit `[McpServerPromptType]` und einer Methode `ReviewPortoBuchungen` mit `[McpServerPrompt(Name = "review_porto_buchungen")]`.
-- [ ] Argumente: `dateVon` (string?, ISO-Date), `dateBis` (string?, ISO-Date), `dryRun` (bool, Default `true`).
-- [ ] Der Prompt-Text enthält erkennbar alle Porto-Keywords (`Deutsche Post`, `DHL`, `Hermes`, `UPS`, `GLS`, `DPD`).
-- [ ] Der Prompt-Text enthält Konto 68000, Kostenstelle 2902, Sphäre 2.
-- [ ] Der Prompt-Text verweist auf die zu verwendenden Tools `list_bookings`, `list_billing_accounts`, `list_booking_projects`, `update_booking`.
-- [ ] Die Zeitraum-Argumente werden im Prompt-Text eingebettet, wenn übergeben.
-- [ ] `dryRun=false` erzeugt einen Text, der explizit zum Ausführen von `update_booking` auffordert; `dryRun=true` (Default) erzeugt nur Vorschläge + Rückfrage.
-- [ ] Registrierung in `Program.cs`: `.WithPrompts<PortoBuchungenPrompt>()`.
-- [ ] 3 neue xUnit-Tests in `PortoBuchungenPromptTests.cs` decken die drei Haupt-Fälle ab.
-- [ ] Gesamtzahl Tests steigt auf 152, Suite bleibt grün.
+- [x] Neue Klasse `PortoBuchungenPrompt` mit `[McpServerPromptType]` und einer Methode `ReviewPortoBuchungen` mit `[McpServerPrompt(Name = "review_porto_buchungen")]`.
+- [x] Argumente: `dateVon` (string?, ISO-Date), `dateBis` (string?, ISO-Date), `dryRun` (bool, Default `true`).
+- [x] Der Prompt-Text enthält erkennbar alle Porto-Keywords (`Deutsche Post`, `DHL`, `Hermes`, `UPS`, `GLS`, `DPD`).
+- [x] Der Prompt-Text enthält Konto 68000, Kostenstelle 2902, Sphäre 2.
+- [x] Der Prompt-Text verweist auf die zu verwendenden Tools `list_bookings`, `list_billing_accounts`, `list_booking_projects`, `update_booking`.
+- [x] Die Zeitraum-Argumente werden im Prompt-Text eingebettet, wenn übergeben.
+- [x] `dryRun=false` erzeugt einen Text, der explizit zum Ausführen von `update_booking` auffordert; `dryRun=true` (Default) erzeugt nur Vorschläge + Rückfrage.
+- [x] Registrierung in `Program.cs`: `.WithPrompts<PortoBuchungenPrompt>()`.
+- [x] 3 neue xUnit-Tests in `PortoBuchungenPromptTests.cs` decken die drei Haupt-Fälle ab.
+- [x] Gesamtzahl Tests steigt auf 152, Suite bleibt grün.
 
 ## Technische Hinweise
 
