@@ -1,6 +1,7 @@
 # User Story 066: update_invoice verrechnet zugeordnete Zahlungen
 
 > **GitHub Issue:** [#141 – US-0066 update_invoice verrechnet zugeordnete Zahlungen](https://github.com/RalfGuder/MCP-easyVerein/issues/141)
+> **Spec (Software Factory):** [features/US-0066-update-invoice-verrechnung-hinweis/spec.md](https://github.com/RalfGuder/MCP-easyVerein/blob/main/features/US-0066-update-invoice-verrechnung-hinweis/spec.md)
 
 ## User Story
 
@@ -18,8 +19,8 @@ Gegenprobe: Die 15 per `create_receipt` erzeugten Eigenbelege (555–570) sind a
 
 ## Akzeptanzkriterien
 
-- [ ] Die Ursache ist an einem Testfall belegt und im Dokument festgehalten. Wird dabei angelegt oder verändert, nur nach ausdrücklicher Freigabe.
-- [ ] Gibt es einen API-Weg, der verrechnet (z. B. `relatedInvoice` an der Buchung setzen, `paymentDifference` setzen oder einen eigenen Endpoint), nutzt `update_invoice` ihn bei `relatedBookingIds`.
+- [x] Die Ursache ist an einem Testfall belegt und im Dokument festgehalten. Wird dabei angelegt oder verändert, nur nach ausdrücklicher Freigabe. (Live-Test 2026-11-27: verrechnet, siehe unten)
+- [x] Gibt es einen API-Weg, der verrechnet (z. B. `relatedInvoice` an der Buchung setzen, `paymentDifference` setzen oder einen eigenen Endpoint), nutzt `update_invoice` ihn bei `relatedBookingIds`. (Ja: `relatedBookings` selbst verrechnet; Text korrigieren über Spec US-0066)
 - [x] Gibt es keinen API-Weg, meldet `update_invoice` nach dem Verknüpfen, wenn `paymentDifference` ungleich 0 bleibt, mit einem klaren Hinweis, die Zahlung in der Oberfläche zuzuordnen; die Tool-Beschreibung nennt die Einschränkung.
 - [x] Tests nach TDD (Warnung).
 - [ ] Live-Prüfung an einem Testfall (offen, siehe Stand).
@@ -29,6 +30,24 @@ Gegenprobe: Die 15 per `create_receipt` erzeugten Eigenbelege (555–570) sind a
 - **Umgesetzt (PR, Warnung):** `update_invoice` liest die Rechnung nach dem Verknüpfen neu ein. Bleibt bei einer finalisierten Rechnung `paymentDifference` ungleich 0, endet die Antwort mit einer `WARNING`-Zeile und dem Hinweis, die Zahlung in der easyVerein-Oberfläche zuzuordnen. Die Tool-Beschreibung nennt die Einschränkung.
 - **OpenAPI-Analyse:** Am Rechnungs-PATCH ist `relatedBookings` schreibbar, `paymentDifference` nicht. Am Buchungs-PATCH ist `paymentDifference` schreibbar, `relatedInvoice` steht nicht in der Spezifikation. `PATCH /invoice/{pk}/update-invoice` („Update invoice (and optional items) atomically“) ist ohne Body-Beschreibung. `PATCH /booking/mass-action` gilt nur für Massenänderungen per Filter.
 - **Offen:** Ursache und verrechnender API-Weg (Kriterien 1 und 2). Belegen lässt sich das nur mit einem schreibenden Test. Echte Vereinsdaten sollen dafür nicht verändert werden; nötig ist ein eigener Testfall (Testrechnung und Testbuchung), der danach entfernt wird, und zwar nur nach Freigabe.
+
+## Live-Test 2026-11-27
+
+Freigegeben vom Nutzer: ein echter offener Fall, der ohnehin zuzuordnen war.
+
+- **Testfall:** Beleg Nr. 413 (ID 456332703, Ausgabe, Nah & Gut Stoll, 25.04.2026, 14,40 €, `isReceipt=true`, finalisiert, `paymentDifference` −14,40, keine Buchung verknüpft) und Buchung 240005835 (27.04.2026, −14,40 €, Kartenzahlung 25.04. 14:13, ohne Beleg).
+- **Variante 1:** `update_invoice(456332703, relatedBookingIds=[240005835])`. Ergebnis: Die Antwort zeigt sofort `paymentDifference` 0,00 und keine WARNING. Die Buchung zeigt `relatedInvoice` [456332703] und ebenfalls `paymentDifference` 0,00.
+- **Varianten 2 und 3:** nicht nötig.
+
+**Ergebnis:** Die Hypothese ist widerlegt. Verknüpfen über `relatedBookings` verrechnet auch an einer bereits finalisierten Rechnung. Warum es am 2026-11-15 bei Rechnung 416 nicht verrechnet hat, lässt sich nicht mehr nachstellen, weil 416 inzwischen in der Oberfläche zugeordnet ist. Mögliche Unterschiede:
+
+- 416 ist eine Mitgliedsbeitragsrechnung (`kind=membership`, `isReceipt=false`, `gross=false`), 413 ein Ausgabenbeleg.
+- Damals lief noch der Code vor Commit 1891fed.
+- easyVerein hat die Differenz möglicherweise verzögert berechnet.
+
+Für Mitgliedsbeitragsrechnungen fehlt gerade ein Testfall: Es gibt keine unzugeordnete Eingangsbuchung, die zu einer der offenen Beitragsrechnungen passt.
+
+**Folge:** Die Warnung aus 1891fed bleibt sinnvoll, weil sie nur greift, wenn `paymentDifference` nach dem Verknüpfen ungleich 0 bleibt. Die Tool-Beschreibung und der Warntext behaupten aber pauschal, die API verrechne bei finalisierten Rechnungen nie. Das ist so falsch.
 
 ## Aufgaben
 
