@@ -46,31 +46,18 @@ public sealed class PortoBuchungenPrompt
     /// <param name="gesperrtBis">Optional lock date (yyyy-MM-dd); invalid values fall back to the default.</param>
     /// <param name="heute">The current date used to compute the default lock date.</param>
     /// <returns>The prompt text.</returns>
-    public static string BuildText(string? dateVon, string? dateBis, bool dryRun, string? gesperrtBis, DateOnly heute)
+    internal static string BuildText(string? dateVon, string? dateBis, bool dryRun, string? gesperrtBis, DateOnly heute)
     {
-        var zeitraumBlock = (dateVon, dateBis) switch
-        {
-            (null, null) => "Zeitraum: aktueller Kalendermonat (heute rückwärts bis zum 1. des Monats).",
-            (not null, null) => $"Zeitraum: ab {dateVon} bis heute.",
-            (null, not null) => $"Zeitraum: seit Beginn des aktuellen Monats bis {dateBis}.",
-            (not null, not null) => $"Zeitraum: von {dateVon} bis {dateBis}."
-        };
-
+        var (von, vonHinweis) = ParseOptionalDate(dateVon, nameof(dateVon), "der Beginn des aktuellen Kalendermonats");
+        var (bis, bisHinweis) = ParseOptionalDate(dateBis, nameof(dateBis), "das heutige Datum");
         var (sperrdatum, sperrHinweis) = ResolveLockDate(gesperrtBis, heute);
 
-        var modusBlock = dryRun
-            ? """
-              Modus: dryRun=true (Default). Du sollst Änderungen NUR vorschlagen, nicht ausführen.
-              Rufe weder update_booking noch update_invoice_item auf.
-              Zeige eine Tabelle mit Buchungs-ID, Empfänger, Betrag, Datum, geplante Änderungen an der Buchung und geplante Änderungen an den Belegpositionen (Positions-ID, Feld alt → neu).
-              Zeige danach die Listen (siehe unten).
-              Frage den Nutzer danach, ob er die Änderungen ausführen lassen möchte.
-              """
-            : """
-              Modus: dryRun=false. Du sollst die Änderungen tatsächlich ausführen.
-              Rufe für jede zu korrigierende Buchung update_booking und für jede zu korrigierende Belegposition update_invoice_item mit den aufgelösten IDs auf (nur die fehlenden oder abweichenden Felder).
-              Liste am Ende alle geänderten Buchungen und Belegpositionen jeweils mit ID und den geänderten Feldern auf, danach die Listen (siehe unten).
-              """;
+        var zeitraumBlock = vonHinweis + bisHinweis + BuildPeriodBlock(von, bis);
+        var gesamtSperre = IsWholePeriodLocked(bis, sperrdatum, heute)
+            ? $"Der gesamte Zeitraum liegt bis einschließlich zum Sperrdatum {Format(sperrdatum)}: Alle Buchungen sind gesperrt. Ändere nichts, melde nur.\n"
+            : "";
+        var modusBlock = BuildModeBlock(dryRun);
+        var sperrdatumText = Format(sperrdatum);
 
         return $$"""
         Du bist ein Buchhaltungs-Assistent für den Kulturverein Milower Land e.V. und sollst Porto-Buchungen nach einer festen Regel kontieren.
@@ -85,16 +72,21 @@ public sealed class PortoBuchungenPrompt
         | Projekt | Kulturverein | – |
 
         Kurz:
-        - Konto 68000 (Porto) an Buchung und Belegposition (`billingAccount` bzw. `billingAccountId`).
-        - Sphäre 2 (Vermögensverwaltung) an Buchung und Belegposition (`sphere` = 2).
-        - Kostenstelle 2902 nur an der Belegposition (`costCentre` = "2902" über update_invoice_item).
-        - Projekt "Kulturverein" nur an der Buchung (`bookingProject` über update_booking).
+        - Konto 68000 (Porto) an Buchung und Belegposition.
+        - Sphäre 2 (Vermögensverwaltung) an Buchung und Belegposition.
+        - Kostenstelle 2902 nur an der Belegposition (über update_invoice_item).
+        - Projekt "Kulturverein" nur an der Buchung (über update_booking).
         - Setze an der Buchung niemals die Kostenstelle 2902 und niemals das Projekt "Büromaterial"; an den Belegpositionen wird kein Projekt gesetzt.
+
+        Feldnamen:
+        - Gelesen (Felder in den Antworten): `billingAccount`, `bookingProject`, `sphere` (Buchung); `billingAccount`, `sphere`, `costCentre` (Belegposition).
+        - Geschrieben mit update_booking: `billingAccountId`, `bookingProjectId`, `sphere`.
+        - Geschrieben mit update_invoice_item: `billingAccountId`, `sphere`, `costCentre`.
 
         ## Sperrdatum (abgeschlossene Geschäftsjahre)
 
-        Sperrdatum: {{sperrdatum}}
-        {{sperrHinweis}}Buchungen mit Datum bis einschließlich {{sperrdatum}} und deren Belegpositionen darfst du nie ändern – auch bei dryRun=false nicht.
+        Sperrdatum: {{sperrdatumText}}
+        {{sperrHinweis}}{{gesamtSperre}}Buchungen mit Datum bis einschließlich {{sperrdatumText}} und deren Belegpositionen darfst du nie ändern – auch bei dryRun=false nicht.
         Nimm sie stattdessen in die Liste "gesperrt (Geschäftsjahr abgeschlossen)" auf, jeweils mit Buchungs-ID, Datum, Betrag, Empfänger und den Abweichungen von der Zielregel (an Buchung und Positionen).
         Liegt das Sperrdatum nach dem Ende des Zeitraums, sind alle Buchungen gesperrt; dann meldest du nur.
 
@@ -131,8 +123,10 @@ public sealed class PortoBuchungenPrompt
         2. Rufe `list_bookings` mit `dateGt` = Startdatum − 1 Tag, `dateLt` = Enddatum + 1 Tag und `limit` = 100 auf.
            Solange `hasMore` true ist, rufe die nächste Seite (`page` + 1) ab; die Buchungen stehen in `items`.
         3. Filtere nach Porto-Kandidaten und nenne die Anzahl.
-        4. Trenne gesperrte Buchungen (Datum bis einschließlich {{sperrdatum}}) ab.
-        5. Lade für die übrigen Kandidaten die Belegpositionen (`list_invoice_items`, bei Bedarf `get_invoice`) und bestimme je Kandidat die Behandlung (siehe oben).
+        4. Trenne gesperrte Buchungen (Datum bis einschließlich {{sperrdatumText}}) ab.
+        5. Lade für alle Kandidaten – auch die gesperrten – die Belegpositionen (`list_invoice_items`, bei Bedarf `get_invoice`).
+           Bei gesperrten Kandidaten nur lesend: ermittle die Abweichungen von der Zielregel an Buchung und Positionen für die Liste "gesperrt (Geschäftsjahr abgeschlossen)" und ändere nichts.
+           Bestimme für die übrigen Kandidaten die Behandlung (siehe oben).
         6. Nenne am Ende die Zahlen: Kandidaten, gesperrt, zu ändern, abweichend kontiert, bereits richtig (übersprungen), Beleg fehlt.
 
         {{modusBlock}}
@@ -148,7 +142,7 @@ public sealed class PortoBuchungenPrompt
         - dateVon={{dateVon ?? "(nicht gesetzt)"}}
         - dateBis={{dateBis ?? "(nicht gesetzt)"}}
         - dryRun={{(dryRun ? "true" : "false")}}
-        - gesperrtBis={{sperrdatum}}
+        - gesperrtBis={{sperrdatumText}}
 
         ## Grenzfälle (beim Nutzer nachfragen)
 
@@ -159,24 +153,100 @@ public sealed class PortoBuchungenPrompt
         """;
     }
 
+    /// <summary>Builds the period line from the validated start and end dates.</summary>
+    /// <param name="von">Validated start date or <c>null</c>.</param>
+    /// <param name="bis">Validated end date or <c>null</c>.</param>
+    /// <returns>The period line for the prompt text.</returns>
+    private static string BuildPeriodBlock(DateOnly? von, DateOnly? bis) => (von, bis) switch
+    {
+        (null, null) => "Zeitraum: aktueller Kalendermonat (heute rückwärts bis zum 1. des Monats).",
+        ({ } v, null) => $"Zeitraum: ab {Format(v)} bis heute.",
+        (null, { } b) => $"Zeitraum: seit Beginn des aktuellen Monats bis {Format(b)}.",
+        ({ } v, { } b) => $"Zeitraum: von {Format(v)} bis {Format(b)}."
+    };
+
+    /// <summary>Builds the mode block for proposal-only (dry run) or execution mode.</summary>
+    /// <param name="dryRun">If <c>true</c> only proposals are requested.</param>
+    /// <returns>The mode block for the prompt text.</returns>
+    private static string BuildModeBlock(bool dryRun) => dryRun
+        ? """
+          Modus: dryRun=true (Default). Du sollst Änderungen NUR vorschlagen, nicht ausführen.
+          Rufe weder update_booking noch update_invoice_item auf.
+          Zeige eine Tabelle mit Buchungs-ID, Empfänger, Betrag, Datum, geplante Änderungen an der Buchung und geplante Änderungen an den Belegpositionen (Positions-ID, Feld alt → neu).
+          Zeige danach die Listen (siehe unten).
+          Frage den Nutzer danach, ob er die Änderungen ausführen lassen möchte.
+          """
+        : """
+          Modus: dryRun=false. Du sollst die Änderungen tatsächlich ausführen.
+          Rufe für jede zu korrigierende Buchung update_booking und für jede zu korrigierende Belegposition update_invoice_item mit den aufgelösten IDs auf (nur die fehlenden oder abweichenden Felder).
+          Liste am Ende alle geänderten Buchungen und Belegpositionen jeweils mit ID und den geänderten Feldern auf, danach die Listen (siehe unten).
+          """;
+
+    /// <summary>
+    /// Returns <c>true</c> if the effective end of the period (end date or today) is on or before the lock date.
+    /// </summary>
+    /// <param name="bis">Validated end date or <c>null</c> (then today is the end).</param>
+    /// <param name="sperrdatum">Effective lock date.</param>
+    /// <param name="heute">The current date.</param>
+    /// <returns>Whether all bookings of the period are locked.</returns>
+    private static bool IsWholePeriodLocked(DateOnly? bis, DateOnly sperrdatum, DateOnly heute)
+        => (bis ?? heute) <= sperrdatum;
+
+    /// <summary>
+    /// Validates an optional date argument. Missing values yield <c>null</c> without notice;
+    /// invalid values yield <c>null</c> plus a notice line naming the fallback.
+    /// </summary>
+    /// <param name="value">The raw argument value.</param>
+    /// <param name="name">The argument name used in the notice.</param>
+    /// <param name="fallback">Human-readable description of the fallback used instead.</param>
+    /// <returns>The parsed date (or <c>null</c>) and an optional notice line.</returns>
+    private static (DateOnly? Datum, string Hinweis) ParseOptionalDate(string? value, string name, string fallback)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return (null, "");
+
+        if (TryParseIso(value, out var parsed))
+            return (parsed, "");
+
+        return (null,
+            $"Hinweis: Der übergebene Wert {name}=\"{value}\" ist ungültig (erwartet yyyy-MM-dd). Stattdessen gilt {fallback}. Weise den Nutzer zu Beginn darauf hin.\n");
+    }
+
     /// <summary>
     /// Determines the effective lock date. A valid <paramref name="gesperrtBis"/> is used as-is;
     /// a missing or invalid value falls back to 31 December of the previous year.
     /// </summary>
     /// <param name="gesperrtBis">The lock date argument (may be null or invalid).</param>
     /// <param name="heute">The current date.</param>
-    /// <returns>The effective lock date (yyyy-MM-dd) and an optional notice line for invalid input.</returns>
-    private static (string Sperrdatum, string Hinweis) ResolveLockDate(string? gesperrtBis, DateOnly heute)
+    /// <returns>The effective lock date and an optional notice line for invalid input.</returns>
+    private static (DateOnly Sperrdatum, string Hinweis) ResolveLockDate(string? gesperrtBis, DateOnly heute)
     {
-        var standard = new DateOnly(heute.Year - 1, 12, 31).ToString(DateFormat, CultureInfo.InvariantCulture);
+        var standard = EndOfPreviousYear(heute);
 
         if (string.IsNullOrWhiteSpace(gesperrtBis))
             return (standard, "");
 
-        if (DateOnly.TryParseExact(gesperrtBis.Trim(), DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
-            return (parsed.ToString(DateFormat, CultureInfo.InvariantCulture), "");
+        if (TryParseIso(gesperrtBis, out var parsed))
+            return (parsed, "");
 
         return (standard,
-            $"Hinweis: Der übergebene Wert gesperrtBis=\"{gesperrtBis}\" ist ungültig (erwartet yyyy-MM-dd). Stattdessen gilt der 31.12. des Vorjahres ({standard}). Weise den Nutzer zu Beginn darauf hin.\n");
+            $"Hinweis: Der übergebene Wert gesperrtBis=\"{gesperrtBis}\" ist ungültig (erwartet yyyy-MM-dd). Stattdessen gilt der 31.12. des Vorjahres ({Format(standard)}). Weise den Nutzer zu Beginn darauf hin.\n");
     }
+
+    /// <summary>Returns 31 December of the year before <paramref name="heute"/>.</summary>
+    /// <param name="heute">The current date.</param>
+    /// <returns>The last day of the previous year.</returns>
+    private static DateOnly EndOfPreviousYear(DateOnly heute) => new(heute.Year - 1, 12, 31);
+
+    /// <summary>Parses a trimmed value strictly in <see cref="DateFormat"/>.</summary>
+    /// <param name="value">The raw value.</param>
+    /// <param name="date">The parsed date on success.</param>
+    /// <returns><c>true</c> if the value is a valid ISO date.</returns>
+    private static bool TryParseIso(string value, out DateOnly date)
+        => DateOnly.TryParseExact(value.Trim(), DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
+
+    /// <summary>Formats a date in <see cref="DateFormat"/>.</summary>
+    /// <param name="date">The date to format.</param>
+    /// <returns>The ISO date string.</returns>
+    private static string Format(DateOnly date) => date.ToString(DateFormat, CultureInfo.InvariantCulture);
 }

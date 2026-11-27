@@ -25,7 +25,7 @@ public static class PromptJson
     }
 
     /// <summary>Reads booleans from JSON booleans or from the strings "true"/"false" (case-insensitive).</summary>
-    public sealed class LenientBooleanConverter : JsonConverter<bool>
+    private sealed class LenientBooleanConverter : JsonConverter<bool>
     {
         /// <summary>Reads a boolean value from a JSON boolean or string token.</summary>
         /// <param name="reader">The JSON reader.</param>
