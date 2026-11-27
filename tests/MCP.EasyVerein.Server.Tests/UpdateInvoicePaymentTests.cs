@@ -2,14 +2,16 @@ using MCP.EasyVerein.Application.Configuration;
 using MCP.EasyVerein.Domain.Entities;
 using MCP.EasyVerein.Domain.Interfaces;
 using MCP.EasyVerein.Server.Tools;
+using System.ComponentModel;
+using System.Reflection;
 using Moq;
 
 namespace MCP.EasyVerein.Server.Tests;
 
 /// <summary>
 /// Tests for the payment check of <c>update_invoice</c> after linking bookings (US-0066).
-/// Linking a booking to an already finalized invoice does not settle the payment in easyVerein;
-/// the tool must say so instead of reporting a silent success.
+/// Linking a booking usually settles the payment, also for finalized invoices; the tool warns
+/// only if a payment difference remains or the settlement could not be checked.
 /// </summary>
 public class UpdateInvoicePaymentTests
 {
@@ -109,5 +111,127 @@ public class UpdateInvoicePaymentTests
         var result = await Run(mock, new[] { 247581501L }, isDraft: true);
 
         Assert.DoesNotContain("WARNING", result);
+    }
+
+    /// <summary>Verifies that the warning names the open amount, the possible reasons and the UI check (AK-3).</summary>
+    [Fact]
+    public async Task UpdateInvoice_NotSettled_WarningIsFactual()
+    {
+        var invoice = new Invoice { Id = InvoiceId, IsDraft = false, PaymentDifference = 60m };
+        var mock = CreateMock(invoice, invoice);
+
+        var result = await Run(mock, new[] { 247581501L });
+
+        var lastLine = result.Split('\n')[^1];
+        Assert.StartsWith("WARNING:", lastLine);
+        Assert.Contains("paymentDifference 60", lastLine);
+        Assert.Contains("not fully settled", lastLine);
+        Assert.Contains("partial payment", lastLine);
+        Assert.Contains("different amount", lastLine);
+        Assert.Contains("easyVerein web interface", lastLine);
+        Assert.DoesNotContain("does not settle", result);
+    }
+
+    /// <summary>Verifies that a negative payment difference is reported with the read amount (EC-1).</summary>
+    [Fact]
+    public async Task UpdateInvoice_NegativeDifference_ReturnsWarningWithAmount()
+    {
+        var invoice = new Invoice { Id = InvoiceId, IsDraft = false, PaymentDifference = -12.5m };
+        var mock = CreateMock(invoice, invoice);
+
+        var result = await Run(mock, new[] { 247581501L });
+
+        var lastLine = result.Split('\n')[^1];
+        Assert.StartsWith("WARNING:", lastLine);
+        Assert.Contains("paymentDifference -12.5", lastLine);
+    }
+
+    /// <summary>Verifies that the re-read value wins over a settled PATCH response (EC-2).</summary>
+    [Fact]
+    public async Task UpdateInvoice_PatchSettledButRereadOpen_ReturnsWarning()
+    {
+        var mock = CreateMock(
+            new Invoice { Id = InvoiceId, IsDraft = false, PaymentDifference = 0m },
+            new Invoice { Id = InvoiceId, IsDraft = false, PaymentDifference = 60m });
+
+        var result = await Run(mock, new[] { 247581501L });
+
+        Assert.Contains("WARNING:", result);
+        Assert.Contains("60", result.Split('\n')[^1]);
+    }
+
+    /// <summary>Verifies that an empty booking list does not trigger a re-read (EC-3).</summary>
+    [Fact]
+    public async Task UpdateInvoice_EmptyBookingList_DoesNotReread()
+    {
+        var invoice = new Invoice { Id = InvoiceId, IsDraft = false, PaymentDifference = 60m };
+        var mock = CreateMock(invoice, invoice);
+
+        var result = await Run(mock, Array.Empty<long>());
+
+        Assert.DoesNotContain("WARNING", result);
+        mock.Verify(c => c.GetInvoiceAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    /// <summary>Verifies that a failing re-read still returns the update result plus a warning (AK-5).</summary>
+    [Fact]
+    public async Task UpdateInvoice_RereadThrows_ReturnsUpdateWithWarning()
+    {
+        var mock = new Mock<IEasyVereinApiClient>();
+        mock.Setup(c => c.UpdateInvoiceAsync(InvoiceId, It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Invoice { Id = InvoiceId, IsDraft = false });
+        mock.Setup(c => c.GetInvoiceAsync(InvoiceId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("503 Service Unavailable"));
+
+        var result = await Run(mock, new[] { 247581501L });
+
+        Assert.DoesNotContain("ERROR", result);
+        Assert.StartsWith("{", result);
+        Assert.Contains("\"id\":459262173", result);
+        var lastLine = result.Split('\n')[^1];
+        Assert.StartsWith("WARNING:", lastLine);
+        Assert.Contains("could not be checked", lastLine);
+        Assert.Contains("503", lastLine);
+    }
+
+    /// <summary>Verifies that a re-read without result is treated like a failed re-read (AK-5).</summary>
+    [Fact]
+    public async Task UpdateInvoice_RereadReturnsNull_ReturnsUpdateWithWarning()
+    {
+        var mock = CreateMock(new Invoice { Id = InvoiceId, IsDraft = false }, null);
+
+        var result = await Run(mock, new[] { 247581501L });
+
+        Assert.Contains("\"id\":459262173", result);
+        var lastLine = result.Split('\n')[^1];
+        Assert.StartsWith("WARNING:", lastLine);
+        Assert.Contains("could not be checked", lastLine);
+    }
+
+    /// <summary>Verifies that a failing PATCH is still reported as error.</summary>
+    [Fact]
+    public async Task UpdateInvoice_PatchThrows_ReturnsError()
+    {
+        var mock = new Mock<IEasyVereinApiClient>();
+        mock.Setup(c => c.UpdateInvoiceAsync(InvoiceId, It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("400 Bad Request"));
+
+        var result = await Run(mock, new[] { 247581501L });
+
+        Assert.StartsWith("ERROR:", result);
+    }
+
+    /// <summary>Verifies that the tool description reflects the actual settlement behaviour (AK-1).</summary>
+    [Fact]
+    public void UpdateInvoice_Description_DescribesSettlement()
+    {
+        var method = typeof(InvoiceTools).GetMethod(nameof(InvoiceTools.UpdateInvoice))!;
+        var description = method.GetCustomAttribute<DescriptionAttribute>()!.Description;
+
+        Assert.Contains("usually settles", description);
+        Assert.Contains("also for finalized invoices", description);
+        Assert.Contains("WARNING", description);
+        Assert.Contains("paymentDifference", description);
+        Assert.DoesNotContain("does not settle", description);
     }
 }
