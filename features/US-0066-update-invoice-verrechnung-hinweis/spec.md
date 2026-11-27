@@ -1,6 +1,6 @@
 # US-0066: update_invoice – Hinweis zur Verrechnung sachlich richtig
 
-**Status:** Planned
+**Status:** Approved
 **Erstellt:** 2026-11-27
 
 ## Abhängigkeiten
