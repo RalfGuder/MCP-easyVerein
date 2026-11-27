@@ -7,7 +7,7 @@ Nächste freie ID: US-0068
 
 | ID | Feature | Status | Ordner |
 |----|---------|--------|--------|
-| US-0066 | update_invoice – Hinweis zur Verrechnung sachlich richtig | Architected | features/US-0066-update-invoice-verrechnung-hinweis/ |
+| US-0066 | update_invoice – Hinweis zur Verrechnung sachlich richtig | In Progress | features/US-0066-update-invoice-verrechnung-hinweis/ |
 | US-0067 | Porto-Prompt – Kontierung nach aktueller Praxis | Approved | features/US-0067-porto-prompt-kontierung/ |
 
 **Status:** Planned (Spec fertig) → Architected → In Progress → In Review → Approved (QA bestanden)

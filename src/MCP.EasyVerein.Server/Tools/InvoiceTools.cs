@@ -145,7 +145,7 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
     /// <param name="isDraft">New isDraft flag (set to <c>false</c> to finalize a draft).</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A JSON string of the updated invoice, or an error message.</returns>
-    [McpServerTool(Name = "update_invoice"), Description("Update an invoice (only provided fields are changed). Use this to finalize drafts (isDraft=false) or link to bookings (relatedBookingIds). Note: linking bookings to an already finalized invoice does not settle the payment in easyVerein; the response then ends with a WARNING line and the payment must be assigned in the easyVerein web interface. Linking while finalizing a draft (as create_receipt does) settles it.")]
+    [McpServerTool(Name = "update_invoice"), Description("Update an invoice (only provided fields are changed). Use this to finalize drafts (isDraft=false) or link to bookings (relatedBookingIds). Linking bookings via relatedBookingIds usually settles the payment, also for finalized invoices. The tool then re-reads the invoice; the response ends with a WARNING line only if paymentDifference remains non-zero (e.g. partial payment or different amount) or if the settlement could not be checked.")]
     public async Task<string> UpdateInvoice(
         [Description("The ID of the invoice to update")] long id,
         [Description("New description")] string? description,
@@ -181,18 +181,54 @@ public sealed class InvoiceTools(IEasyVereinApiClient client, EasyVereinConfigur
             if (relatedBookingIds is not { Length: > 0 } || updated.IsDraft == true)
                 return json;
 
-            var reread = await client.GetInvoiceAsync(id, ct);
-            var openAmount = reread?.PaymentDifference ?? 0m;
-            return openAmount == 0m
-                ? json
-                : $"{json}\nWARNING: Bookings linked, but the payment is not settled (paymentDifference {openAmount.ToString(CultureInfo.InvariantCulture)}). " +
-                  "easyVerein does not settle bookings linked to a finalized invoice via the API; assign the payment in the easyVerein web interface.";
+            return $"{json}{await CheckSettlementAsync(id, ct)}";
         }
         catch (Exception ex)
         {
             return $"ERROR: {ex.GetType().Name}: {ex.Message}\nInner: {ex.InnerException?.Message}";
         }
     }
+
+    /// <summary>
+    /// Re-reads an invoice after bookings were linked and checks whether the payment is settled.
+    /// </summary>
+    /// <param name="id">The ID of the invoice to re-read.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>
+    /// An empty string if <c>paymentDifference</c> is 0; otherwise a newline followed by a single
+    /// <c>WARNING:</c> line (open amount, or settlement could not be checked).
+    /// </returns>
+    private async Task<string> CheckSettlementAsync(long id, CancellationToken ct)
+    {
+        Invoice? reread;
+        try
+        {
+            reread = await client.GetInvoiceAsync(id, ct);
+        }
+        catch (Exception ex)
+        {
+            return $"\nWARNING: Bookings linked, but the settlement could not be checked (re-reading the invoice failed: {SingleLine(ex.Message)}). " +
+                   "Check amounts and assignment in the easyVerein web interface.";
+        }
+
+        if (reread is null)
+            return "\nWARNING: Bookings linked, but the settlement could not be checked (re-reading the invoice returned no invoice). " +
+                   "Check amounts and assignment in the easyVerein web interface.";
+
+        var openAmount = reread.PaymentDifference ?? 0m;
+        return openAmount == 0m
+            ? string.Empty
+            : $"\nWARNING: Bookings linked, but the payment is not fully settled (paymentDifference {openAmount.ToString(CultureInfo.InvariantCulture)}). " +
+              "Possible reasons: partial payment or a different amount. Check amounts and assignment in the easyVerein web interface.";
+    }
+
+    /// <summary>
+    /// Collapses line breaks so that a message fits into a single WARNING line.
+    /// </summary>
+    /// <param name="text">The text to collapse.</param>
+    /// <returns>The text without line breaks.</returns>
+    private static string SingleLine(string text) =>
+        text.Replace("\r", " ").Replace("\n", " ").Trim();
 
     /// <summary>
     /// Creates a complete receipt (invoice + one item) and links it to a booking in one MCP call.
