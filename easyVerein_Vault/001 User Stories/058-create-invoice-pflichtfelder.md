@@ -1,6 +1,6 @@
 # US-0058 create_invoice um fehlende Felder erweitern
 
-**Issue:** [#90](https://github.com/RalfGuder/MCP-easyVerein/issues/90)
+**Issue:** [#90](https://github.com/RalfGuder/MCP-easyVerein/issues/90) (geschlossen 2026-11-27, umgesetzt mit PR #91)
 
 ## User Story
 
@@ -14,15 +14,15 @@ Das aktuelle Tool `create_invoice` (`src/MCP.EasyVerein.Server/Tools/InvoiceTool
 
 ## Akzeptanzkriterien
 
-- [ ] `create_invoice` akzeptiert zusätzlich die optionalen Parameter `refNumber`, `paymentInformation`, `actualCallStateName`, `callStateDelayDays`, `accnumber`, `guid`, `mode` und `offerStatus`.
-- [ ] Alle neuen Parameter sind nullable; nicht gesetzte Werte werden **nicht** im POST-Body mitgesendet (keine Default-Überschreibung serverseitig).
-- [ ] Die bisherigen Parameter (`invoiceNumber`, `totalPrice`, `description`, `kind`) bleiben in Reihenfolge und Semantik unverändert (non-breaking).
-- [ ] MCP-Tool-Beschreibung (`[Description]`) nennt die erlaubten Werte für `mode`, `kind` und `paymentInformation` aus der API-Doku.
-- [ ] `isDraft` wird **nicht** als Parameter ergänzt; das Thema `invoiceItems`-Pflicht bei Non-Draft wird in einer separaten User Story adressiert.
-- [ ] xUnit-Tests in `tests/MCP.EasyVerein.Server.Tests` (neu oder erweitert) decken ab:
+- [x] `create_invoice` akzeptiert zusätzlich die optionalen Parameter `refNumber`, `paymentInformation`, `actualCallStateName`, `callStateDelayDays`, `accnumber`, `guid`, `mode` und `offerStatus`.
+- [x] Alle neuen Parameter sind nullable; nicht gesetzte Werte werden **nicht** im POST-Body mitgesendet (keine Default-Überschreibung serverseitig).
+- [x] Die bisherigen Parameter (`invoiceNumber`, `totalPrice`, `description`, `kind`) bleiben in Reihenfolge und Semantik unverändert (non-breaking).
+- [x] MCP-Tool-Beschreibung (`[Description]`) nennt die erlaubten Werte für `mode`, `kind` und `paymentInformation` aus der API-Doku.
+- [x] `isDraft` wird **nicht** als Parameter ergänzt; das Thema `invoiceItems`-Pflicht bei Non-Draft wird in einer separaten User Story adressiert.
+- [x] xUnit-Tests in `tests/MCP.EasyVerein.Server.Tests` (neu oder erweitert) decken ab:
   - Tool serialisiert alle neuen Felder korrekt in den POST-Body.
   - Nicht übergebene Felder erscheinen nicht im JSON-Body.
-- [ ] Gesamtzahl der Tests erhöht; Build und Test-Suite bleiben grün (Coverage ≥ 70 %).
+- [x] Gesamtzahl der Tests erhöht; Build und Test-Suite bleiben grün (Coverage ≥ 70 %).
 
 ## Aufgaben
 
