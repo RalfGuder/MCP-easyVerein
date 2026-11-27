@@ -29,7 +29,7 @@ Der MCP-Prompt `review_porto_buchungen` setzt die Kostenstelle 2902 über das Pr
 - Andere Buchungsregeln (Strom, Wasser, Entgeltabrechnung …) als Prompts
 - Änderung von Belegkopf-Feldern (Datum, Nummer, Betrag) oder Verknüpfungen zwischen Buchung und Beleg
 - Löschen oder Umbenennen des Projekts „Büromaterial“
-- Änderungen an Tools; nur der Prompt-Text und seine Argumente ändern sich
+- Änderungen an Tools; nur der Prompt-Text und seine Argumente ändern sich (Ausnahme: Argument-Binding der Prompts, siehe Product Decisions)
 
 ## Akzeptanzkriterien
 Alle Kriterien beziehen sich auf den Text, den der Prompt `review_porto_buchungen` liefert (MCP `prompts/get`), bzw. auf seine Beschreibung in `prompts/list`.
@@ -69,3 +69,5 @@ Alle Kriterien beziehen sich auf den Text, den der Prompt `review_porto_buchunge
 - Buchungen ohne Beleg werden an der Buchung kontiert und gemeldet, aber ohne Eigenbeleg: Regel „Buchung ohne Beleg erst klären“ (2026-11-27)
 - Bereits mit 68000 kontierte Buchungen werden nachgezogen, andere Konten nicht angefasst: alte Prompt-Ergebnisse korrigieren, bewusste Abweichungen respektieren (2026-11-27)
 - Sperrdatum `gesperrtBis` mit Default 31.12. des Vorjahres: abgeschlossene Geschäftsjahre (aktuell bis 2025) dürfen nicht verändert werden; im Januar kann ein früheres Datum übergeben werden (2026-11-27)
+- Nachtrag nach Umsetzung: Prompts erhalten eigene Serializer-Optionen (`PromptJson`) mit einem toleranten Bool-Konverter, weil MCP Prompt-Argumente als Zeichenketten überträgt (`"dryRun": "false"`) und der Aufruf sonst mit -32603 scheitert. Die Registrierung in `Program.cs` ändert sich dafür; die Tools bleiben unverändert. Begründung in `design.md` (2026-11-27)
+- Nachtrag aus dem Review: `dateVon` und `dateBis` werden wie `gesperrtBis` auf yyyy-MM-dd geprüft; ein ungültiger Wert führt zu einem Hinweis im Text statt stiller Übernahme (2026-11-27)
