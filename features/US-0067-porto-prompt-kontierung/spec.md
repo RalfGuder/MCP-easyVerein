@@ -1,6 +1,6 @@
 # US-0067: Porto-Prompt – Kontierung nach aktueller Praxis
 
-**Status:** Planned
+**Status:** Approved
 **Erstellt:** 2026-11-27
 
 ## Abhängigkeiten

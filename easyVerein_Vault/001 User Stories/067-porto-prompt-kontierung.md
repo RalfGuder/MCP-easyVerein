@@ -1,6 +1,7 @@
 # US-0067 Porto-Prompt – Kontierung nach aktueller Praxis
 
-**Issue:** folgt mit `/to-factory US-0067`
+**Issue:** [#148](https://github.com/RalfGuder/MCP-easyVerein/issues/148) · **PR:** [#149](https://github.com/RalfGuder/MCP-easyVerein/pull/149) (gemergt 2026-11-27)
+**Status:** Erledigt
 **Spec (Vertrag für die Software Factory):** [features/US-0067-porto-prompt-kontierung/spec.md](https://github.com/RalfGuder/MCP-easyVerein/blob/main/features/US-0067-porto-prompt-kontierung/spec.md)
 **Vorgänger:** [[060-porto-prompt]] (US-0060, PR #95)
 
@@ -14,11 +15,11 @@
 
 Die verbindlichen Akzeptanzkriterien (AK-1 bis AK-14) und Edge Cases stehen in der Spec. Kurzfassung:
 
-- [ ] Prompt-Text nennt die Zielregel und setzt Kostenstelle/„Büromaterial“ nicht mehr an der Buchung.
-- [ ] Kandidaten ohne Konto oder mit 68000 werden nach Zielregel ergänzt/korrigiert; andere Konten werden nur gemeldet.
-- [ ] Buchungen ohne Beleg: an der Buchung kontieren, kein Eigenbeleg, Liste „Beleg fehlt“.
-- [ ] Neues Argument `gesperrtBis` (Default 31.12. des Vorjahres); bis dahin nur melden, nie ändern.
-- [ ] `dateVon`, `dateBis`, `dryRun` bleiben unverändert nutzbar.
+- [x] Prompt-Text nennt die Zielregel und setzt Kostenstelle/„Büromaterial“ nicht mehr an der Buchung.
+- [x] Kandidaten ohne Konto oder mit 68000 werden nach Zielregel ergänzt/korrigiert; andere Konten werden nur gemeldet.
+- [x] Buchungen ohne Beleg: an der Buchung kontieren, kein Eigenbeleg, Liste „Beleg fehlt“.
+- [x] Neues Argument `gesperrtBis` (Default 31.12. des Vorjahres); bis dahin nur melden, nie ändern.
+- [x] `dateVon`, `dateBis`, `dryRun` bleiben unverändert nutzbar.
 
 ## Aufgaben
 
@@ -27,5 +28,5 @@ Die verbindlichen Akzeptanzkriterien (AK-1 bis AK-14) und Edge Cases stehen in d
 
 ## Technische Hinweise
 
-- Betroffen: `src/MCP.EasyVerein.Server/Prompts/PortoBuchungenPrompt.cs` und `PortoBuchungenPromptTests`.
+- Betroffen: `src/MCP.EasyVerein.Server/Prompts/PortoBuchungenPrompt.cs`, neu `Prompts/PromptJson.cs` (Bool-Argumente als String), `PortoBuchungenPromptTests`, `PromptJsonTests`.
 - Regel-Quelle: Memory „Porto-Buchungsregel“ (Stand 2026-11-27), analog Entgeltabrechnung.
