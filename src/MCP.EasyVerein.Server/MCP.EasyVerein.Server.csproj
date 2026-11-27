@@ -12,6 +12,10 @@
     <PackageReference Include="ModelContextProtocol" Version="1.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="MCP.EasyVerein.Server.Tests" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>

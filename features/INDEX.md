@@ -7,6 +7,6 @@ Nächste freie ID: US-0068
 
 | ID | Feature | Status | Ordner |
 |----|---------|--------|--------|
-| US-0067 | Porto-Prompt – Kontierung nach aktueller Praxis | Planned | features/US-0067-porto-prompt-kontierung/ |
+| US-0067 | Porto-Prompt – Kontierung nach aktueller Praxis | In Review | features/US-0067-porto-prompt-kontierung/ |
 
 **Status:** Planned (Spec fertig) → Architected → In Progress → In Review → Approved (QA bestanden)

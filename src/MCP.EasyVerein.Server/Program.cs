@@ -79,7 +79,7 @@ builder.Services
     .WithTools<InventoryObjectGroupTools>()
     .WithTools<InvoiceItemTools>()
     .WithTools<LendingTools>()
-    .WithPrompts<PortoBuchungenPrompt>();
+    .WithPrompts<PortoBuchungenPrompt>(PromptJson.SerializerOptions);
 
 var app = builder.Build();
 await app.RunAsync();
