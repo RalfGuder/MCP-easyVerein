@@ -23,7 +23,7 @@ Gegenprobe: Die 15 per `create_receipt` erzeugten Eigenbelege (555–570) sind a
 - [x] Gibt es einen API-Weg, der verrechnet (z. B. `relatedInvoice` an der Buchung setzen, `paymentDifference` setzen oder einen eigenen Endpoint), nutzt `update_invoice` ihn bei `relatedBookingIds`. (Ja: `relatedBookings` selbst verrechnet; Text korrigieren über Spec US-0066)
 - [x] Gibt es keinen API-Weg, meldet `update_invoice` nach dem Verknüpfen, wenn `paymentDifference` ungleich 0 bleibt, mit einem klaren Hinweis, die Zahlung in der Oberfläche zuzuordnen; die Tool-Beschreibung nennt die Einschränkung.
 - [x] Tests nach TDD (Warnung).
-- [ ] Live-Prüfung an einem Testfall (offen, siehe Stand).
+- [x] Live-Prüfung an einem Testfall (Beleg 413, 2026-11-27; Umsetzung: Issue [#152](https://github.com/RalfGuder/MCP-easyVerein/issues/152), PR [#153](https://github.com/RalfGuder/MCP-easyVerein/pull/153))
 
 ## Stand 2026-11-15
 
