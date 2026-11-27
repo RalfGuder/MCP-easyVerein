@@ -122,13 +122,81 @@ public class PortoBuchungenPromptTests
         Assert.Contains($"gesperrtBis={erwartet}", text);
     }
 
-    /// <summary>The MCP prompt method uses the real current date for the default lock date.</summary>
+    /// <summary>AK-6: with a fixed "today" and no gesperrtBis the lock date is 31.12. of the previous year and no notice appears.</summary>
     [Fact]
-    public void ReviewPortoBuchungen_OhneGesperrtBis_NutztAktuellesVorjahr()
+    public void BuildText_OhneGesperrtBis_NutztVorjahrDesFestenDatums()
     {
-        var text = PortoBuchungenPrompt.ReviewPortoBuchungen();
+        var text = PortoBuchungenPrompt.BuildText(null, null, true, null, new DateOnly(2030, 6, 15));
 
-        Assert.Contains($"Sperrdatum: {DateTime.Today.Year - 1}-12-31", text);
+        Assert.Contains("Sperrdatum: 2029-12-31", text);
+        Assert.DoesNotContain("ungültig", text);
+    }
+
+    /// <summary>Review #1: the invoice items of locked candidates are loaded read-only so deviations can be reported.</summary>
+    [Fact]
+    public void GesperrteKandidaten_PositionenWerdenNurLesendGeladen()
+    {
+        var text = Text(dryRun: false);
+
+        Assert.Contains("Lade für alle Kandidaten – auch die gesperrten – die Belegpositionen", text);
+        Assert.Contains("Bei gesperrten Kandidaten nur lesend", text);
+        Assert.DoesNotContain("Lade für die übrigen Kandidaten", text);
+    }
+
+    /// <summary>Review #2: fields read from responses are named separately from the parameters written via the tools.</summary>
+    [Fact]
+    public void Parameternamen_LesenUndSchreibenGetrennt()
+    {
+        var text = Text(dryRun: false);
+
+        Assert.Contains("Gelesen (Felder in den Antworten): `billingAccount`, `bookingProject`, `sphere` (Buchung); `billingAccount`, `sphere`, `costCentre` (Belegposition).", text);
+        Assert.Contains("Geschrieben mit update_booking: `billingAccountId`, `bookingProjectId`, `sphere`.", text);
+        Assert.Contains("Geschrieben mit update_invoice_item: `billingAccountId`, `sphere`, `costCentre`.", text);
+        Assert.DoesNotContain("`bookingProject` über update_booking", text);
+        Assert.DoesNotContain("(`billingAccount` bzw. `billingAccountId`)", text);
+    }
+
+    /// <summary>Review #3: invalid dateVon/dateBis are not adopted silently but mentioned.</summary>
+    [Theory]
+    [InlineData("01.04.2026", null, "dateVon")]
+    [InlineData(null, "30.04.2026", "dateBis")]
+    [InlineData("2026-02-30", null, "dateVon")]
+    [InlineData(null, "abc", "dateBis")]
+    public void Zeitraum_UngueltigesDatum_WirdGemeldet(string? von, string? bis, string name)
+    {
+        var text = Text(von, bis);
+        var wert = von ?? bis;
+
+        Assert.Contains($"Hinweis: Der übergebene Wert {name}=\"{wert}\" ist ungültig (erwartet yyyy-MM-dd)", text);
+        Assert.DoesNotContain($"Zeitraum: ab {wert}", text);
+        Assert.DoesNotContain($"bis {wert}.", text);
+    }
+
+    /// <summary>Review #3: valid dates do not produce a notice.</summary>
+    [Fact]
+    public void Zeitraum_GueltigesDatum_KeinHinweis()
+    {
+        var text = Text("2026-04-01", "2026-04-30");
+
+        Assert.DoesNotContain("ungültig", text);
+    }
+
+    /// <summary>EC-4: lock date after the end of the period – everything is only reported.</summary>
+    [Fact]
+    public void Sperrdatum_NachZeitraumende_AllesNurMelden()
+    {
+        var text = Text("2025-01-01", "2025-03-31", dryRun: false, gesperrtBis: "2025-12-31");
+
+        Assert.Contains("Der gesamte Zeitraum liegt bis einschließlich zum Sperrdatum 2025-12-31: Alle Buchungen sind gesperrt. Ändere nichts, melde nur.", text);
+    }
+
+    /// <summary>EC-4: lock date before the end of the period – no "everything locked" notice.</summary>
+    [Fact]
+    public void Sperrdatum_VorZeitraumende_KeinGesamtsperrHinweis()
+    {
+        var text = Text("2026-01-01", "2026-03-31", gesperrtBis: "2025-12-31");
+
+        Assert.DoesNotContain("Der gesamte Zeitraum liegt", text);
     }
 
     /// <summary>AK-7: an explicit gesperrtBis is used as lock date.</summary>
@@ -178,6 +246,7 @@ public class PortoBuchungenPromptTests
             Assert.Contains("geplante Änderungen an der Buchung", text);
             Assert.Contains("geplante Änderungen an den Belegpositionen", text);
             Assert.Contains("Frage den Nutzer", text);
+            Assert.Contains("Rufe weder update_booking noch update_invoice_item auf", text);
             Assert.DoesNotContain("dryRun=false. Du sollst", text);
         }
     }
