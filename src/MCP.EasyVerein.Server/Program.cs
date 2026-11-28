@@ -82,6 +82,20 @@ builder.Services
     .WithPrompts<PortoBuchungenPrompt>(PromptJson.SerializerOptions);
 
 var app = builder.Build();
+
+// Validate the configuration at startup so an unsupported API version is rejected
+// immediately with a suggestion instead of failing on the first tool call (FR-015, US-0068 AK-3)
+try
+{
+    app.Services.GetRequiredService<EasyVereinConfiguration>();
+}
+catch (ArgumentException ex)
+{
+    Console.Error.WriteLine($"Fehler: {ex.Message}");
+    Environment.ExitCode = 1;
+    return;
+}
+
 await app.RunAsync();
 
 /// <summary>

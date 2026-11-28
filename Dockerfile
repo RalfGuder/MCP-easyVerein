@@ -19,8 +19,8 @@ FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-ENV EASYVEREIN_API_TOKEN=""
-ENV EASYVEREIN_BASE_URL="https://easyverein.com/api"
+ENV EASYVEREIN_API_KEY=""
+ENV EASYVEREIN_API_URL="https://easyverein.com/api"
 ENV EASYVEREIN_API_VERSION="v2.0"
 
 ENTRYPOINT ["dotnet", "MCP.EasyVerein.Server.dll"]
