@@ -41,7 +41,26 @@ public class EasyVereinApiClient : IEasyVereinApiClient
 
         // Authentifizierung (FR-002)
         _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {config.ApiKey}");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {NormalizeApiKey(config.ApiKey)}");
+    }
+
+    /// <summary>
+    /// Removes surrounding whitespace and a leading "Bearer" prefix (any casing, followed by whitespace
+    /// or standing alone) from the configured API key, so that the client never sends "Bearer Bearer …" (US-0068).
+    /// A key that merely starts with "Bearer" without whitespace (e.g. "Bearerxyz") is left unchanged.
+    /// </summary>
+    /// <param name="apiKey">The configured API key, possibly with prefix.</param>
+    /// <returns>The key without prefix and surrounding whitespace; an empty string if nothing remains.</returns>
+    public static string NormalizeApiKey(string? apiKey)
+    {
+        const string prefix = "Bearer";
+        var key = (apiKey ?? string.Empty).Trim();
+        if (key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            && (key.Length == prefix.Length || char.IsWhiteSpace(key[prefix.Length])))
+        {
+            key = key[prefix.Length..].Trim();
+        }
+        return key;
     }
 
     /// <summary>
