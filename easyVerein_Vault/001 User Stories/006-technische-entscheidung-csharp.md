@@ -1,6 +1,7 @@
 # User Story 006: Technische Entscheidung C#
 
 > **GitHub Issue:** [#6 – US-0006 Technische Entscheidung C#](https://github.com/RalfGuder/MCP-easyVerein/issues/6)
+> **Status:** Abgeschlossen (2026-11-28), Restpunkte in US-0068
 
 ## User Story
 
@@ -14,9 +15,9 @@
 - [x] Die Anwendung ist plattformübergreifend lauffähig auf Windows, Linux und macOS *(CI/CD baut auf allen drei Plattformen)*
 - [x] Die Architektur folgt den Prinzipien der Clean Architecture *(4 Schichten: Domain, Application, Infrastructure, Server)*
 - [x] Ein Dockerfile ist vorhanden und das System kann als Docker-Container bereitgestellt werden *(Multi-Stage Dockerfile, Alpine-basiert)*
-- [ ] Die Projektstruktur ist dokumentiert (README mit Aufbau und Schichten) *(Should – noch nicht im README)*
+- [ ] Die Projektstruktur ist dokumentiert (README mit Aufbau und Schichten) *(Should – noch nicht im README)* → übernommen in [[068-doku-und-konfiguration-vervollstaendigen|US-0068 (#160)]]
 - [x] Ein Build- und Testlauf ist auf allen drei Zielplattformen erfolgreich (CI/CD) *(`.github/workflows/build.yml` mit Matrix: ubuntu, windows, macos)*
-- [ ] Die Entscheidung für C# / .NET 8 ist als ADR dokumentiert *(Should – noch nicht erstellt)*
+- [ ] Die Entscheidung für C# / .NET 8 ist als ADR dokumentiert *(Should – noch nicht erstellt)* → übernommen in [[068-doku-und-konfiguration-vervollstaendigen|US-0068 (#160)]]
 
 ## Aufgaben
 
@@ -24,7 +25,7 @@
 - [x] **Schichten definieren**: Domain, Application, Infrastructure, Presentation/API
 - [x] **Dockerfile erstellen** für Container-Bereitstellung
 - [x] **CI/CD-Pipeline** mit Multi-Plattform-Builds (Windows, Linux, macOS)
-- [ ] **Dokumentation** erstellen: Projektstruktur, Architekturentscheidung
+- [ ] **Dokumentation** erstellen: Projektstruktur, Architekturentscheidung → übernommen in [[068-doku-und-konfiguration-vervollstaendigen|US-0068 (#160)]]
 - [x] **Beispiel-Test** mit xUnit erstellt *(46 Tests in 4 Testprojekten: Domain: 19, Application: 13, Infrastructure: 14, Server: 0)*
 
 ## Technische Hinweise
