@@ -1,6 +1,7 @@
 # User Story 005: Verschiedene API-Versionen
 
 > **GitHub Issue:** [#5 – US-0005 Verschiedene API-Versionen](https://github.com/RalfGuder/MCP-easyVerein/issues/5)
+> **Status:** Abgeschlossen (2026-11-28), Restpunkte in US-0068
 
 ## User Story
 
@@ -14,18 +15,18 @@
 - [x] Die unterstützten Versionen sind fest im Code hinterlegt *(`ApiVersion._supportedVersions`)*
 - [x] Pro Serverinstanz wird eine API-Version verwendet *(Standard: v1.7 in `EasyVereinConfiguration`)*
 - [x] Die API-Version ist über eine Umgebungsvariable konfigurierbar (`EASYVEREIN_API_VERSION`) *(umgesetzt in `EasyVereinConfiguration.FromEnvironment()`)*
-- [ ] Die API-Version kann pro MCP-Tool-Aufruf als Parameter überschrieben werden *(Should – Infrastruktur vorhanden via `GetVersionedBaseUrl(override)`, aber noch nicht in Tools exponiert)*
+- [ ] Die API-Version kann pro MCP-Tool-Aufruf als Parameter überschrieben werden *(Should – Infrastruktur vorhanden via `GetVersionedBaseUrl(override)`, aber noch nicht in Tools exponiert)* → übernommen in [[068-doku-und-konfiguration-vervollstaendigen|US-0068 (#160)]]
 - [x] Bei einer nicht unterstützten API-Version wird eine Fehlermeldung mit Vorschlag der nächstmöglichen Version ausgegeben *(umgesetzt in `ApiVersion.Create()` mit `GetClosestVersion()`)*
-- [ ] Die Versionskonfiguration ist dokumentiert *(Should – noch nicht im README)*
+- [ ] Die Versionskonfiguration ist dokumentiert *(Should – noch nicht im README)* → übernommen in [[068-doku-und-konfiguration-vervollstaendigen|US-0068 (#160)]]
 
 ## Aufgaben
 
 - [x] **Versionsabstraktion implementieren** *(Value Object `ApiVersion` mit Validierung und Vorschlägen)*
 - [x] **Konfiguration umsetzen**: Umgebungsvariable als Standard *(`EASYVEREIN_API_VERSION`)*
-- [ ] **Parameter-Override** pro MCP-Tool-Aufruf implementieren
+- [ ] **Parameter-Override** pro MCP-Tool-Aufruf implementieren → übernommen in [[068-doku-und-konfiguration-vervollstaendigen|US-0068 (#160)]]
 - [x] **Fehlerbehandlung** bei ungültiger Version mit Vorschlag *(8 Tests in `ApiVersionTests`)*
 - [x] **Unterstützte Versionen pflegen** als fest hinterlegte Liste
-- [ ] **Dokumentation** der Versionskonfiguration im README ergänzen
+- [ ] **Dokumentation** der Versionskonfiguration im README ergänzen → übernommen in [[068-doku-und-konfiguration-vervollstaendigen|US-0068 (#160)]]
 
 ## Technische Hinweise
 
