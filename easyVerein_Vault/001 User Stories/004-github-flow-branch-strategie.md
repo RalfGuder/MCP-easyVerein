@@ -1,6 +1,7 @@
 # User Story 004: GitHub Flow als Branch-Strategie
 
 > **GitHub Issue:** [#4 – US-0004 GitHub Flow als Branch-Strategie](https://github.com/RalfGuder/MCP-easyVerein/issues/4)
+> **Status:** Abgeschlossen (2026-11-28)
 
 ## User Story
 
@@ -15,7 +16,7 @@
 - [x] Branch-Namenskonvention ist definiert: `feature/US-XXXX-kurzbeschreibung` bzw. `fix/kurzbeschreibung` *(angewandt und im README dokumentiert)*
 - [x] Änderungen werden über Pull Requests in `main` integriert *(PRs #7, #8, #9, #10)*
 - [x] CI/CD-Pipeline prüft Tests vor dem Merge *(`.github/workflows/build.yml` als PR-Check)*
-- [ ] Feature-Branches werden nach dem Merge gelöscht *(GitHub-Einstellung noch nicht konfiguriert)*
+- [x] Feature-Branches werden nach dem Merge gelöscht *(GitHub-Einstellung „Automatically delete head branches“ aktiv seit 2026-11-28)*
 - [x] Die Branch-Strategie ist im README dokumentiert *(README enthält Branch-Strategie-Abschnitt)*
 
 ## Aufgaben
@@ -23,8 +24,8 @@
 - [x] **GitHub Flow als Standard definieren** und dokumentieren
 - [x] **Branch-Namenskonvention festlegen** und dokumentieren
 - [x] **README erstellen/aktualisieren** mit Branch-Strategie-Abschnitt
-- [ ] **Branch-Schutzregeln** für `main` auf GitHub konfigurieren (optional)
-- [ ] **Auto-Delete** für Feature-Branches nach Merge aktivieren
+- [x] **Branch-Schutzregeln** für `main` auf GitHub konfigurieren (optional) *(aktiv seit 2026-04-22: PR-Pflicht, keine Force-Pushes, keine Löschung)*
+- [x] **Auto-Delete** für Feature-Branches nach Merge aktivieren *(2026-11-28)*
 
 ## Technische Hinweise
 
