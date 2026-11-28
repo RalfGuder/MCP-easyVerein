@@ -1,44 +1,39 @@
-# User Story 068: Dokumentation und Konfiguration vervollständigen
+# User Story 068: Dokumentation vervollständigen und Konfigurationsbeispiele korrigieren
 
-> **GitHub Issue:** [#160 – US-0068 Dokumentation und Konfiguration vervollständigen](https://github.com/RalfGuder/MCP-easyVerein/issues/160)
+> **GitHub Issue:** [#160 – US-0068 Dokumentation vervollständigen und Konfigurationsbeispiele korrigieren](https://github.com/RalfGuder/MCP-easyVerein/issues/160)
+> **Spec:** `features/US-0068-doku-konfiguration-docker/spec.md` (Vertrag für die Software Factory)
 > **Herkunft:** Restpunkte aus [[001-easyverein-mcp-server|US-0001 (#1)]], [[005-verschiedene-api-versionen|US-0005 (#5)]] und [[006-technische-entscheidung-csharp|US-0006 (#6)]] (am 2026-11-28 geschlossen)
+> **Aufgeteilt am 2026-11-28:** [[069-konfigurationsdatei|US-0069 Konfigurationsdatei]], [[070-api-version-pro-aufruf|US-0070 API-Version pro Lese-Aufruf]], [[071-http-transport-lokal|US-0071 Lokaler HTTP-Transport]]
 
 ## User Story
 
 **Als** Betreiber und Entwickler des MCP-Servers,
-**möchte ich** eine vollständige Dokumentation zu Konfiguration, API-Versionen und Projektaufbau sowie flexiblere Konfigurations- und Transportwege,
-**damit** ich den Server ohne Blick in den Code einrichten und erweitern kann und ihn auch außerhalb von stdio und Umgebungsvariablen betreiben kann.
+**möchte ich** im README nachlesen können, wie der Server konfiguriert und gestartet wird, wie er aufgebaut ist und welche Endpoints er anbietet, und Beispiele, die wirklich funktionieren,
+**damit** ich den Server ohne Blick in den Code einrichten und erweitern kann.
 
 ## Akzeptanzkriterien
 
-### Dokumentation
+Kurzfassung, verbindlich ist die Spec (AK-1 bis AK-13):
 
-- [ ] Das README hat einen Abschnitt **Konfiguration**: CLI-Parameter (`--api-key`, `--api-url`, `--api-version`), Umgebungsvariablen (`EASYVEREIN_API_KEY`, `EASYVEREIN_API_URL`, `EASYVEREIN_API_VERSION`), Defaults (URL `https://easyverein.com/api`, Version `v2.0`) und die Priorität (CLI vor Umgebung vor Default). *(aus #5)*
-- [ ] Das README listet die unterstützten API-Versionen (v1.4, v1.5, v1.6, v1.7, v2.0) und beschreibt die Fehlermeldung mit Vorschlag der nächstmöglichen Version. *(aus #5)*
-- [ ] Das README hat einen Abschnitt **Projektstruktur**: die vier Schichten Domain, Application, Infrastructure, Server, ihre Abhängigkeitsrichtung und das Muster für neue Endpoints. *(aus #6)*
-- [ ] Die Entscheidung für C# / .NET 8 ist als ADR dokumentiert (Kontext, Entscheidung, Alternativen, Konsequenzen). *(aus #6)*
-- [ ] README und `Dockerfile` verwenden `EASYVEREIN_API_KEY` statt `EASYVEREIN_API_TOKEN`. Das Docker-Beispiel aus dem README startet den Server mit gültigem Schlüssel.
-
-### Konfiguration und Transport
-
-- [ ] Die Konfiguration kann alternativ aus einer Konfigurationsdatei kommen. *(aus #1, Should)*
-- [ ] Die API-Version kann pro MCP-Tool-Aufruf überschrieben werden. *(aus #5, Should; Infrastruktur vorhanden über `GetVersionedBaseUrl(override)`)*
-- [ ] Der MCP-Server ist zusätzlich über SSE bzw. HTTP erreichbar; stdio bleibt der Standard. *(aus #1, Could)*
+- [ ] README-Abschnitt **Konfiguration**: CLI-Parameter, Umgebungsvariablen, Defaults, Priorität, `--help`, Schlüssel ohne `Bearer `-Präfix
+- [ ] README: unterstützte API-Versionen v1.4–v2.0, Standard v2.0, Fehlermeldung mit Vorschlag
+- [ ] README: Docker-Beispiel mit `-i --rm -e EASYVEREIN_API_KEY` und `.mcp.json`-Eintrag für den Container; nativer Start mit `--project`
+- [ ] README-Abschnitt **Projektstruktur**: vier Schichten, Abhängigkeitsrichtung, fünf Schritte für neue Endpoints
+- [ ] README: Tabelle aller Endpoints mit Operationen
+- [ ] `Dockerfile` setzt `EASYVEREIN_API_KEY` und `EASYVEREIN_API_URL` (statt `…_API_TOKEN`, `…_BASE_URL`)
+- [ ] `.mcp.json.example` ohne `Bearer `-Präfix
+- [ ] ADR `docs/adr/0001-csharp-dotnet8.md`
+- [ ] Schlüssel mit `Bearer `-Präfix wird toleriert (Präfix wird entfernt)
 
 ## Aufgaben
 
-- Spec mit `/write-spec` schreiben (offene Fragen siehe unten), danach Übergabe an die Software Factory
-- README: Abschnitte Konfiguration, API-Versionen, Projektstruktur
-- ADR anlegen
-- `Dockerfile` und README auf `EASYVEREIN_API_KEY` korrigieren
-- Konfigurationsdatei, Versions-Override und SSE nach Spec umsetzen (TDD)
+- Übergabe an die Software Factory (Issue #160)
+- Nach dem Merge: Spec-Status und diese Story nachziehen
 
 ## Technische Hinweise
 
-- **Gefundener Fehler:** `Dockerfile:22` setzt `ENV EASYVEREIN_API_TOKEN=""`, `README.md:17` zeigt `docker run --env EASYVEREIN_API_TOKEN=<token>`. Der Code liest `EASYVEREIN_API_KEY` (`EasyVereinConfiguration.EnvironmentVariableApiKey`). Das dokumentierte Docker-Beispiel funktioniert deshalb nicht.
-- Offene Fragen für die Spec:
-  - Konfigurationsdatei: Format (JSON?), Ort (Arbeitsverzeichnis, Benutzerprofil, `--config <pfad>`?), Rang in der Priorität (zwischen Umgebung und Default?). Der API-Schlüssel darf nicht versehentlich ins Repo gelangen.
-  - Versions-Override: optionaler Parameter `apiVersion` an jedem Tool (rund 120 Tools) oder nur an ausgewählten? Neue Tool-Parameter immer mit Standardwert anlegen (Lehre aus PR #133).
-  - SSE: Das MCP SDK v1.2.0 bietet HTTP-Transport über ASP.NET Core. Port, Bindung nur an `localhost`, Authentifizierung? Auswahl per `--transport stdio|http`?
-  - Ablageort der ADR (`docs/adr/` oder `easyVerein_Vault/`).
+- **Gefundene Fehler (2026-11-28):**
+  - `Dockerfile` setzt `EASYVEREIN_API_TOKEN` und `EASYVEREIN_BASE_URL`, der Code liest `EASYVEREIN_API_KEY` und `EASYVEREIN_API_URL`.
+  - Das README-Beispiel `docker run` ohne `-i` beendet den stdio-Server sofort.
+  - `.mcp.json.example` erzeugt `Bearer Bearer …`, weil der Client das Präfix selbst setzt (`EasyVereinApiClient.cs:44`).
 - Die Factory darf laut `docs/stack.md` `.github/workflows`, `Konten.md` und Daily Notes nicht ändern; README, `Dockerfile`, `docs/` und `src/` sind erlaubt.
