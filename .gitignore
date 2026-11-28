@@ -430,3 +430,9 @@ easyVerein_Vault/.obsidian/
 # Claude Code runtime state
 .claude/scheduled_tasks.lock
 
+# Lokale Claude-Code-Erweiterungen (nicht versioniert)
+.claude/commands/
+.claude/skills/Beispieldaten_Entwurf.lnk
+.claude/skills/excalidraw-diagram/
+.claude/skills/projekt-aufwandsschaetzung/
+.claude/skills/remotion-best-practices/
