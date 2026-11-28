@@ -40,6 +40,60 @@ public class EasyVereinApiClientTests
             v => v == "Bearer my-secret-token");
     }
 
+    /// <summary>
+    /// A configured key with or without a "Bearer " prefix (any casing, extra whitespace)
+    /// results in exactly one "Bearer " prefix in the Authorization header (US-0068 AK-12, AK-13, EC-1, EC-2, EC-4).
+    /// </summary>
+    [Theory]
+    [InlineData("abc123", "Bearer abc123")]
+    [InlineData("Bearer abc123", "Bearer abc123")]
+    [InlineData("bearer abc123", "Bearer abc123")]
+    [InlineData("BEARER abc123", "Bearer abc123")]
+    [InlineData("  Bearer   abc123 ", "Bearer abc123")]
+    [InlineData("Bearer\tabc123", "Bearer abc123")]
+    [InlineData("Bearerxyz", "Bearer Bearerxyz")]
+    public void Constructor_NormalizesBearerPrefix(string configuredKey, string expectedHeader)
+    {
+        var httpClient = new HttpClient(new FakeHttpHandler(HttpStatusCode.OK, "{}"));
+        var config = new EasyVereinConfiguration { ApiKey = configuredKey };
+
+        _ = new EasyVereinApiClient(httpClient, config);
+
+        Assert.Equal(expectedHeader, Assert.Single(httpClient.DefaultRequestHeaders.GetValues("Authorization")));
+    }
+
+    /// <summary>
+    /// A key consisting only of the prefix is treated like an empty key (US-0068 EC-3).
+    /// </summary>
+    [Theory]
+    [InlineData("Bearer")]
+    [InlineData("Bearer ")]
+    [InlineData("  bearer  ")]
+    public void Constructor_PrefixOnlyKey_BehavesLikeEmptyKey(string configuredKey)
+    {
+        var emptyClient = new HttpClient(new FakeHttpHandler(HttpStatusCode.OK, "{}"));
+        _ = new EasyVereinApiClient(emptyClient, new EasyVereinConfiguration { ApiKey = string.Empty });
+        var prefixClient = new HttpClient(new FakeHttpHandler(HttpStatusCode.OK, "{}"));
+        _ = new EasyVereinApiClient(prefixClient, new EasyVereinConfiguration { ApiKey = configuredKey });
+
+        Assert.Equal(
+            emptyClient.DefaultRequestHeaders.GetValues("Authorization"),
+            prefixClient.DefaultRequestHeaders.GetValues("Authorization"));
+    }
+
+    /// <summary>NormalizeApiKey strips the prefix and whitespace and leaves other keys unchanged.</summary>
+    [Theory]
+    [InlineData(null, "")]
+    [InlineData("", "")]
+    [InlineData("Bearer", "")]
+    [InlineData("Bearer abc", "abc")]
+    [InlineData("Bearerxyz", "Bearerxyz")]
+    [InlineData(" abc ", "abc")]
+    public void NormalizeApiKey_ReturnsKeyWithoutPrefix(string? input, string expected)
+    {
+        Assert.Equal(expected, EasyVereinApiClient.NormalizeApiKey(input));
+    }
+
     // ------------------------------------------------------------------ //
     // Members
     // ------------------------------------------------------------------ //
