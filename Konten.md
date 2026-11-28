@@ -2,6 +2,8 @@
 
 ## Buchungskonten (SKR42)
 
+> **Hinweis (2026-11-15):** Kontonummern und -namen mit dem SKR42-Kontenplan in easyVerein abgeglichen. Frühere „(Vorschlag)“-Nummern waren im SKR42 bereits anders belegt und sind korrigiert. Bankgebühren gehören auf **68550 Nebenkosten des Geldverkehrs**.
+
 ### Ideeller Bereich
 
 | Konto | Bezeichnung |
@@ -15,12 +17,12 @@
 | 40600 | Sachzuwendungen ohne Zuwendungsbestätigung |
 | 48280 | Zuschüsse von Verbänden und Behörden |
 | 48290 | Sonstige Zuschüsse |
-| 40700 | Zweckgebundene Spenden (Vorschlag) |
-| 40750 | Projektbezogene Spendenaktionen (Vorschlag) |
-| 68500 | Reisekosten Ehrenamtliche (Vorschlag) |
-| 68550 | Fortbildung Ehrenamtliche (Vorschlag) |
-| 68600 | Bank- und Zahlungsverkehrskosten (Vorschlag) |
-| 68700 | Software- und IT-Kosten (Vorschlag) |
+| 40700 | Aufwandszuwendungen ohne Zuwendungsbestätigung (SKR42; früherer Vorschlag „Zweckgebundene Spenden“ ungültig) |
+| 40750 | Ertrag aus Spendenverbrauch (SKR42; früherer Vorschlag „Projektbezogene Spendenaktionen“ ungültig) |
+| 68500 | Sonstiger Betriebsbedarf (SKR42; früherer Vorschlag „Reisekosten Ehrenamtliche“ ungültig) |
+| 68550 | Nebenkosten des Geldverkehrs (SKR42; früherer Vorschlag „Fortbildung Ehrenamtliche“ ungültig) |
+| 68600 | Nicht abziehbare Vorsteuer (SKR42; früherer Vorschlag „Bank- und Zahlungsverkehrskosten“ ungültig) |
+| 68700 | Software- und IT-Kosten (Vorschlag, in easyVerein nicht angelegt) |
 
 ### Vermögensverwaltung
 
@@ -36,12 +38,12 @@
 | 64600 | Reparaturen und Instandhaltung von technischen Anlagen und Maschinen |
 | 64850 | Reparaturen und Instandhaltung von anderen Anlagen |
 | 64900 | Sonstige Reparaturen und Instandhaltungen |
-| 48620 | Erlöse aus Umlagen/Nebenkosten (Vorschlag) |
-| 63260 | Müllabfuhr und Entsorgung (Vorschlag) |
-| 63360 | Garten- und Außenanlagenpflege (Vorschlag) |
-| 64950 | Kleinreparaturen Gebäude (Vorschlag) |
-| 68510 | Grundsteuer und kommunale Abgaben (Vorschlag) |
-| 68610 | Hausverwaltung und Objektbetreuung (Vorschlag) |
+| 48620 | Erlöse aus Vermietung und Verpachtung 19 % USt (SKR42; früherer Vorschlag „Erlöse aus Umlagen/Nebenkosten“ ungültig) |
+| 63260 | Müllabfuhr und Entsorgung (Vorschlag, in easyVerein nicht angelegt) |
+| 63360 | Garten- und Außenanlagenpflege (Vorschlag, in easyVerein nicht angelegt) |
+| 64950 | Wartungskosten für Hard- und Software (SKR42; früherer Vorschlag „Kleinreparaturen Gebäude“ ungültig) |
+| 68510 | Grundsteuer und kommunale Abgaben (Vorschlag, in easyVerein nicht angelegt) |
+| 68610 | Hausverwaltung und Objektbetreuung (Vorschlag, in easyVerein nicht angelegt) |
 | 68000 | Porto |
 
 ### Zweckbetrieb
@@ -71,12 +73,12 @@
 | 68100 | Internetkosten |
 | 68150 | Bürobedarf |
 | 68450 | Werkzeuge und Kleingeräte |
-| 42050 | Erlöse aus Kurs- und Workshopgebühren (Vorschlag) |
-| 42100 | Erlöse aus Teilnehmerpauschalen (Vorschlag) |
-| 66500 | GEMA/GVL und Lizenzgebühren (Vorschlag) |
-| 66600 | Künstler- und Referentenhonorare (Vorschlag) |
-| 66700 | Technik- und Bühnenmiete (Vorschlag) |
-| 68300 | Ticket-/Vorverkaufs- und Zahlungsgebühren (Vorschlag) |
+| 42050 | Erlöse aus Veranstaltungen (SKR42; früherer Vorschlag „Erlöse aus Kurs- und Workshopgebühren“ ungültig) |
+| 42100 | Erlöse aus Teilnehmerpauschalen (Vorschlag, in easyVerein nicht angelegt) |
+| 66500 | Reisekosten (SKR42; früherer Vorschlag „GEMA/GVL und Lizenzgebühren“ ungültig) |
+| 66600 | Reisekosten Übernachtungsaufwand (SKR42; früherer Vorschlag „Künstler- und Referentenhonorare“ ungültig) |
+| 66700 | Technik- und Bühnenmiete (Vorschlag, in easyVerein nicht angelegt) |
+| 68300 | Buchführungskosten (SKR42; früherer Vorschlag „Ticket-/Vorverkaufs- und Zahlungsgebühren“ ungültig) |
 
 ### Steuerpflichtiger wirtschaftlicher Geschäftsbetrieb (wGB)
 
@@ -90,12 +92,12 @@
 | 53470 | Wareneingang 7 % Vorsteuer |
 | 54000 | Wareneingang 19 % Vorsteuer |
 | 54180 | Wareneingang 19 % Vorsteuer |
-| 43100 | Erlöse Speisen 7% USt. (Vorschlag) |
-| 44100 | Erlöse Getränke 19% USt. (Vorschlag) |
-| 44200 | Erlöse Merchandising 19% USt. (Vorschlag) |
-| 54200 | Verpackung/Einwegmaterial 19 % Vorsteuer (Vorschlag) |
-| 66200 | Verkaufsprovisionen und Plattformgebühren (Vorschlag) |
-| 66250 | EC-/Kreditkartengebühren (Vorschlag) |
+| 43100 | Erlöse Speisen 7% USt. (Vorschlag, in easyVerein nicht angelegt) |
+| 44100 | Erlöse Getränke 19% USt. (Vorschlag, in easyVerein nicht angelegt) |
+| 44200 | Reserviertes Konto (SKR42; früherer Vorschlag „Erlöse Merchandising 19% USt.“ ungültig) |
+| 54200 | Innergemeinschaftlicher Erwerb 7 % Vorsteuer und 7 % Umsatzsteuer (SKR42; früherer Vorschlag „Verpackung/Einwegmaterial 19 % Vorsteuer“ ungültig) |
+| 66200 | Geschenke nicht abzugsfähig ohne § 37b EStG (SKR42; früherer Vorschlag „Verkaufsprovisionen und Plattformgebühren“ ungültig) |
+| 66250 | Geschenke ausschließlich betrieblich genutzt (SKR42; früherer Vorschlag „EC-/Kreditkartengebühren“ ungültig) |
 
 ## Kostenstellen
 
@@ -204,6 +206,13 @@
 | 4722 | Kindertag - Einnahmen: Erlös Speisen/Getränke |
 | 4723 | Kindertag - Einnahmen: sonstige Einnahmen |
 | 4724 | Kindertag - Ausgaben: Wareneinkauf |
+| 4730 | Silvester – Gesellige Veranstaltung |
+| 4731 | Silvester – Einnahmen: Eintrittsgelder |
+| 4732 | Silvester - Einnahmen: Erlös Speisen/Getränke |
+| 4733 | Silvester - Einnahmen: Sonstige Einnahmen |
+| 4734 | Silvester - Ausgaben: Wareneinkauf |
+| 4735 | Silvester - Ausgaben: Musik |
+| 4736 | Silvester - Ausgaben: Sonstige Ausgaben |
 | 4800 | Maler – Gesellige Veranstaltungen |
 | 4900 | Kulturverein – Gesellige Veranstaltungen |
 
